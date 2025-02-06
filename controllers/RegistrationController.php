@@ -33,18 +33,17 @@ class RegistrationController extends Controller
         Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
 
         $request = Yii::$app->request;
-        $data = $request->post();
+        $data = json_decode($request->getRawBody(), true); // ใช้ getRawBody() แทน post()
 
         if (empty($data) || !isset($data['rows'])) {
             return ['status' => 'error', 'message' => 'No valid data received'];
         }
 
-        $rows = $data['rows']; // สมมติว่าโครงสร้าง JSON ที่รับมาเป็น { "rows": [...] }
+        $rows = $data['rows'];
         $errors = [];
 
-        // กำหนดชื่อฟิลด์ตามตาราง Participants
         $fields = [
-            '_id',
+            //'_id',
             'first_name',
             'last_name',
             'email',
@@ -100,32 +99,33 @@ class RegistrationController extends Controller
             'pickup_at'
         ];
 
+
+
         foreach ($rows as $index => $row) {
-            // ข้าม Header (ถ้ามี)
-            if ($index === 0 || (isset($row[0]) && $row[0] === 'No.')) {
-                continue;
-            }
-
-            // ตรวจสอบว่าจำนวนข้อมูลตรงกับจำนวนฟิลด์ที่กำหนดไว้
             if (count($row) !== count($fields)) {
-                $errors[] = "Row $index: Data does not match the expected structure";
+                Yii::debug(["Row Index" => $index, "Row Data" => $row, "Expected Fields" => count($fields)], 'debug');
+                file_put_contents('debug.log', json_encode(["Row Index" => $index, "Row Data" => $row, "Expected Fields" => count($fields)], JSON_PRETTY_PRINT), FILE_APPEND);
+                continue;
+            }
+            if ($index === 0 || (isset($row[0]) && $row[0] === '_id')) {
                 continue;
             }
 
-            // แมปค่าจาก CSV เป็น associative array ตามชื่อฟิลด์ในฐานข้อมูล
-            $rowData = array_combine($fields, $row);
+            if (count($row) !== count($fields)) {
+                //    var_dump($row);
+                //  exit;
+                $errors[] = ["row" => $index + 1, "message" => "Data does not match the expected structure"];
+                continue;
+            }
 
+            $rowData = array_combine($fields, $row);
             $model = new Participants();
             $model->attributes = $rowData;
 
             if (!$model->save()) {
-                $errors[] = [
-                    'row' => $index + 1,
-                    'errors' => $model->errors
-                ];
+                $errors[] = ["row" => $index + 1, "errors" => $model->errors];
             }
         }
-
 
         if (!empty($errors)) {
             return ['status' => 'error', 'errors' => $errors];

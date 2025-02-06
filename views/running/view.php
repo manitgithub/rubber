@@ -50,16 +50,9 @@ $this->params['breadcrumbs'][] = $this->title;
     // เมื่อผู้ใช้เลือกไฟล์
     fileInput.addEventListener('change', function(e) {
         const file = e.target.files[0];
-        if (file) {
-            // แสดงปุ่มยืนยันอัพโหลด
-            confirmUploadButton.style.display = 'block';
-        } else {
-            // ซ่อนปุ่มยืนยันอัพโหลดถ้าไม่มีไฟล์
-            confirmUploadButton.style.display = 'none';
-        }
+        confirmUploadButton.style.display = file ? 'block' : 'none';
     });
 
-    // เมื่อคลิกปุ่มยืนยันอัพโหลด
     // เมื่อคลิกปุ่มยืนยันอัพโหลด
     confirmUploadButton.addEventListener('click', function() {
         const file = fileInput.files[0];
@@ -91,34 +84,43 @@ $this->params['breadcrumbs'][] = $this->title;
             table.innerHTML = `<tr><td>จำนวนแถวทั้งหมด: ${rowCount}</td></tr>`;
 
             // ส่งข้อมูลไปยังเซิร์ฟเวอร์
-            fetch('/registration/save-data', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Accept': 'application/json' // แจ้งว่าเราต้องการ JSON กลับ
-                    },
-                    body: JSON.stringify(jsonData) // ส่งข้อมูลตรง ๆ ไม่ต้องใส่ { jsonData }
-                })
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error(`HTTP error! Status: ${response.status}`);
-                    }
-                    return response.json(); // แปลงเป็น JSON
-                })
-                .then(result => {
-                    console.log('บันทึกข้อมูลสำเร็จ:', result);
-                })
-                .catch(error => {
-                    console.error('เกิดข้อผิดพลาด:', error);
-                });
-
-
-            // แสดงข้อความสำเร็จ
-            alert(`อัพโหลดสำเร็จ! จำนวนแถว: ${rowCount}`);
+            sendDataToServer(jsonData, rowCount);
         };
 
         reader.readAsArrayBuffer(file);
     });
+
+    // ฟังก์ชันส่งข้อมูลไปยังเซิร์ฟเวอร์
+    function sendDataToServer(data, rowCount) {
+        fetch('/registration/save-data', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json' // แจ้งว่าเราต้องการ JSON กลับ
+                },
+                body: JSON.stringify({
+                    rows: data
+                }) // ห่อข้อมูลใน key "rows"
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+                return response.json(); // แปลงเป็น JSON
+            })
+            .then(result => {
+                if (result.status === 'success') {
+                    alert(`อัพโหลดสำเร็จ! จำนวนแถว: ${rowCount}`);
+                } else {
+                    console.error('ข้อผิดพลาดจากเซิร์ฟเวอร์:', result.errors);
+                    alert(`เกิดข้อผิดพลาดในการบันทึกข้อมูล: ${JSON.stringify(result.errors)}`);
+                }
+            })
+            .catch(error => {
+                console.error('เกิดข้อผิดพลาด:', error);
+                alert(`เกิดข้อผิดพลาดในการอัพโหลด: ${error.message}`);
+            });
+    }
     </script>
 
     <!-- รวมไลบรารี SheetJS -->
