@@ -172,6 +172,24 @@ class RunningController extends Controller
         }
     }
 
+    public function actionShowRunning($id)
+    {
+        Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+
+        $sql = "SELECT SUM(CASE WHEN status = 1 THEN 1 ELSE 0 END) AS pick, SUM(CASE WHEN status = 0 THEN 1 ELSE 0 END) AS notpick FROM participants WHERE runningid = $id;";
+        $result = Yii::$app->db->createCommand($sql)->queryOne();
+        $report = [];
+        $report['main'] = $result;
+        /** 
+        $sql2 = "SELECT SUM(CASE WHEN status = 1 THEN 1 ELSE 0 END) AS pick, SUM(CASE WHEN status = 0 THEN 1 ELSE 0 END) AS notpick,age_category FROM participants WHERE runningid = $id GROUP BY age_category;";
+        $result2 = Yii::$app->db->createCommand($sql2)->queryAll();
+
+        $report['age'] = $result2;
+         */
+        return $report;
+    }
+
+
     /**
      * Finds the Running model based on its primary key value.
      * If the model is not found, a 404 HTTP exception will be thrown.

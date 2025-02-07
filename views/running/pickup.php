@@ -36,13 +36,12 @@ $this->params['breadcrumbs'][] = $this->title;
                         <div class="row h-100">
                             <div class="col-auto pr-0">
                                 <div class="avatar avatar-60 no-shadow border-0">
-                                    <div class="overlay gradient-danger"></div>
-                                    <i class="material-icons text-danger">favorite</i>
+                                    <div class="overlay gradient-info"></div>
+                                    <i class="material-icons text-info">directions_run</i>
                                 </div>
                             </div>
                             <div class="col">
-                                <p>$ 150.00<br><small class="text-secondary">Medical Treatment</small></p>
-                                <p class="text-secondary text-mute small">แยกรุ่นอายุ</p>
+                                <font id="total" style="font-size: 1.5rem;">0 </font><br>ทั้งหมด
                             </div>
                         </div>
                     </div>
@@ -55,12 +54,11 @@ $this->params['breadcrumbs'][] = $this->title;
                             <div class="col-auto pr-0">
                                 <div class="avatar avatar-60 no-shadow border-0">
                                     <div class="overlay gradient-success"></div>
-                                    <i class="material-icons text-success">pets</i>
+                                    <i class="material-icons text-success">widgets</i>
                                 </div>
                             </div>
                             <div class="col">
-                                <p>$ 100.00<br><small class="text-secondary">Pets Food</small></p>
-                                <p class="text-secondary text-mute small">แยกระยะวิ่ง</p>
+                                <font id="pick" style="font-size: 1.5rem;">0 </font><br>รับแล้ว
                             </div>
                         </div>
                     </div>
@@ -72,31 +70,12 @@ $this->params['breadcrumbs'][] = $this->title;
                         <div class="row h-100">
                             <div class="col-auto pr-0">
                                 <div class="avatar avatar-60 no-shadow border-0">
-                                    <div class="overlay gradient-warning"></div>
-                                    <i class="material-icons text-warning">directions_car</i>
+                                    <div class="overlay gradient-danger"></div>
+                                    <i class="material-icons text-danger">cancel</i>
                                 </div>
                             </div>
                             <div class="col">
-                                <p>$ 150.00<br><small class="text-secondary">Transportation</small></p>
-                                <p class="text-secondary text-mute small">แยกชาย-หญิง</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="swiper-slide">
-                <div class="card shadow border-0">
-                    <div class="card-body">
-                        <div class="row h-100">
-                            <div class="col-auto pr-0">
-                                <div class="avatar avatar-60 no-shadow border-0">
-                                    <div class="overlay gradient-warning"></div>
-                                    <i class="material-icons text-warning">directions_car</i>
-                                </div>
-                            </div>
-                            <div class="col">
-                                <p>$ 150.00<br><small class="text-secondary">Transportation</small></p>
-                                <p class="text-secondary text-mute small">รวมทั้งหมด</p>
+                                <font id="notpick" style="font-size: 1.5rem;">0 </font><br>ยังไม่ได้รับ
                             </div>
                         </div>
                     </div>
@@ -118,6 +97,33 @@ $this->params['breadcrumbs'][] = $this->title;
         <div id="participants"></div>
 
         <script type="text/javascript">
+            document.addEventListener("DOMContentLoaded", function() {
+                function fetchData() {
+                    $.ajax({
+                        url: "<?= Url::to(['/running/show-running', 'id' => $model->id]) ?>",
+                        type: "GET",
+                        dataType: "json",
+                        success: function(response) {
+                            let pick = response.main.pick;
+                            let notpick = response.main.notpick;
+                            let total = parseInt(pick) + parseInt(notpick);
+                            console.log(response);
+
+                            $("#pick").text(pick);
+                            $("#notpick").text(notpick);
+                            $("#total").text(total);
+                        },
+                        error: function(xhr, status, error) {
+                            console.error("เกิดข้อผิดพลาดในการโหลดข้อมูล:", error);
+                        }
+                    });
+                }
+
+                fetchData(); // เรียกใช้งานตอนโหลดหน้าเว็บ
+                setInterval(fetchData, 5000); // อัปเดตข้อมูลทุก 5 วินาที
+            });
+
+
             function updateParticipant() {
                 var nationId = document.getElementById('nationId').value;
                 var runningId = <?= $model->id ?>;
@@ -138,9 +144,13 @@ $this->params['breadcrumbs'][] = $this->title;
                                 timer: 1500
                             });
 
-                            readtable(response.data);
                             var participants = response.data;
                             readtable(participants);
+
+                            document.getElementById('nationId').value = '';
+                            document.getElementById('nationId').focus();
+
+
                             document.getElementById('participants').innerHTML = htmlContent;
                         } else {
                             Swal.fire({
@@ -152,8 +162,11 @@ $this->params['breadcrumbs'][] = $this->title;
                             });
                             document.getElementById('participants').innerHTML =
                                 `<p style="color: red;">${response.message}</p>`;
+                            document.getElementById('nationId').value = '';
+                            document.getElementById('nationId').focus();
+
                             var participants = response.data;
-                            readtable(participants);
+                            //readtable(participants);
                         }
                     },
                     error: function() {
@@ -164,35 +177,37 @@ $this->params['breadcrumbs'][] = $this->title;
             }
 
             function readtable(data) {
-                var htmlContent = `<h3>รายชื่อผู้เข้าร่วม</h3><table border="1" cellspacing="0" cellpadding="5" class="table table-striped table-bordered datatable">
-                        <tr>
-                                                    <th>BIB</th>
-                            <th>ชื่อ-นามสกุล</th>
-                            <th>Email</th>
-                            <th>เพศ</th>
-                            <th>โทรศัพท์</th>
-                            <th>ประเภทตั๋ว</th>
-                            <th>shirt_type</th>
-                            <th>Size</th>
-                            <th>พิมพ์ใบรับของ</th>
-                        </tr>`;
+                var htmlContent = `<h3>รายชื่อผู้เข้าร่วม</h3>
+        <table border="1" cellspacing="0" cellpadding="5" class="table table-striped table-bordered datatable">
+            <tr>
+                <th>BIB</th>
+                <th>ชื่อ-นามสกุล</th>
+                <th>Email</th>
+                <th>เพศ</th>
+                <th>โทรศัพท์</th>
+                <th>ประเภทตั๋ว</th>
+                <th>shirt_type</th>
+                <th>Size</th>
+                <th>พิมพ์ใบรับของ</th>
+            </tr>`;
 
                 data.forEach((data, index) => {
                     htmlContent += `
-                        <tr>
-                            <td>${data.bib_number}</td>
-                            <td>${data.first_name} ${data.last_name}</td>
-                            <td>${data.email}</td>
-                            <td>${data.gender}</td>
-                            <td>${data.participant_telephone}</td>
-                            <td>${data.ticket_type}</td>
-                            <td>${data.shirt_type}</td>
-                            <td>${data.shirt}</td>
-                            <td><button onclick="printReceipt(${data.id})" class="btn btn-primary">พิมพ์</button></td>
-                        </tr>`;
+            <tr>
+                <td>${data.bib_number}</td>
+                <td>${data.first_name} ${data.last_name}</td>
+                <td>${data.email}</td>
+                <td>${data.gender}</td>
+                <td>${data.participant_telephone}</td>
+                <td>${data.ticket_type}</td>
+                <td>${data.shirt_type}</td>
+                <td>${data.shirt}</td>
+                <td><button onclick="printReceipt(${data.id})" class="btn btn-primary">พิมพ์</button></td>
+            </tr>`;
                 });
 
-                htmlContent += `</table>`;
+                htmlContent += `
+        </table>`;
                 document.getElementById('participants').innerHTML = htmlContent;
             }
 
@@ -200,11 +215,6 @@ $this->params['breadcrumbs'][] = $this->title;
                 window.open('<?= Url::to(['participants/printreceipt']) ?>?id=' + id, '_blank');
             }
         </script>
-
-
-
-
-
     </div>
 </div>
 
