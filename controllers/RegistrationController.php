@@ -21,9 +21,6 @@ class RegistrationController extends Controller
             ],
             'verbs' => [
                 'class' => VerbFilter::class,
-                'actions' => [
-                    'save-data' => ['POST'],
-                ],
             ],
         ];
     }
@@ -38,91 +35,56 @@ class RegistrationController extends Controller
         if (empty($data) || !isset($data['rows'])) {
             return ['status' => 'error', 'message' => 'No valid data received'];
         }
-
         $rows = $data['rows'];
         $errors = [];
+        $runningId = $data['running'];
 
-        $fields = [
-            //'_id',
-            'first_name',
-            'last_name',
-            'email',
-            'gender',
-            'participant_telephone',
-            'birthDate',
-            'age_category',
-            'bib_number',
-            'health_issues',
-            'emergency_contact',
-            'emergency_contact_relationship',
-            'emergency_contact_phone',
-            'province',
-            'nationalId',
-            'shirt',
-            'shirt_type',
-            'reg_deliver_option',
-            'reg_deliver_to_street',
-            'reg_deliver_to_locality',
-            'reg_deliver_to_city',
-            'reg_deliver_to_recipient',
-            'reg_deliver_to_telephone',
-            'reg_deliver_to_postalCode',
-            'reg_deliver_to_address',
-            'reg_deliver_to_province',
-            'remarks',
-            'delivery',
-            'deliver_to_recipient',
-            'deliver_to_address',
-            'reg_status',
-            'group_name',
-            'registration_date',
-            'registration_type',
-            'ticket_type',
-            'race',
-            'price',
-            'user_code',
-            'payment_method',
-            'payment_amount',
-            'payment_date',
-            'payment_reference',
-            'registration_id',
-            'participant_id',
-            'payment_id',
-            'codes',
-            'tracking_code',
-            'registration_code',
-            'start_date',
-            'ticket_code',
-            'image_other_url',
-            'pickup_status',
-            'pickup_id',
-            'pickup_at'
+        $mapFields = [
+            'first_name' => 0,
+            'last_name' => 1,
+            'email' => 2,
+            'gender' => 3,
+            'participant_telephone' => 4,
+            'birthDate' => 5,
+            'age_category' => 6,
+            'bib_number' => 7,
+            'health_issues' => 9,
+            'emergency_contact' => 10,
+            'emergency_contact_relationship' => 11,
+            'emergency_contact_phone' => 12,
+            'province' => 13,
+            'nationalId' => 14,
+            'shirt' => 15,
+            'shirt_type' => 16,
+            'reg_deliver_option' => 17,
+            'race' => 18,
+            'ticket_type' => 19,
+            'price' => 21,
+            'ticket_code' => 22,
+            'user_code' => 22,
+            'start_date' => 23,
+            'picktime' => 24,
         ];
 
-
-
         foreach ($rows as $index => $row) {
-            if (count($row) !== count($fields)) {
-                Yii::debug(["Row Index" => $index, "Row Data" => $row, "Expected Fields" => count($fields)], 'debug');
-                file_put_contents('debug.log', json_encode(["Row Index" => $index, "Row Data" => $row, "Expected Fields" => count($fields)], JSON_PRETTY_PRINT), FILE_APPEND);
-                continue;
-            }
-            if ($index === 0 || (isset($row[0]) && $row[0] === '_id')) {
+            // ข้ามแถวแรกถ้าข้อมูลอาจเป็น header
+            if ($index === 0 || (isset($row[0]) && strtolower($row[0]) === '_id')) {
                 continue;
             }
 
-            if (count($row) !== count($fields)) {
-                //    var_dump($row);
-                //  exit;
-                $errors[] = ["row" => $index + 1, "message" => "Data does not match the expected structure"];
+            if (!is_array($row)) {
+                $errors[] = ["row" => $index + 1, "errors" => "Invalid row format"];
                 continue;
             }
 
-            $rowData = array_combine($fields, $row);
             $model = new Participants();
-            $model->attributes = $rowData;
 
-            if (!$model->save()) {
+            foreach ($mapFields as $field => $position) {
+                $model->$field = isset($row[$position]) ? trim($row[$position]) : null;
+            }
+            $model->runningid = $runningId;
+
+            if (!$model->save(false)) {
                 $errors[] = ["row" => $index + 1, "errors" => $model->errors];
             }
         }

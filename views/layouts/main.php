@@ -30,18 +30,18 @@ $this->registerLinkTag(['rel' => 'icon', 'type' => 'image/x-icon', 'href' => Yii
     <link href="<?= Url::base() ?>/manifest.json" rel="manifest">
     <?php $this->head() ?>
     <style type="text/css">
-        .help-block {
-            color: red;
-        }
+    .help-block {
+        color: red;
+    }
     </style>
 </head>
 
 <body>
     <?php $this->beginBody() ?>
     <script>
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('<?= Url::base() ?>/js/service-worker.js');
-        }
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('<?= Url::base() ?>/js/service-worker.js');
+    }
     </script>
     <?php //include('_loader.php'); 
     ?>
@@ -60,10 +60,10 @@ $this->registerLinkTag(['rel' => 'icon', 'type' => 'image/x-icon', 'href' => Yii
 
                 <div class="col-auto">
                     <?php if (!empty($this->params['callBack'])) { ?>
-                        <a href="<?= Url::to($this->params['callBack']) ?>" class="btn  btn-link text-dark"><i
-                                class="material-icons">navigate_before</i></a>
+                    <a href="<?= Url::to($this->params['callBack']) ?>" class="btn  btn-link text-dark"><i
+                            class="material-icons">navigate_before</i></a>
                     <?php } else { ?>
-                        <div style="width:54px;"></div>
+                    <div style="width:54px;"></div>
                     <?php } ?>
                 </div>
                 <div class="col text-center">
@@ -113,7 +113,7 @@ $this->registerLinkTag(['rel' => 'icon', 'type' => 'image/x-icon', 'href' => Yii
         <div class="container">
             <?= $content ?>
         </div>
-        <?php include('_footer.php');
+        <?php // include('_footer.php');
         ?>
     </div>
 

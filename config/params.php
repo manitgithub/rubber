@@ -7,21 +7,13 @@ return [
 
     'menu' => [
         1 => [
-            'name' => 'โครงการ',
-            'description' => 'โครงการ',
+            'name' => 'กิจกรรม',
+            'description' => 'กิจกรรม',
             'icon' => 'description',
             'controller' => 'running',
             'action' => 'index'
         ],
 
-
-        5 => [
-            'name' => 'จัดการฐานข้อมูล',
-            'description' => 'ตั้งค่าหมวดสินค้า,ตั้งค่าหน่วย,ตั้งค่าคู่ค้า,ตั้งค่าแผนก',
-            'icon' => 'settings',
-            'controller' => 'sys',
-            'action' => 'index'
-        ],
 
 
         99 => [

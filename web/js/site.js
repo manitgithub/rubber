@@ -3,19 +3,6 @@ $(document).ready(function () {
     language: {
       url: "https://cdn.datatables.net/plug-ins/1.13.7/i18n/th.json",
     },
-    dom: "Bfrtip",
-    buttons: [
-      {
-        extend: "print",
-        text: `<i class="material-icons small">print</i> พิมพ์`,
-        className: "text-white bg-info",
-      },
-      {
-        extend: "excel",
-        text: `<i class="material-icons small">file_download</i> Excel`,
-        className: "text-white bg-success",
-      },
-    ],
     pagingType: "simple",
     lengthChange: false,
   //  order: [[0, "desc"]],

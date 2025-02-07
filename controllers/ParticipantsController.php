@@ -2,18 +2,16 @@
 
 namespace app\controllers;
 
-use app\models\Running;
+use app\models\participants;
 use yii\data\ActiveDataProvider;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
-use app\models\Participants;
-use Yii;
 
 /**
- * RunningController implements the CRUD actions for Running model.
+ * ParticipantsController implements the CRUD actions for participants model.
  */
-class RunningController extends Controller
+class ParticipantsController extends Controller
 {
     /**
      * @inheritDoc
@@ -34,14 +32,14 @@ class RunningController extends Controller
     }
 
     /**
-     * Lists all Running models.
+     * Lists all participants models.
      *
      * @return string
      */
     public function actionIndex()
     {
         $dataProvider = new ActiveDataProvider([
-            'query' => Running::find(),
+            'query' => participants::find(),
             /*
             'pagination' => [
                 'pageSize' => 50
@@ -60,7 +58,7 @@ class RunningController extends Controller
     }
 
     /**
-     * Displays a single Running model.
+     * Displays a single participants model.
      * @param int $id ID
      * @return string
      * @throws NotFoundHttpException if the model cannot be found
@@ -71,20 +69,15 @@ class RunningController extends Controller
             'model' => $this->findModel($id),
         ]);
     }
-    public function actionPickup($id)
-    {
-        return $this->render('pickup', [
-            'model' => $this->findModel($id),
-        ]);
-    }
+
     /**
-     * Creates a new Running model.
+     * Creates a new participants model.
      * If creation is successful, the browser will be redirected to the 'view' page.
      * @return string|\yii\web\Response
      */
     public function actionCreate()
     {
-        $model = new Running();
+        $model = new participants();
 
         if ($this->request->isPost) {
             if ($model->load($this->request->post()) && $model->save()) {
@@ -100,7 +93,7 @@ class RunningController extends Controller
     }
 
     /**
-     * Updates an existing Running model.
+     * Updates an existing participants model.
      * If update is successful, the browser will be redirected to the 'view' page.
      * @param int $id ID
      * @return string|\yii\web\Response
@@ -120,7 +113,7 @@ class RunningController extends Controller
     }
 
     /**
-     * Deletes an existing Running model.
+     * Deletes an existing participants model.
      * If deletion is successful, the browser will be redirected to the 'index' page.
      * @param int $id ID
      * @return \yii\web\Response
@@ -133,55 +126,16 @@ class RunningController extends Controller
         return $this->redirect(['index']);
     }
 
-    public function actionUpdateparticipant()
-    {
-        Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-
-        $request = Yii::$app->request;
-        $nationId = $request->get('nationId');
-        $runningId = $request->get('runningId');
-
-        // ค้นหาผู้เข้าร่วมที่มี nationalId และ runningId ที่ตรงกันทั้งหมด
-        $participants = Participants::findAll(['nationalId' => $nationId, 'runningid' => $runningId]);
-
-        if ($participants) {
-            $updatedParticipants = [];
-            $pick = 0;
-
-            foreach ($participants as $participant) {
-                if ($participant->status == 1) {
-                    $updatedParticipants[] = $participant;
-                    $pick = 1;
-
-                    continue; // ข้ามรายการที่มีสถานะเป็น 1 (รับของไปแล้ว)
-                }
-                $participant->status = 1;
-                $participant->picktime = date('Y-m-d H:i:s');
-                $participant->save(false);
-
-                $updatedParticipants[] = $participant;
-            }
-
-            if ($pick == 0) {
-                return ['status' => 'success', 'message' => 'ยืนยันการรับของ', 'data' => $updatedParticipants];
-            } else {
-                return ['status' => 'error', 'message' => 'รับแล้ว หากข้อมูลไม่ถูกต้องให้ติตต่อ Admintrator เพื่อแก้ไขข้อมูล', 'data' => $updatedParticipants];
-            }
-        } else {
-            return ['status' => 'error', 'message' => 'ไม่พบข้อมูล', 'data' => null];
-        }
-    }
-
     /**
-     * Finds the Running model based on its primary key value.
+     * Finds the participants model based on its primary key value.
      * If the model is not found, a 404 HTTP exception will be thrown.
      * @param int $id ID
-     * @return Running the loaded model
+     * @return participants the loaded model
      * @throws NotFoundHttpException if the model cannot be found
      */
     protected function findModel($id)
     {
-        if (($model = Running::findOne(['id' => $id])) !== null) {
+        if (($model = participants::findOne(['id' => $id])) !== null) {
             return $model;
         }
 

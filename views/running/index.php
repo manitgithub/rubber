@@ -16,47 +16,62 @@ $this->params['breadcrumbs'][] = $this->title;
     <h1><?= Html::encode($this->title) ?></h1>
 
     <p class="text-right">
-        <?= Html::a('<i class="material-icons">add</i> เพิ่มกิจกรรม', ['create'], ['class' => 'btn btn-success']) ?>
+
     </p>
+    <row class="row">
 
-    <div class="jumbotron  bg-white">
-        <h4 class="mb-3">Hello, Visitors and Buyers!</h4>
-        <p class="lead">This is default view of framework, Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
-        <hr class="my-4">
-        <p>Fimobile is HTML template based on Bootstrap 4.3.1 framework. This html template can be used in various
-            business domains like Manufacturing, inventory, IT, administration etc. for admin panel, system development,
-            web applications, even website can be created. This template also considered social pages, ecommerce pages
-            and many more.</p>
-        <br>
-        <a class="btn btn-primary" href="#" role="button">Learn more</a>
-    </div>
+        <div class="col-md-4">
+            <div class="jumbotron  bg-white">
+                <a class="btn btn-success" href="/running/create"><i class="material-icons">add</i> เพิ่มกิจกรรม</a>
+            </div>
+        </div>
+
+        <?php foreach ($dataProvider->getModels() as $model) { ?>
+            <div class="col-md-4">
+                <div class="jumbotron  bg-white">
+                    <h4 class="mb-3"><?= $model->name ?>!
+                        <p class="lead">วันที่: <?= $model->date ?> ผู้จัด: <?= $model->owner ?>
+                        </p>
+                        <hr class="my-4">
+                        <br>
+                        รายละเอียด: <?= $model->detail ?><br>
+
+                        <br>
+                        <div class="float-right">
+
+                            <a class="btn btn-primary" href="<?= Url::to(['running/view', 'id' => $model->id]) ?>"
+                                role="button"><i class="material-icons">visibility</i> จัดการ</a>
+                        </div>
+                </div>
+            </div>
+        <?php } ?>
 
 
+        <!--
+        <?= GridView::widget([
+            'dataProvider' => $dataProvider,
+            'columns' => [
+                ['class' => 'yii\grid\SerialColumn'],
 
-    <?= GridView::widget([
-        'dataProvider' => $dataProvider,
-        'columns' => [
-            ['class' => 'yii\grid\SerialColumn'],
-
-            'id',
-            'name',
-            'date',
-            'owner',
-            'detail',
-            //'flag_del',
-            //'created_id',
-            //'updated_id',
-            //'created_at',
-            //'updated_at',
-            //'img',
-            [
-                'class' => ActionColumn::className(),
-                'urlCreator' => function ($action, Running $model, $key, $index, $column) {
-                    return Url::toRoute([$action, 'id' => $model->id]);
-                }
+                'id',
+                'name',
+                'date',
+                'owner',
+                'detail',
+                //'flag_del',
+                //'created_id',
+                //'updated_id',
+                //'created_at',
+                //'updated_at',
+                //'img',
+                [
+                    'class' => ActionColumn::className(),
+                    'urlCreator' => function ($action, Running $model, $key, $index, $column) {
+                        return Url::toRoute([$action, 'id' => $model->id]);
+                    }
+                ],
             ],
-        ],
-    ]); ?>
-
+        ]); ?>
+-->
 
 </div>
