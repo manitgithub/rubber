@@ -14,7 +14,7 @@ $this->params['breadcrumbs'][] = $this->title;
     <div class="row no-gutters login-row">
         <div class="col align-self-center px-3 text-center">
 
-            <img src="/temp.202302181351/img/logo.png" alt="logo" class="logo"><br><br>
+            <img src="/temp.202302181351/img/logo.png" alt="logo" class="logo" width="400"> <br> <br> <br>
             <?= $form->field($model, 'username')->textInput(['class' => 'form-control form-control-lg text-center', 'placeholder' => 'ชื่อผู้ใช้งาน', 'autofocus' => true])->label(false) ?>
             <?= $form->field($model, 'password')->passwordInput(['class' => 'form-control form-control-lg text-center', 'placeholder' => 'รหัสผ่าน'])->label(false) ?>
         </div>
