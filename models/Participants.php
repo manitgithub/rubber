@@ -97,4 +97,9 @@ class Participants extends \yii\db\ActiveRecord
             'status' => 'Status',
         ];
     }
+
+    public function getRunning()
+    {
+        return $this->hasOne(Running::className(), ['id' => 'runningid']);
+    }
 }

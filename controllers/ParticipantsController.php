@@ -70,6 +70,14 @@ class ParticipantsController extends Controller
         ]);
     }
 
+    public function actionPrint($id)
+    {
+        // ใช้ layout print
+        $this->layout = 'print';
+        return $this->render('print', [
+            'model' => $this->findModel($id),
+        ]);
+    }
     /**
      * Creates a new participants model.
      * If creation is successful, the browser will be redirected to the 'view' page.

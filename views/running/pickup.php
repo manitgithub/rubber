@@ -121,151 +121,190 @@ $this->params['breadcrumbs'][] = $this->title;
         <div id="participants"></div>
 
         <script type="text/javascript">
-            document.addEventListener("DOMContentLoaded", function() {
-                function fetchData() {
-                    $.ajax({
-                        url: "<?= Url::to(['/running/show-running', 'id' => $model->id]) ?>",
-                        type: "GET",
-                        dataType: "json",
-                        success: function(response) {
-                            let pick = response.main.pick;
-                            let notpick = response.main.notpick;
-                            let total = parseInt(pick) + parseInt(notpick);
-                            console.log(response);
-
-                            $("#pick").text(pick);
-                            $("#notpick").text(notpick);
-                            $("#total").text(total);
-                        },
-                        error: function(xhr, status, error) {
-                            console.error("เกิดข้อผิดพลาดในการโหลดข้อมูล:", error);
-                        }
-                    });
-                }
-
-                fetchData(); // เรียกใช้งานตอนโหลดหน้าเว็บ
-                setInterval(fetchData, 5000); // อัปเดตข้อมูลทุก 5 วินาที
-            });
-
-
-            function updateParticipant() {
-                var nationId = document.getElementById('nationId').value;
-                var runningId = <?= $model->id ?>;
-
+        document.addEventListener("DOMContentLoaded", function() {
+            function fetchData() {
                 $.ajax({
-                    url: '<?= Url::to(['running/updateparticipant']) ?>?nationId=' + nationId + '&runningId=' +
-                        runningId,
-                    type: 'get',
+                    url: "<?= Url::to(['/running/show-running', 'id' => $model->id]) ?>",
+                    type: "GET",
+                    dataType: "json",
                     success: function(response) {
+                        let pick = response.main.pick;
+                        let notpick = response.main.notpick;
+                        let total = parseInt(pick) + parseInt(notpick);
                         console.log(response);
 
-                        if (response.status === "success") {
-                            Swal.fire({
-                                position: "top-end",
-                                icon: "success",
-                                title: response.message,
-                                showConfirmButton: false,
-                                timer: 1500
-                            });
-
-                            var participants = response.data;
-                            readtable(participants);
-
-                            document.getElementById('nationId').value = '';
-                            document.getElementById('nationId').focus();
-
-
-                            document.getElementById('participants').innerHTML = htmlContent;
-                        } else {
-                            Swal.fire({
-                                position: "top-end",
-                                icon: "error",
-                                title: response.message,
-                                showConfirmButton: false,
-                                timer: 1500
-                            });
-                            document.getElementById('participants').innerHTML =
-                                `<p style="color: red;">${response.message}</p>`;
-                            document.getElementById('nationId').value = '';
-                            document.getElementById('nationId').focus();
-
-                            var participants = response.data;
-                            //readtable(participants);
-                        }
+                        $("#pick").text(pick);
+                        $("#notpick").text(notpick);
+                        $("#total").text(total);
                     },
-                    error: function() {
-                        document.getElementById('participants').innerHTML =
-                            `<p style="color: red;">เกิดข้อผิดพลาดในการโหลดข้อมูล</p>`;
+                    error: function(xhr, status, error) {
+                        console.error("เกิดข้อผิดพลาดในการโหลดข้อมูล:", error);
                     }
                 });
             }
 
-            function readtable(data) {
-                var htmlContent = `<h3>รายชื่อผู้เข้าร่วม</h3>
+            fetchData(); // เรียกใช้งานตอนโหลดหน้าเว็บ
+            setInterval(fetchData, 5000); // อัปเดตข้อมูลทุก 5 วินาที
+        });
+
+
+        function updateParticipant() {
+            var nationId = document.getElementById('nationId').value;
+            var runningId = <?= $model->id ?>;
+
+            $.ajax({
+                url: '<?= Url::to(['running/updateparticipant']) ?>?nationId=' + nationId + '&runningId=' +
+                    runningId,
+                type: 'get',
+                success: function(response) {
+                    console.log(response);
+
+                    if (response.status === "success") {
+                        /*Swal.fire({
+                            position: "top-end",
+                            icon: "success",
+                            title: response.message,
+                            showConfirmButton: false,
+                            timer: 1500
+                        });*/
+
+                        var participants = response.data;
+                        readtable(participants);
+
+                        document.getElementById('nationId').value = '';
+                        document.getElementById('nationId').focus();
+
+
+                        document.getElementById('participants').innerHTML = htmlContent;
+                    } else {
+                        Swal.fire({
+                            position: "top-end",
+                            icon: "error",
+                            title: response.message,
+                            showConfirmButton: false,
+                            timer: 1500
+                        });
+                        document.getElementById('participants').innerHTML =
+                            `<p style="color: red;">${response.message}</p>`;
+                        document.getElementById('nationId').value = '';
+                        document.getElementById('nationId').focus();
+
+                        var participants = response.data;
+                        //readtable(participants);
+                    }
+                },
+                error: function() {
+                    document.getElementById('participants').innerHTML =
+                        `<p style="color: red;">เกิดข้อผิดพลาดในการโหลดข้อมูล</p>`;
+                }
+            });
+        }
+
+        function readtable(data) {
+            var htmlContent = `<h3>รายชื่อผู้เข้าร่วม</h3>
         <table border="1" cellspacing="0" cellpadding="5" class="table table-striped table-bordered datatable">
             <tr>
                 <th>BIB</th>
                 <th>ชื่อ-นามสกุล</th>
-                <th>Email</th>
                 <th>เพศ</th>
                 <th>โทรศัพท์</th>
                 <th>ประเภทตั๋ว</th>
                 <th>shirt_type</th>
                 <th>Size</th>
+                <th>Status</th>
                 <th>พิมพ์ใบรับของ</th>
             </tr>`;
 
-                data.forEach((data, index) => {
-                    htmlContent += `
+            data.forEach((data, index) => {
+                htmlContent += `
             <tr>
                 <td>${data.bib_number}</td>
                 <td>${data.first_name} ${data.last_name}</td>
-                <td>${data.email}</td>
                 <td>${data.gender}</td>
                 <td>${data.participant_telephone}</td>
                 <td>${data.ticket_type}</td>
                 <td>${data.shirt_type}</td>
                 <td>${data.shirt}</td>
+                <td>${data.status == 1 ? 'รับของแล้ว' : 'ยังไม่รับของ'}</td>
                 <td>
-                <button onclick="pickup(${data.id})" class="btn btn-success">รับของ</button>
-                <button onclick="printReceipt(${data.id})" class="btn btn-primary">พิมพ์</button></td>
+                    ${data.status == 0 ? `<button onclick="pickup(${data.id},${data.nationalId})" class="btn btn-success">รับของ</button>` : ''}
+                ${data.status == 1 ? `<button onclick="printReceipt(${data.id})" class="btn btn-primary">พิมพ์ใบรับของ</button>` : ''}
             </tr>`;
-                });
+            });
 
-                htmlContent += `
+            htmlContent += `
         </table>`;
-                document.getElementById('participants').innerHTML = htmlContent;
-            }
+            document.getElementById('participants').innerHTML = htmlContent;
+        }
 
-            function printReceipt(id) {
-                window.open('<?= Url::to(['participants/printreceipt']) ?>?id=' + id, '_blank');
-            }
+        function printReceipt(id) {
 
-            function openQrScanner() {
-                const qrReader = document.getElementById('qr-reader');
-                qrReader.style.display = 'block';
+            window.open('<?= Url::to(['participants/print']) ?>?id=' + id, '_blank');
+        }
 
-                const html5QrCode = new Html5Qrcode("qr-reader");
-                html5QrCode.start({
-                        facingMode: "environment"
-                    }, // ใช้กล้องหลัง
-                    {
-                        fps: 10, // จำนวนเฟรมต่อวินาที
-                        qrbox: 250 // ขนาดกรอบสแกน
-                    },
-                    (decodedText, decodedResult) => {
-                        // เมื่อสแกนสำเร็จ นำค่าไปกรอกในช่องเลขบัตรประชาชน
-                        document.getElementById('nationId').value = decodedText;
-                        html5QrCode.stop(); // หยุดการสแกน
-                        qrReader.style.display = 'none';
-                    },
-                    (errorMessage) => {
-                        console.log("Error scanning: ", errorMessage);
+        function pickup(id, nactionId) {
+            $.ajax({
+                url: '<?= Url::to(['running/put-pickup']) ?>?id=' + id + '&nationId=' + nactionId +
+                    '&runningId=' +
+                    <?= $model->id ?>,
+                type: 'get',
+                success: function(response) {
+                    console.log(response);
+
+                    if (response.status === "success") {
+                        Swal.fire({
+                            position: "top-end",
+                            icon: "success",
+                            title: response.message,
+                            showConfirmButton: false,
+                            timer: 1500
+                        });
+
+                        var participants = response.data;
+                        readtable(participants);
+                        document.getElementById('participants').innerHTML = htmlContent;
+                    } else {
+                        Swal.fire({
+                            position: "top-end",
+                            icon: "error",
+                            title: response.message,
+                            showConfirmButton: false,
+                            timer: 1500
+                        });
                     }
-                ).catch(err => {
-                    console.error("Cannot start QR code scanner", err);
-                });
-            }
+                },
+                error: function() {
+                    document.getElementById('participants').innerHTML =
+                        `<p style="color: red;">เกิดข้อผิดพลาดในการโหลดข้อมูล</p>`;
+                }
+            });
+        }
+
+        function openQrScanner() {
+            const qrReader = document.getElementById('qr-reader');
+            qrReader.style.display = 'block';
+
+            const html5QrCode = new Html5Qrcode("qr-reader");
+            html5QrCode.start({
+                    facingMode: "environment"
+                }, // ใช้กล้องหลัง
+                {
+                    fps: 10, // จำนวนเฟรมต่อวินาที
+                    qrbox: 250 // ขนาดกรอบสแกน
+                },
+                (decodedText, decodedResult) => {
+                    // เมื่อสแกนสำเร็จ นำค่าไปกรอกในช่องเลขบัตรประชาชน
+                    document.getElementById('nationId').value = decodedText;
+                    html5QrCode.stop(); // หยุดการสแกน
+                    qrReader.style.display = 'none';
+                },
+                (errorMessage) => {
+                    console.log("Error scanning: ", errorMessage);
+                }
+            ).catch(err => {
+                console.error("Cannot start QR code scanner", err);
+            });
+        }
         </script>
     </div>
 </div>

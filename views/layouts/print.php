@@ -24,7 +24,7 @@ $this->registerLinkTag(['rel' => 'icon', 'type' => 'image/x-icon', 'href' => Yii
 <html lang="<?= Yii::$app->language ?>">
 
 <head>
-    <title><?= Html::encode($this->title) ?> | Wanderwoods🍃</title>
+    <title><?= Html::encode($this->title) ?> | Pickup System</title>
     <link href="<?= Url::base() ?>/manifest.json" rel="manifest">
     <?php $this->head() ?>
 </head>
@@ -42,9 +42,9 @@ $this->registerLinkTag(['rel' => 'icon', 'type' => 'image/x-icon', 'href' => Yii
 </body>
 
 <script>
-$(document).ready(function() {
-    window.print();
-});
+    $(document).ready(function() {
+        window.print();
+    });
 </script>
 
 </html>

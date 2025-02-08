@@ -146,6 +146,7 @@ class RunningController extends Controller
         $nationId = $request->get('nationId');
         $runningId = $request->get('runningId');
 
+
         // ค้นหาผู้เข้าร่วมที่มี nationalId และ runningId ที่ตรงกันทั้งหมด
         $participants = Participants::findAll(['nationalId' => $nationId, 'runningid' => $runningId]);
 
@@ -167,11 +168,44 @@ class RunningController extends Controller
                 $updatedParticipants[] = $participant;
             }
 
-            if ($pick == 0) {
-                return ['status' => 'success', 'message' => 'ยืนยันการรับของ', 'data' => $updatedParticipants];
-            } else {
-                return ['status' => 'error', 'message' => 'รับแล้ว หากข้อมูลไม่ถูกต้องให้ติตต่อ Admintrator เพื่อแก้ไขข้อมูล', 'data' => $updatedParticipants];
+            return ['status' => 'success', 'message' => 'ยืนยันการรับของ', 'data' => $updatedParticipants];
+        } else {
+            return ['status' => 'error', 'message' => 'ไม่พบข้อมูล', 'data' => null];
+        }
+    }
+
+    public function actionPutPickup()
+    {
+        Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+        $request = Yii::$app->request;
+        $Id = $request->get('id');
+        $nationId = $request->get('nationId');
+        $runningId = $request->get('runningId');
+
+        $participantUpdate = Participants::findOne($Id);
+        if ($participantUpdate->status == 1) {
+            return ['status' => 'error', 'message' => 'มีการรับไปแล้วก่อนหน้านี้', 'data' => null];
+        }
+        $participantUpdate->status = 1;
+        $participantUpdate->picktime = date('Y-m-d H:i:s');
+        $participantUpdate->save(false);
+
+        $participants = Participants::findAll(['nationalId' => $nationId, 'runningid' => $runningId]);
+
+        if ($participants) {
+            $updatedParticipants = [];
+            $pick = 0;
+
+            foreach ($participants as $participant) {
+                if ($participant->status == 1) {
+                    $updatedParticipants[] = $participant;
+                    $pick = 1;
+
+                    continue; // ข้ามรายการที่มีสถานะเป็น 1 (รับของไปแล้ว)
+                }
+                $updatedParticipants[] = $participant;
             }
+            return ['status' => 'success', 'message' => 'ยืนยันการรับของ', 'data' => $updatedParticipants];
         } else {
             return ['status' => 'error', 'message' => 'ไม่พบข้อมูล', 'data' => null];
         }
