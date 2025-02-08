@@ -13,18 +13,20 @@ $this->params['breadcrumbs'][] = ['label' => 'Runnings', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 \yii\web\YiiAsset::register($this);
 ?>
+<script src="https://unpkg.com/html5-qrcode/minified/html5-qrcode.min.js"></script>
+
 <div class="running-view">
-
-
-
     <div class="swiper-pagination"></div>
     <span class="swiper-notification" aria-live="assertive" aria-atomic="true"></span>
 </div>
 <div class="jumbotron  bg-white">
     <h4 class="mb-3"><?= $model->name ?>!
         <div class="float-right">
-            <a class="btn btn-warning" href="<?= Url::to(['index']) ?>" role="button"><i
-                    class="material-icons">arrow_back</i> กลับ</a>
+            <div class="btn">
+
+                <a class="btn btn-warning" href="<?= Url::to(['view', 'id' => $model->id]) ?>"><i
+                        class="material-icons">arrow_back</i> กลับ</a>
+            </div>
         </div>
     </h4>
     <hr class="my-4">
@@ -81,17 +83,39 @@ $this->params['breadcrumbs'][] = $this->title;
                     </div>
                 </div>
             </div>
+            <div class="col-md-2">
+                <div class="button-group">
+                    <br>
+                    <button class="btn btn-secondary btn-block" onclick="openQrScanner()"><i
+                            class="material-icons">fullscreen</i> สแกน</button>
+                </div>
+            </div>
+
+            <div id="qr-reader" style="width: 100%; display: none;"></div>
 
 
         </div>
         <hr class="my-4">
 
         <!-- เขียน form สำหรับกรอกเลขบัตรประชาชน เมื่อกรอกให้ไปอัพเดทข้อมูลในตาราง participants โดยใช้ ajax -->
-        <div class="form-group">
-            <label for="nationId">เลขบัตรประชาชน</label>
-            <input type="text" class="form-control" id="nationId" placeholder="เลขบัตรประชาชน"
-                onchange="updateParticipant()">
+        <div class="row">
+            <div class="col-md-10">
+                <div class="form-group">
+                    <label for="nationId">เลขบัตรประชาชน</label>
+                    <input type="text" class="form-control" id="nationId" placeholder="เลขบัตรประชาชน">
+                </div>
+            </div>
+            <div class="col-md-2">
+                <div class="button-group">
+                    <br>
+                    <button class="btn btn-primary btn-block" onclick="updateParticipant()"><i
+                            class="material-icons">search</i>
+                        ค้นหา</button>
+                </div>
+            </div>
+
         </div>
+
         <div id="participants"></div>
 
         <div id="participants"></div>
@@ -202,7 +226,9 @@ $this->params['breadcrumbs'][] = $this->title;
                 <td>${data.ticket_type}</td>
                 <td>${data.shirt_type}</td>
                 <td>${data.shirt}</td>
-                <td><button onclick="printReceipt(${data.id})" class="btn btn-primary">พิมพ์</button></td>
+                <td>
+                <button onclick="pickup(${data.id})" class="btn btn-success">รับของ</button>
+                <button onclick="printReceipt(${data.id})" class="btn btn-primary">พิมพ์</button></td>
             </tr>`;
                 });
 
@@ -213,6 +239,32 @@ $this->params['breadcrumbs'][] = $this->title;
 
             function printReceipt(id) {
                 window.open('<?= Url::to(['participants/printreceipt']) ?>?id=' + id, '_blank');
+            }
+
+            function openQrScanner() {
+                const qrReader = document.getElementById('qr-reader');
+                qrReader.style.display = 'block';
+
+                const html5QrCode = new Html5Qrcode("qr-reader");
+                html5QrCode.start({
+                        facingMode: "environment"
+                    }, // ใช้กล้องหลัง
+                    {
+                        fps: 10, // จำนวนเฟรมต่อวินาที
+                        qrbox: 250 // ขนาดกรอบสแกน
+                    },
+                    (decodedText, decodedResult) => {
+                        // เมื่อสแกนสำเร็จ นำค่าไปกรอกในช่องเลขบัตรประชาชน
+                        document.getElementById('nationId').value = decodedText;
+                        html5QrCode.stop(); // หยุดการสแกน
+                        qrReader.style.display = 'none';
+                    },
+                    (errorMessage) => {
+                        console.log("Error scanning: ", errorMessage);
+                    }
+                ).catch(err => {
+                    console.error("Cannot start QR code scanner", err);
+                });
             }
         </script>
     </div>

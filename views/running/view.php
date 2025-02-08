@@ -31,6 +31,13 @@ $this->params['breadcrumbs'][] = $this->title;
         <?= DetailView::widget([
             'model' => $model,
             'attributes' => [
+                [
+                    'attribute' => 'img',
+                    'format' => 'html',
+                    'value' => function ($model) {
+                        return Html::img($model->PhotoViewer, ['class' => 'img-thumbnail', 'style' => 'width: 200px;']);
+                    }
+                ],
                 'date',
                 'owner',
                 'detail',
@@ -63,20 +70,25 @@ $this->params['breadcrumbs'][] = $this->title;
                     foreach ($participants as $index => $participant) {
 
 
-                        $status = $participant->status == 1 ? 'รับของแล้ว' : 'ยังไม่ได้มารับของ';
+                        $status = $participant->status == 1 ? '<font class="text text-success">รับของแล้ว</font>' : '<font class="text text-warning">รอรับของ</font>';
                     ?>
                         <tr>
                             <td><?= $index + 1 ?></td>
                             <td><?= $participant->nationalId ?></td>
                             <td><?= $participant->first_name ?> <?= $participant->last_name ?></td>
-                            <td><?= $participant->gender ?></td>
+                            <td><?= $participant->gender == "male" ? "ชาย" : "หญิง" ?></td>
                             <td><?= $participant->participant_telephone ?></td>
-                            <td><?= $status ?></td>
                             <td>
-                                <a href="<?= Url::to(['participants/view', 'id' => $participant->id]) ?>"
-                                    class="btn btn-primary"><i class="material-icons">visibility</i> ดู</a>
-                                <a href="<?= Url::to(['participants/update', 'id' => $participant->id]) ?>"
-                                    class="btn btn-warning"><i class="material-icons">edit</i> แก้ไข</a>
+                                <div class="text-center"> <?= $status ?> </div>
+                            </td>
+                            <td>
+                                <div class="text-center">
+
+                                    <a href="<?= Url::to(['participants/view', 'id' => $participant->id]) ?>"
+                                        class="btn btn-primary"><i class="material-icons">visibility</i> ดู</a>
+                                    <a href="<?= Url::to(['participants/update', 'id' => $participant->id]) ?>"
+                                        class="btn btn-warning"><i class="material-icons">edit</i> แก้ไข</a>
+                                </div>
                             </td>
 
                         <?php

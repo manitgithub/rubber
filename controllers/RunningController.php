@@ -87,7 +87,10 @@ class RunningController extends Controller
         $model = new Running();
 
         if ($this->request->isPost) {
-            if ($model->load($this->request->post()) && $model->save()) {
+            if ($model->load($this->request->post())) {
+                $model->img = $model->upload($model, 'img', 'img');
+                $model->save(false);
+
                 return $this->redirect(['view', 'id' => $model->id]);
             }
         } else {
@@ -110,7 +113,9 @@ class RunningController extends Controller
     {
         $model = $this->findModel($id);
 
-        if ($this->request->isPost && $model->load($this->request->post()) && $model->save()) {
+        if ($this->request->isPost && $model->load($this->request->post())) {
+            $model->img = $model->upload($model, 'img', 'img');
+            $model->save(false);
             return $this->redirect(['view', 'id' => $model->id]);
         }
 
@@ -155,9 +160,9 @@ class RunningController extends Controller
 
                     continue; // ข้ามรายการที่มีสถานะเป็น 1 (รับของไปแล้ว)
                 }
-                $participant->status = 1;
-                $participant->picktime = date('Y-m-d H:i:s');
-                $participant->save(false);
+                //$participant->status = 1;
+                //$participant->picktime = date('Y-m-d H:i:s');
+                //$participant->save(false);
 
                 $updatedParticipants[] = $participant;
             }

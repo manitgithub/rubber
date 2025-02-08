@@ -52,11 +52,11 @@ class Participants extends \yii\db\ActiveRecord
     {
         return [
             [['picktime'], 'safe'],
-            [['runningid'], 'integer'],
+            [['runningid', 'status'], 'integer'],
             [['first_name', 'last_name', 'emergency_contact', 'province'], 'string', 'max' => 100],
             [['email', 'health_issues'], 'string', 'max' => 255],
             [['gender', 'participant_telephone', 'birthDate', 'emergency_contact_phone', 'price', 'start_date'], 'string', 'max' => 20],
-            [['age_category', 'bib_number', 'emergency_contact_relationship', 'nationalId', 'shirt_type', 'reg_deliver_option', 'registration_type', 'ticket_type', 'race', 'user_code', 'ticket_code'], 'string', 'max' => 50],
+            [['age_category', 'bib_number', 'emergency_contact_relationship', 'nationalId', 'shirt_type', 'reg_deliver_option', 'registration_type', 'ticket_type', 'race', 'user_code', 'ticket_code'], 'string', 'max' => 200],
             [['shirt'], 'string', 'max' => 10],
         ];
     }
@@ -94,6 +94,7 @@ class Participants extends \yii\db\ActiveRecord
             'ticket_code' => 'Ticket Code',
             'picktime' => 'Picktime',
             'runningid' => 'Runningid',
+            'status' => 'Status',
         ];
     }
 }
