@@ -6,57 +6,57 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Slip Print</title>
     <style>
-    body {
-        font-family: 'Arial', sans-serif;
-        margin: 20px;
-    }
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 20px;
+        }
 
-    .slip-container {
-        border: 1px solid #000;
-        padding: 20px;
-        max-width: 400px;
-        margin: auto;
-    }
+        .slip-container {
+            border: 1px solid #000;
+            padding: 20px;
+            max-width: 400px;
+            margin: auto;
+        }
 
-    .title {
-        text-align: center;
-        font-size: 18px;
-        font-weight: bold;
-    }
+        .title {
+            text-align: center;
+            font-size: 18px;
+            font-weight: bold;
+        }
 
-    .section {
-        margin-top: 10px;
-    }
+        .section {
+            margin-top: 10px;
+        }
 
-    .section h4 {
-        margin: 0;
-        font-size: 14px;
-        font-weight: bold;
-    }
+        .section h4 {
+            margin: 0;
+            font-size: 14px;
+            font-weight: bold;
+        }
 
-    .section p {
-        margin: 2px 0;
-        font-size: 12px;
-    }
+        .section p {
+            margin: 2px 0;
+            font-size: 12px;
+        }
 
-    .center {
-        text-align: center;
-    }
+        .center {
+            text-align: center;
+        }
 
-    .box {
-        border: 1px solid #000;
-        padding: 10px;
-        margin-top: 10px;
-        font-size: 12px;
-    }
+        .box {
+            border: 1px solid #000;
+            padding: 10px;
+            margin-top: 10px;
+            font-size: 12px;
+        }
 
-    .bold {
-        font-weight: bold;
-    }
+        .bold {
+            font-weight: bold;
+        }
 
-    .page-break {
-        page-break-before: always;
-    }
+        .page-break {
+            page-break-before: always;
+        }
     </style>
 </head>
 
@@ -136,8 +136,8 @@
             <p><?= $model->age_category ?></p>
             <h4>BIB:</h4><!-- แสดงเป็น 4 หลัก -->
             <p><?= str_pad($model->bib_number, 4, '0', STR_PAD_LEFT) ?></p>
-            <h4>เวลาเริ่มต้น / Start Time:</h4>
-            <p>06:00 น.</p>
+            <h4>รับของ / Pick Up:</h4>
+            <p> <?= $model->picktime ?></p>
         </div>
 
         <div class="section">
