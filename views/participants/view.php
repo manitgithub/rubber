@@ -18,7 +18,9 @@ $this->params['breadcrumbs'][] = $this->title;
             <div class="card-header rounded-0">
                 <h4><?= Html::encode($this->title) ?>
                     <div class="float-right">
-                        <?= Html::a('Update', ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
+                        <?= Html::a('กลับ', ['running/view?id=' . $model->runningid], ['class' => 'btn btn-secondary']) ?>
+                        <?= Html::a('พิมพ์', ['print', 'id' => $model->id], ['class' => 'btn btn-success', 'target' => '_blank']) ?>
+                        <?= Html::a('แก้ไข', ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
                     </div>
                 </h4>
             </div>

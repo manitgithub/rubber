@@ -8,46 +8,40 @@
     <style>
         body {
             font-family: 'Arial', sans-serif;
+            color: #000;
             margin: 20px;
+            max-width: 80mm;
+            margin:0;
         }
-
-        .slip-container {
-            border: 1px solid #000;
-            padding: 20px;
-            max-width: 400px;
-            margin: auto;
-        }
-
         .title {
             text-align: center;
             font-size: 18px;
-            font-weight: bold;
         }
 
         .section {
             margin-top: 10px;
+            max-width: 80mm;
+
         }
 
         .section h4 {
             margin: 0;
-            font-size: 14px;
+            font-size: 18px;
             font-weight: bold;
         }
 
         .section p {
             margin: 2px 0;
-            font-size: 12px;
-        }
-
-        .center {
-            text-align: center;
+            font-size: 16px;
+            max-width: 80mm;
         }
 
         .box {
             border: 1px solid #000;
             padding: 10px;
             margin-top: 10px;
-            font-size: 12px;
+            font-size: 16px;
+            max-width: 80mm;
         }
 
         .bold {
@@ -61,11 +55,10 @@
 </head>
 
 <body>
-    <div class="slip-container">
+    <div>
         <div class="center">
-            <img src="<?= $model->running->PhotoViewer ?>" class="img-fluid" width="300px">
+            <img src="<?= $model->running->PhotoViewer ?>" class="img-fluid" style="width: 80mm;">
             <br>
-            <span class="title"><?= $model->running->name ?></span>
         </div>
 
         <div class="section">
@@ -92,8 +85,8 @@
             <p><?= $model->age_category ?></p>
             <h4>BIB:</h4><!-- แสดงเป็น 4 หลัก -->
             <p><?= str_pad($model->bib_number, 4, '0', STR_PAD_LEFT) ?></p>
-            <h4>เวลาเริ่มต้น / Start Time:</h4>
-            <p>06:00 น.</p>
+            <h4>รับของ / Pick Up:</h4>
+            <p> <?= $model->picktime ?></p>
         </div>
 
         <div class="section">
@@ -107,9 +100,8 @@
 
     <div class="slip-container">
         <div class="center">
-            <img src="<?= $model->running->PhotoViewer ?>" class="img-fluid" width="300px">
-            <br>
-            <span class="title"><?= $model->running->name ?></span>
+        <img src="<?= $model->running->PhotoViewer ?>" class="img-fluid" style="width: 80mm;">
+        <br>
         </div>
 
         <div class="section">

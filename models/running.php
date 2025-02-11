@@ -104,6 +104,6 @@ class Running extends \yii\db\ActiveRecord
 
     public function getPhotoViewer()
     {
-        return empty($this->img) ? Yii::getAlias('@web') . '/temp.202302181351/img/user1.png' : $this->getUploadUrl() . $this->img;
+        return empty($this->img) ? Yii::getAlias('@web') . '/temp.202302181351/img/800x300.png' : $this->getUploadUrl() . $this->img;
     }
 }

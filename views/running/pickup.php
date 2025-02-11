@@ -88,6 +88,8 @@ $this->params['breadcrumbs'][] = $this->title;
                     <br>
                     <button class="btn btn-secondary btn-block" onclick="openQrScanner()"><i
                             class="material-icons">fullscreen</i> สแกน</button>
+                    <button class="btn btn-primary btn-block" onclick="stop()" style="display: none;" id="stop"><i
+                            class="material-icons">stop</i> หยุด</button>
                 </div>
             </div>
 
@@ -281,7 +283,10 @@ $this->params['breadcrumbs'][] = $this->title;
         }
 
         function openQrScanner() {
+        
             const qrReader = document.getElementById('qr-reader');
+            const stop = document.getElementById('stop');
+            stop.style.display = 'block';
             qrReader.style.display = 'block';
 
             const html5QrCode = new Html5Qrcode("qr-reader");
@@ -296,7 +301,7 @@ $this->params['breadcrumbs'][] = $this->title;
                     // เมื่อสแกนสำเร็จ นำค่าไปกรอกในช่องเลขบัตรประชาชน
                     document.getElementById('nationId').value = decodedText;
                     html5QrCode.stop(); // หยุดการสแกน
-                    qrReader.style.display = 'none';
+                    
                 },
                 (errorMessage) => {
                     console.log("Error scanning: ", errorMessage);
