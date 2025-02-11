@@ -88,7 +88,7 @@ $this->params['breadcrumbs'][] = $this->title;
                     <br>
                     <button class="btn btn-secondary btn-block" onclick="openQrScanner()"><i
                             class="material-icons">fullscreen</i> สแกน</button>
-                    <button class="btn btn-primary btn-block" onclick="stop()" style="display: none;" id="stop"><i
+                    <button class="btn btn-danger btn-block" onclick="stop()" style="display: none;" id="stop"><i
                             class="material-icons">stop</i> หยุด</button>
                 </div>
             </div>
@@ -309,6 +309,15 @@ $this->params['breadcrumbs'][] = $this->title;
             ).catch(err => {
                 console.error("Cannot start QR code scanner", err);
             });
+        }
+        function stop(){
+
+            const qrReader = document.getElementById('qr-reader');
+            const stop = document.getElementById('stop');
+            stop.style.display = 'none';
+            qrReader.style.display = 'none';
+
+        
         }
         </script>
     </div>
