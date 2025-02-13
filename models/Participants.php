@@ -52,7 +52,7 @@ class Participants extends \yii\db\ActiveRecord
     {
         return [
             [['picktime'], 'safe'],
-            [['runningid', 'status'], 'integer'],
+            [['runningid', 'status','adminid','updateid'], 'integer'],
             [['first_name', 'last_name', 'emergency_contact', 'province'], 'string', 'max' => 100],
             [['email', 'health_issues'], 'string', 'max' => 255],
             [['gender', 'participant_telephone', 'birthDate', 'emergency_contact_phone', 'price', 'start_date'], 'string', 'max' => 20],
