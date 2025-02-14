@@ -5,6 +5,14 @@ $(document).ready(function () {
     },
     pagingType: "simple",
     lengthChange: false,
+    dom: "Bfrtip",
+    buttons: [
+      {
+        extend: "excel",
+        text: `<i class="material-icons small">file_download</i> ดาวน์โหลด Excel`,
+        className: "text-white bg-info",
+      },
+    ],
   //  order: [[0, "desc"]],
   });
 

@@ -52,7 +52,7 @@ class Participants extends \yii\db\ActiveRecord
     {
         return [
             [['picktime'], 'safe'],
-            [['runningid', 'status','adminid','updateid'], 'integer'],
+            [['runningid', 'status','pickup_by','updateid'], 'integer'],
             [['first_name', 'last_name', 'emergency_contact', 'province'], 'string', 'max' => 100],
             [['email', 'health_issues'], 'string', 'max' => 255],
             [['gender', 'participant_telephone', 'birthDate', 'emergency_contact_phone', 'price', 'start_date'], 'string', 'max' => 20],
@@ -101,5 +101,10 @@ class Participants extends \yii\db\ActiveRecord
     public function getRunning()
     {
         return $this->hasOne(Running::className(), ['id' => 'runningid']);
+    }
+
+    public function getPickupByUser()
+    {
+        return $this->hasOne(User::className(), ['id' => 'pickup_by']);
     }
 }

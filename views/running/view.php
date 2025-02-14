@@ -13,6 +13,7 @@ $this->params['breadcrumbs'][] = ['label' => 'Runnings', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 \yii\web\YiiAsset::register($this);
 ?>
+
 <div class="running-view">
 
 
@@ -50,9 +51,10 @@ $this->params['breadcrumbs'][] = $this->title;
         <br><br>
 
         <table id="excelTable"></table>
+
         <div class="table-responsive">
             <h4>รายชื่อผู้เข้าร่วม</h4>
-            <table class="table table-striped table-bordered datatable">
+            <table class="table table-striped table-bordered datatable" id="myTable">
                 <thead>
                     <tr>
                         <th>ลำดับ</th>
@@ -61,12 +63,14 @@ $this->params['breadcrumbs'][] = $this->title;
                         <th>เพศ</th>
                         <th>เบอร์โทร</th>
                         <th>สถานะ</th>
+                        <th>วันเวลาที่รับของ</th>
+                        <th>ผู้จ่ายของ</th>
                         <th>จัดการ</th>
                     </tr>
                 </thead>
                 <tbody>
                     <?php
-                    $participants = Participants::find()->where(['runningid' => $model->id])->all();
+                    $participants = Participants::find()->where(['runningid' => $model->id])->orderBy(['picktime' => SORT_DESC])->all();
                     foreach ($participants as $index => $participant) {
 
 
@@ -81,6 +85,8 @@ $this->params['breadcrumbs'][] = $this->title;
                             <td>
                                 <div class="text-center"> <?= $status ?> </div>
                             </td>
+                            <td><?= $participant->status == 1 ? $participant->picktime : "รอรับของ" ?></td>
+                            <td><?=  $participant->status == 1 ? $participant->pickupByUser->fullname : "รอรับของ" ?></td>
                             <td>
                                 <div class="text-center">
 

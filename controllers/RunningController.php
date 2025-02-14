@@ -188,6 +188,8 @@ class RunningController extends Controller
         }
         $participantUpdate->status = 1;
         $participantUpdate->picktime = date('Y-m-d H:i:s');
+        $participantUpdate->pickup_by = Yii::$app->user->identity->id;
+        $participantUpdate->updateid = Yii::$app->user->identity->id;
         $participantUpdate->save(false);
 
         $participants = Participants::findAll(['nationalId' => $nationId, 'runningid' => $runningId]);

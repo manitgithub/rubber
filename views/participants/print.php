@@ -34,6 +34,7 @@
             margin: 2px 0;
             font-size: 16px;
             max-width: 80mm;
+            padding: 2px 0;
         }
 
         .box {
@@ -87,6 +88,7 @@
             <p><?= str_pad($model->bib_number, 4, '0', STR_PAD_LEFT) ?></p>
             <h4>รับของ / Pick Up:</h4>
             <p> <?= $model->picktime ?></p>
+            <p> [<?= $model->pickupByUser->fullname ?>]</p>
         </div>
 
         <div class="section">
