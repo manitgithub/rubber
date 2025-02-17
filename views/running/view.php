@@ -20,6 +20,8 @@ $this->params['breadcrumbs'][] = $this->title;
     <div class="jumbotron  bg-white">
         <h4 class="mb-3"><?= $model->name ?>!
             <div class="float-right">
+                <a class="btn btn-primary" href="<?= Url::to(['running/report', 'id' => $model->id]) ?>"
+                    role="button"><i class="material-icons">dashboard</i> รายงานสรุป</a>
                 <a class="btn btn-primary" href="<?= Url::to(['running/pickup', 'id' => $model->id]) ?>"
                     role="button"><i class="material-icons">add</i> รับของ</a>
                 <a class="btn btn-warning" href="<?= Url::to(['update', 'id' => $model->id]) ?>" role="button"><i

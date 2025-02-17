@@ -230,6 +230,16 @@ class RunningController extends Controller
         return $report;
     }
 
+    public function actionReport($id)
+    {
+        $model = $this->findModel($id);
+        $participants = Participants::find()->where(['runningid' => $model->id])->orderBy(['picktime' => SORT_DESC])->all();
+        return $this->render('report', [
+            'model' => $model,
+            'participants' => $participants
+        ]);
+    }
+
 
     /**
      * Finds the Running model based on its primary key value.

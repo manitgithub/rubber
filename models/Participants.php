@@ -57,7 +57,7 @@ class Participants extends \yii\db\ActiveRecord
             [['email', 'health_issues'], 'string', 'max' => 255],
             [['gender', 'participant_telephone', 'birthDate', 'emergency_contact_phone', 'price', 'start_date'], 'string', 'max' => 20],
             [['age_category', 'bib_number', 'emergency_contact_relationship', 'nationalId', 'shirt_type', 'reg_deliver_option', 'registration_type', 'ticket_type', 'race', 'user_code', 'ticket_code'], 'string', 'max' => 200],
-            [['shirt'], 'string', 'max' => 10],
+            [['shirt'], 'string', 'max' => 30],
         ];
     }
 
