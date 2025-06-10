@@ -1,4 +1,6 @@
 $(document).ready(function () {
+  $.fn.dataTable.ext.errMode = 'none';
+
   $(".datatable").DataTable({
     language: {
       url: "https://cdn.datatables.net/plug-ins/1.13.7/i18n/th.json",
@@ -9,7 +11,12 @@ $(document).ready(function () {
     buttons: [
       {
         extend: "excel",
-        text: `<i class="material-icons small">file_download</i> ดาวน์โหลด Excel`,
+        text: `<i class="material-icons small">file_download</i> Excel`,
+        className: "text-white bg-success",
+      },
+      {
+        extend: "print",
+        text: `<i class="material-icons small">print</i> พิมพ์`,
         className: "text-white bg-info",
       },
     ],

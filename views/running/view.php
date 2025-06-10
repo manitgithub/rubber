@@ -28,6 +28,7 @@ $this->params['breadcrumbs'][] = $this->title;
                         class="material-icons">edit</i> แก้ไข</a>
                 <a class="btn btn-warning" href="<?= Url::to(['index']) ?>" role="button"><i
                         class="material-icons">arrow_back</i> กลับ</a>
+                        <a class="btn btn-danger" href="<?= Url::to(['delete', 'id' => $model->id]) ?>" role="button" data-method="post" data-confirm="คุณแน่ใจหรือไม่ที่จะลบกิจกรรมนี้?"><i class="material-icons">delete</i> ลบ</a>
             </div>
         </h4>
         <hr class="my-4">
@@ -64,6 +65,9 @@ $this->params['breadcrumbs'][] = $this->title;
                         <th>ชื่อสกุล</th>
                         <th>เพศ</th>
                         <th>เบอร์โทร</th>
+                        <th style="display: none;">ประเภทเสื้อ</th>
+                        <th>ขนาดเสื้อ</th>
+                        <th>ระยะ</th>
                         <th>สถานะ</th>
                         <th>วันเวลาที่รับของ</th>
                         <th>ผู้จ่ายของ</th>
@@ -84,14 +88,16 @@ $this->params['breadcrumbs'][] = $this->title;
                             <td><?= $participant->first_name ?> <?= $participant->last_name ?></td>
                             <td><?= $participant->gender == "male" ? "ชาย" : "หญิง" ?></td>
                             <td><?= $participant->participant_telephone ?></td>
+                            <td style="display: none;"><?= $participant->shirt_type ?></td>
+                            <td><?= $participant->shirt ?></td>
+                            <td><?= $participant->race ?></td>
                             <td>
                                 <div class="text-center"> <?= $status ?> </div>
                             </td>
-                            <td><?= $participant->status == 1 ? $participant->picktime : "รอรับของ" ?></td>
-                            <td><?=  $participant->status == 1 ? $participant->pickupByUser->fullname : "รอรับของ" ?></td>
+                            <td><?= $participant->status == 1 ? @$participant->picktime : "รอรับของ" ?></td>
+                            <td><?=  $participant->status == 1 ? @$participant->pickupByUser->fullname : "รอรับของ" ?></td>
                             <td>
                                 <div class="text-center">
-
                                     <a href="<?= Url::to(['participants/view', 'id' => $participant->id]) ?>"
                                         class="btn btn-primary"><i class="material-icons">visibility</i> ดู</a>
                                     <a href="<?= Url::to(['participants/update', 'id' => $participant->id]) ?>"

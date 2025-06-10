@@ -2,7 +2,7 @@
 
 use yii\helpers\Url;
 
-Yii::$app->view->params['callBack'] = ['site/index'];
+//Yii::$app->view->params['callBack'] = ['site/index'];
 
 ?>
 

@@ -22,24 +22,22 @@ $this->params['breadcrumbs'][] = $this->title;
 
         <div class="col-md-4">
             <div class="jumbotron  bg-white">
-                <a class="btn btn-success" href="/running/create"><i class="material-icons">add</i> เพิ่มกิจกรรม</a>
+                <a class="btn btn-success btn-block" href="/running/create"><i class="material-icons">add</i> เพิ่มกิจกรรม</a>
             </div>
         </div>
 
         <?php foreach ($dataProvider->getModels() as $model) { ?>
             <div class="col-md-4">
                 <div class="jumbotron  bg-white">
-                    <h4 class="mb-3"><?= $model->name ?>!
-                        <p class="lead">วันที่: <?= $model->date ?> ผู้จัด: <?= $model->owner ?>
+                    <div class="text-center">
+                <img src="<?= $model->PhotoViewer ?>" class="img-thumbnail" ></div>
+                    <h4><?= $model->name ?>!</h4>
+                        <p class="lead"><?= $model->date ?> <br>ผู้จัด: <?= $model->owner ?>
                         </p>
                         <hr class="my-4">
-                        <br>
-                        รายละเอียด: <?= $model->detail ?><br>
-
-                        <br>
-                        <div class="float-right">
-
-                            <a class="btn btn-primary" href="<?= Url::to(['running/view', 'id' => $model->id]) ?>"
+                        <?= $model->detail ?><br>
+                        <div>
+                            <a class="btn btn-primary btn-block" href="<?= Url::to(['view', 'id' => $model->id]) ?>"
                                 role="button"><i class="material-icons">visibility</i> จัดการ</a>
                         </div>
                 </div>

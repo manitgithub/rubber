@@ -47,46 +47,34 @@ class ReportController extends Controller
     {
         return $this->render('index');
     }
-    public function actionMonthlyReport()
-    {
-        return $this->render('monthly-report');
-    }
-    public function actionCurrentStock()
-    {
-        return $this->render('current-stock');
-    }
-    public function actionCurrentStockDetail()
-    {
-        return $this->render('current-stock-detail');
-    }
-    public function actionExpiredProduct()
-    {
-        return $this->render('expired-product');
-    }
-    public function actionRemainingProduct()
-    {
-        return $this->render('remaining-product');
+    public function actionDaily()
+{
+    $model = new \yii\base\DynamicModel(['date']);
+    $model->addRule('date', 'required');
+
+    $date = Yii::$app->request->get('date', date('Y-m-d'));
+    $model->date = $date;
+
+    $purchases = \app\models\Purchases::find()
+        ->where(['date' => $date])
+        ->andWhere(['flagdel' => 0])
+        ->all();
+
+    $total_weight = $total_dry_weight = $total_amount = 0;
+    foreach ($purchases as $p) {
+        $total_weight += $p->weight;
+        $total_dry_weight += $p->dry_weight;
+        $total_amount += $p->total_amount;
     }
 
-    public function actionMovementProduct()
-    {
-        return $this->render('movement-product');
-    }
+    return $this->render('daily', [
+        'model' => $model,
+        'date' => $date,
+        'purchases' => $purchases,
+        'total_weight' => $total_weight,
+        'total_dry_weight' => $total_dry_weight,
+        'total_amount' => $total_amount,
+    ]);
+}
 
-    public function actionMonthly()
-    {
-        return $this->render('monthly');
-    }
-    public function actionReportProduct()
-    {
-        return $this->render('report-product');
-    }
-    public function actionReportPartner()
-    {
-        return $this->render('report-partner');
-    }
-    public function actionRequisitionProduct()
-    {
-        return $this->render('requisition-product');
-    }
 }

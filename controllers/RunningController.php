@@ -41,7 +41,7 @@ class RunningController extends Controller
     public function actionIndex()
     {
         $dataProvider = new ActiveDataProvider([
-            'query' => Running::find(),
+            'query' => Running::find()->where(['flag_del' => 0]),
             /*
             'pagination' => [
                 'pageSize' => 50
@@ -133,7 +133,9 @@ class RunningController extends Controller
      */
     public function actionDelete($id)
     {
-        $this->findModel($id)->delete();
+        $model = $this->findModel($id);
+        $model->flag_del = 1;
+        $model->save(false);
 
         return $this->redirect(['index']);
     }

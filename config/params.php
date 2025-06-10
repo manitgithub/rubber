@@ -104,47 +104,20 @@ return [
     'menuSysReport' => [
 
         1 => [
-            'name' => 'รายงานการปฏิบัติงานรายเดือน',
+            'name' => 'รายงานรับซื้อรายวัน',
             'description' => '',
-            'icon' => 'list',
+            'icon' => 'show_chart',
             'controller' => 'report',
-            'action' => 'leave-report'
+            'action' => 'daily'
         ],
         2 => [
-            'name' => 'รายงานการลงเวลาเข้าออกงานรายบุคคล',
+            'name' => 'รายงานสรุปยอดตามช่วงเวลา',
             'description' => '',
             'icon' => 'show_chart',
             'controller' => 'report',
-            'action' => 'checkin-report'
+            'action' => 'report-summary'
         ],
-        3 => [
-            'name' => 'รายงานการเข้าออกงานรายวัน',
-            'description' => '',
-            'icon' => 'show_chart',
-            'controller' => 'report',
-            'action' => 'checkin-report-day'
-        ],
-        4 => [
-            'name' => 'รายงานสรุปการปฏิบัติงานรายเดือน',
-            'description' => '',
-            'icon' => 'show_chart',
-            'controller' => 'report',
-            'action' => 'monthly-report'
-        ],
-        6 => [
-            'name' => 'รายงานการปฏิบัติงานรายปี',
-            'description' => '',
-            'icon' => 'show_chart',
-            'controller' => 'report',
-            'action' => 'report-year'
-        ],
-        7 => [
-            'name' => 'รายงานการลา',
-            'description' => '',
-            'icon' => 'show_chart',
-            'controller' => 'report',
-            'action' => 'leave-report-year'
-        ],
+
 
 
 
