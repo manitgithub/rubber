@@ -30,20 +30,25 @@ function generateRunningNumberFromPurchases($runDate) {
     return $yy . $mm . $dd . $run;
 }
 
-
+if(isset($_GET['date']) && !empty($_GET['date'])) {
+    $date = $_GET['date'];
+} else {
+    $date = date('Y-m-d');
+}
 ?>
     <div class="row">
+                <div class="col-md-3">
+            <?= $form->field($model, 'receipt_number')->textInput(['maxlength' => true, 'readonly' => true, 'value' => generateRunningNumberFromPurchases(date('Y-m-d'))]) ?>
+        </div>
+        <div class="col-md-3">
+            <?= $form->field($model, 'date')->textInput(['type' => 'date', 'value' => $date, 'class' => 'form-control datepicker' ,'onchange' => 'location.href = "?date=" + this.value']) ?>
+        </div>
+
         <div class="col-md-6">
             <?= $form->field($model, 'member_id')->dropDownList(
                 ArrayHelper::map(Members::find()->all(), 'id', 'fullname'),
                 ['prompt' => 'เลือกสมาชิก', 'class' => 'form-control select2']
             ) ?>
-        </div>
-        <div class="col-md-3">
-            <?= $form->field($model, 'receipt_number')->textInput(['maxlength' => true, 'readonly' => true, 'value' => generateRunningNumberFromPurchases(date('Y-m-d'))]) ?>
-        </div>
-        <div class="col-md-3">
-            <?= $form->field($model, 'date')->textInput(['type' => 'date', 'value' => date('Y-m-d'), 'class' => 'form-control datepicker']) ?>
         </div>
 
         <div class="col-md-4">

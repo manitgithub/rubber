@@ -52,11 +52,11 @@ class ReportController extends Controller
     $model = new \yii\base\DynamicModel(['date']);
     $model->addRule('date', 'required');
 
-    $date = Yii::$app->request->get('date', date('Y-m-d'));
-    $model->date = $date;
+    $sdate = Yii::$app->request->get('sdate', date('Y-m-d'));
+    $edate = Yii::$app->request->get('edate', date('Y-m-d'));
 
     $purchases = \app\models\Purchases::find()
-        ->where(['date' => $date])
+        ->where(['between', 'date', $sdate, $edate])
         ->andWhere(['flagdel' => 0])
         ->all();
 
@@ -69,7 +69,8 @@ class ReportController extends Controller
 
     return $this->render('daily', [
         'model' => $model,
-        'date' => $date,
+        'sdate' => $sdate,
+        'edate' => $edate,
         'purchases' => $purchases,
         'total_weight' => $total_weight,
         'total_dry_weight' => $total_dry_weight,

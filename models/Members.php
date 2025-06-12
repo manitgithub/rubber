@@ -106,5 +106,9 @@ class Members extends \yii\db\ActiveRecord
     {
         return $this->memberid . ':' . $this->pername . ' ' . $this->name . ' ' . $this->surname;
     }
+    public function getFullname2()
+    {
+        return $this->pername . ' ' . $this->name . ' ' . $this->surname;
+    }
 
 }

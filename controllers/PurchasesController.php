@@ -84,7 +84,7 @@ class PurchasesController extends Controller
             if ($model->load($this->request->post()) && $model->save()) {
                 // Set the status to 'active' after saving
                 Yii::$app->session->setFlash('success');
-                return $this->redirect(['create', 'msg' => 'success']);
+                return $this->redirect(['create', 'msg' => 'success', 'date' => $model->date]);
         } 
             $model->loadDefaultValues();
         }

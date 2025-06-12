@@ -9,6 +9,12 @@ use yii\widgets\ActiveForm;
 $this->title = 'บันทึกการซื้อน้ำยาง';
 $this->params['breadcrumbs'][] = ['label' => 'Purchases', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
+
+if (isset($_GET['date']) && !empty($_GET['date'])) {
+    $date = $_GET['date'];
+} else {
+    $date = date('Y-m-d');
+}
 ?>
 
 <div class="running-create">
@@ -24,7 +30,7 @@ $this->params['breadcrumbs'][] = $this->title;
         <div class="running-create">
     <div class="card shadow-sm rounded-0">
         <div class="card-header rounded-0">
-            <h4> รายการบันทึกการซื้อน้ำยาง <?=Yii::$app->helpers->DateThai(date('Y-m-d'))?></h4>
+            <h4> รายการบันทึกการซื้อน้ำยาง <?=Yii::$app->helpers->DateThai($date) ?>
             </h4>
         </div>
         <div class="card-body">
@@ -68,7 +74,7 @@ $this->params['breadcrumbs'][] = $this->title;
                     </tr>
                 </thead>
                 <tbody>
-                    <?php $model = \app\models\Purchases::find()->where(['date' => date('Y-m-d'), 'flagdel' => 0])->orderBy(['id' => SORT_DESC])->all(); ?>
+                    <?php $model = \app\models\Purchases::find()->where(['date' => $date, 'flagdel' => 0])->orderBy(['id' => SORT_DESC])->all(); ?>
                     <?php if (empty($model)): ?>
                         <tr>
                             <td colspan="7" class="text-center">ไม่มีข้อมูล</td>
@@ -83,7 +89,7 @@ $this->params['breadcrumbs'][] = $this->title;
                             <td><?= Html::encode($purchase->price_per_kg) ?></td>
                             <td><?= number_format($purchase->total_amount, 2) ?></td>
                             <td class="text-center">
-                                <?= Html::a('แก้ไข', ['update', 'id' => $purchase->id], ['class' => 'btn btn-primary btn-sm']) ?>
+                                <?= Html::a('แก้ไข', ['update', 'id' => $purchase->id, 'date' => $date], ['class' => 'btn btn-primary btn-sm']) ?>
                                 <?= Html::a('ลบ', ['delete', 'id' => $purchase->id], [
                                     'class' => 'btn btn-danger btn-sm',
                                     'data' => [

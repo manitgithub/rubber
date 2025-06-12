@@ -9,8 +9,20 @@ use yii\widgets\ActiveForm;
 /** @var float $total_weight */
 /** @var float $total_dry_weight */
 /** @var float $total_amount */
+$this->title = 'ระหว่าง วันที่ ' . Yii::$app->helpers->DateThai($sdate) . ' - ' . Yii::$app->helpers->DateThai($edate);
 
-$this->title = 'รายงานสรุปการรับซื้อน้ำยางรายวัน';
+
+if(isset($_GET['sdate']) && !empty($_GET['sdate'])) {
+    $sdate = $_GET['sdate'];
+} else {
+    $sdate = date('Y-m-d');
+}
+
+if (isset($_GET['edate']) && !empty($_GET['edate'])) {
+    $edate = $_GET['edate'];
+} else {
+    $edate = date('Y-m-d');
+}
 ?>
 <div class="card card-body mb-4">
     <h5><i class="bi bi-file-earmark-text"></i> รายงานสรุปการรับซื้อน้ำยาง</h5>
@@ -21,8 +33,14 @@ $this->title = 'รายงานสรุปการรับซื้อน�
         <div class="row g-3">
             <div class="col-md-3">
                 <label class="form-label">วันที่</label>
-                <input type="date" name="date" value="<?= $date ?>" class="form-control">
+                <input type="date" name="sdate" value="<?= $sdate ?>" class="form-control datepicker">
             </div>
+
+            <div class="col-md-3">
+                <label class="form-label">ถึงวันที่</label>
+                <input type="date" name="edate" value="<?= $edate ?>" class="form-control datepicker">
+            </div>
+
             <div class="col-md-2 d-flex align-items-end">
                 <button type="submit" class="btn btn-success w-100">ค้นหา</button>
             </div>
@@ -32,41 +50,51 @@ $this->title = 'รายงานสรุปการรับซื้อน�
 
 
 <?php if (!empty($purchases)): ?>
-    <p class="text-muted">แสดงรายงานการรับซื้อน้ำยางประจำวันที่ <?= Yii::$app->formatter->asDate($date, 'php:d/m/Y') ?></p>
+    <p class="text-muted">แสดงรายงานการรับซื้อน้ำยาง วันที่ <?= Yii::$app->helpers->DateThai($sdate) ?> ถึง <?= Yii::$app->helpers->DateThai($edate) ?></p>
 
-    <table class="table datatable">
+    <table class="table datatable table-striped table-bordered table-hover">
         <thead>
             <tr>
                 <th>ลำดับ</th>
-                <th>ชื่อสมาชิก</th>
-                <th>น้ำหนัก (กก.)</th>
-                <th>เปอร์เซ็นต์</th>
-                <th>น้ำหนักแห้ง (กก.)</th>
-                <th>ราคาต่อกก.</th>
+                <th>วันที่</th>
+                <th>ชื่อ-สกุล</th>
+                <th>เลขทะเบียน</th>
+                <th>นน ยางสด(กก.)</th>
+                <th>%DRC</th>
+                <th>นน ยางแห้ง (กก.)</th>
+                <th>ราคา/กก.</th>
                 <th>ยอดรวม</th>
+                <th>ลายมือชื่อผู้ส่ง</th>
+
             </tr>
         </thead>
         <tbody>
             <?php foreach ($purchases as $i => $p): ?>
             <tr>
                 <td><?= $i + 1 ?></td>
-                <td><?= Html::encode($p->members->fullname) ?></td>
+                <td><?= Yii::$app->helpers->DateThai($p->date) ?></td>
+                <td><?= Html::encode($p->members->fullname2) ?></td>
+                <td><?= Html::encode($p->members->memberid) ?></td>
                 <td><?= number_format($p->weight, 2) ?></td>
                 <td><?= number_format($p->percentage, 2) ?></td>
                 <td><?= number_format($p->dry_weight, 2) ?></td>
                 <td><?= number_format($p->price_per_kg, 2) ?></td>
                 <td><?= number_format($p->total_amount, 2) ?></td>
+                <td></td>
+
             </tr>
             <?php endforeach ?>
         </tbody>
         <tfoot>
             <tr class="table-warning">
-                <td colspan="2" class="text-center"><strong>รวม</strong></td>
+                <td colspan="4" class="text-center"><strong>รวม</strong></td>
                 <td class="text-end"><strong><?= number_format($total_weight, 2) ?></strong></td>
                 <td></td>
                 <td class="text-end"><strong><?= number_format($total_dry_weight, 2) ?></strong></td>
                 <td></td>
                 <td class="text-end"><strong><?= number_format($total_amount, 2) ?></strong></td>
+                                <td></td>
+
             </tr>
         </tfoot>
     </table>
