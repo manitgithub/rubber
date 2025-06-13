@@ -47,6 +47,11 @@ class ReportController extends Controller
     {
         return $this->render('index');
     }
+    public function actionReportSummary()
+    {
+
+        return $this->render('report-summary');
+    }
     public function actionDaily()
 {
     $model = new \yii\base\DynamicModel(['date']);
