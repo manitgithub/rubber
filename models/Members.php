@@ -104,7 +104,9 @@ class Members extends \yii\db\ActiveRecord
     }
     public function getFullname()
     {
-        return $this->memberid . ':' . $this->pername . ' ' . $this->name . ' ' . $this->surname;
+        // $this->memberid ให้แสดง 3 หลัก โดยเติม 0 ข้างหน้า
+        $memberid = str_pad($this->memberid, 3, '0', STR_PAD_LEFT);
+        return $memberid . ' : ' . $this->pername . ' ' . $this->name . ' ' . $this->surname;
     }
     public function getFullname2()
     {
