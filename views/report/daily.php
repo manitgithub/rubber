@@ -115,6 +115,12 @@ $this->title = $showday ? 'รายงานการรับซื้อน�
             </tr>
         </tfoot>
     </table>
+<?php else: ?>
+    <div class="alert alert-warning text-center" role="alert">
+        <i class="bi bi-exclamation-triangle"></i>
+        <strong>ไม่พบข้อมูล</strong><br>
+        ไม่มีรายการรับซื้อน้ำยางในช่วงวันที่ที่เลือก
+    </div>
 <?php endif; ?>
 
 </div>
@@ -122,8 +128,10 @@ $this->title = $showday ? 'รายงานการรับซื้อน�
 <!-- Print-only content -->
 <div id="printContent" class="d-none">
     <div class="print-header text-center mb-4">
-        <h2>รายงานการรับซื้อน้ำยาง</h2>
-        <h4><?= $showday ? 'วันที่ ' . Yii::$app->helpers->DateThai($sdate) . ' ถึง ' . Yii::$app->helpers->DateThai($edate) : 'วันที่ ' . Yii::$app->helpers->DateThai($sdate) ?></h4>
+        <h2>สหกรณ์การกองทุนยางฉลองน้ำขาวพัฒนา จำกัด</h2>
+        <h2>ใบรับน้ำยาง</h2>
+
+        <h2>รับซื้อน้ำยาสดประจำ<?= $showday ? 'วันที่ ' . Yii::$app->helpers->DateThai($sdate) . ' ถึง ' . Yii::$app->helpers->DateThai($edate) : 'วันที่ ' . Yii::$app->helpers->DateThai($sdate) ?></h2>
         <hr style="border: 1px solid #000; margin: 10px 0;">
     </div>
     
@@ -132,15 +140,15 @@ $this->title = $showday ? 'รายงานการรับซื้อน�
         <thead>
             <tr>
                 <th style="width: 5%;">ลำดับ</th>
-                <?= $showday ? '<th style="width: 10%;">วันที่</th>' : '' ?>
-                <th style="width: 15%;">ชื่อ-สกุล</th>
-                <th style="width: 10%;">เลขทะเบียน</th>
-                <th style="width: 10%;">นน.ยางสด(กก.)</th>
-                <th style="width: 8%;">%DRC</th>
-                <th style="width: 10%;">นน.ยางแห้ง(กก.)</th>
-                <th style="width: 10%;">ราคา/กก.</th>
-                <th style="width: 10%;">ยอดรวม</th>
-                <th style="width: 12%;">ลายมือชื่อผู้ส่ง</th>
+                <?= $showday ? '<th style="width: 8%;">วันที่</th>' : '' ?>
+                <th style="width: 20%;">ชื่อ-สกุล</th>
+                <th style="width: 9%;">เลขทะเบียน</th>
+                <th style="width: 9%;">นน.ยางสด(กก.)</th>
+                <th style="width: 7%;">%DRC</th>
+                <th style="width: 9%;">นน.ยางแห้ง(กก.)</th>
+                <th style="width: 9%;">ราคา/กก.</th>
+                <th style="width: 9%;">ยอดรวม</th>
+                <th style="width: 15%;">ลายมือชื่อผู้ส่ง</th>
             </tr>
         </thead>
         <tbody>
@@ -246,7 +254,7 @@ $this->title = $showday ? 'รายงานการรับซื้อน�
     }
     
     .print-table {
-        font-size: 14px;
+        font-size: 16px;
         width: 100%;
         border-collapse: collapse;
         border: 2px solid #000;
@@ -266,7 +274,7 @@ $this->title = $showday ? 'รายงานการรับซื้อน�
     .print-table th {
         background-color: #f0f0f0;
         font-weight: bold;
-        font-size: 13px;
+        font-size: 18px;
         border: 2px solid #000;
     }
     
@@ -383,7 +391,7 @@ function printReportNewWindow() {
                 .print-table {
                     width: 100%;
                     border-collapse: collapse;
-                    font-size: 14px;
+                    font-size: 16px;
                     border: 2px solid #000;
                     margin-bottom: 25px;
                 }
@@ -401,7 +409,7 @@ function printReportNewWindow() {
                 .print-table th {
                     background-color: #f0f0f0;
                     font-weight: bold;
-                    font-size: 13px;
+                    font-size: 18px;
                     border: 2px solid #000;
                 }
                 
@@ -469,9 +477,9 @@ function printReportNewWindow() {
         </head>
         <body>
             <div class="print-header">
-            <br>
-                <h2>รายงานการรับซื้อน้ำยาง</h2>
-                <h4><?= $showday ? 'วันที่ ' . Yii::$app->helpers->DateThai($sdate) . ' ถึง ' . Yii::$app->helpers->DateThai($edate) : 'วันที่ ' . Yii::$app->helpers->DateThai($sdate) ?></h4>
+                <h3>สหกรณ์การกองทุนยางฉลองน้ำขาวพัฒนา จำกัด</h3>
+                <h3>ใบรับน้ำยาง</h3>
+                <h3><?= $showday ? 'วันที่ ' . Yii::$app->helpers->DateThai($sdate) . ' ถึง ' . Yii::$app->helpers->DateThai($edate) : 'วันที่ ' . Yii::$app->helpers->DateThai($sdate) ?></h3>
                 <hr style="border: 1px solid #000; margin: 10px 0;">
             </div>
             ${printContent}
