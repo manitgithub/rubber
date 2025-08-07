@@ -9,7 +9,6 @@ use yii\widgets\ActiveForm;
 /** @var float $total_weight */
 /** @var float $total_dry_weight */
 /** @var float $total_amount */
-$this->title = 'ระหว่าง วันที่ ' . Yii::$app->helpers->DateThai($sdate) . ' - ' . Yii::$app->helpers->DateThai($edate);
 
 
 if(isset($_GET['sdate']) && !empty($_GET['sdate'])) {
@@ -23,6 +22,15 @@ if (isset($_GET['edate']) && !empty($_GET['edate'])) {
 } else {
     $edate = date('Y-m-d');
 }
+$showday = true;
+if($sdate == $edate) {
+    $showday = false;
+} else {
+    $showday = true;
+}
+
+$this->title = $showday ? 'รายงานการรับซื้อน้ำยาง <br> วันที่ ' . Yii::$app->helpers->DateThai($sdate) . ' ถึง ' . Yii::$app->helpers->DateThai($edate) : 'รายงานการรับซื้อน้ำยาง <br> วันที่ ' . Yii::$app->helpers->DateThai($sdate);
+
 ?>
 <div class="card card-body mb-4">
     <h5><i class="bi bi-file-earmark-text"></i> รายงานสรุปการรับซื้อน้ำยาง</h5>
@@ -49,14 +57,16 @@ if (isset($_GET['edate']) && !empty($_GET['edate'])) {
 </div>
 
 
-<?php if (!empty($purchases)): ?>
-    <p class="text-muted">แสดงรายงานการรับซื้อน้ำยาง วันที่ <?= Yii::$app->helpers->DateThai($sdate) ?> ถึง <?= Yii::$app->helpers->DateThai($edate) ?></p>
 
+<?php if (!empty($purchases)): ?>
+    <p class="text-muted">
+        <?= $showday ? 'รายงานการรับซื้อน้ำยาง <br>วันที่ ' . Yii::$app->helpers->DateThai($sdate) . ' ถึง ' . Yii::$app->helpers->DateThai($edate) : 'แสดงรายงานการรับซื้อน้ำยาง วันที่ ' . Yii::$app->helpers->DateThai($sdate) ?>
+    </p>
     <table class="table datatable table-striped table-bordered table-hover">
         <thead>
             <tr>
                 <th>ลำดับ</th>
-                <th>วันที่</th>
+                <?= $showday ? '<th>วันที่</th>' : '' ?>
                 <th>ชื่อ-สกุล</th>
                 <th>เลขทะเบียน</th>
                 <th>นน ยางสด(กก.)</th>
@@ -72,7 +82,7 @@ if (isset($_GET['edate']) && !empty($_GET['edate'])) {
             <?php foreach ($purchases as $i => $p): ?>
             <tr>
                 <td><?= $i + 1 ?></td>
-                <td><?= Yii::$app->helpers->DateThai($p->date) ?></td>
+                <?= $showday ? '<td>' . Yii::$app->helpers->DateThai($p->date) . '</td>' : '' ?>
                 <td><?= Html::encode($p->members->fullname2) ?></td>
                 <td><?= Html::encode($p->members->memberid) ?></td>
                 <td><?= number_format($p->weight, 2) ?></td>
@@ -87,7 +97,7 @@ if (isset($_GET['edate']) && !empty($_GET['edate'])) {
         </tbody>
         <tfoot>
             <tr class="table-warning">
-                <td colspan="4" class="text-center"><strong>รวม</strong></td>
+                <td colspan="<?= $showday ? '4' : '3' ?>" class="text-end"><strong>รวม</strong></td>
                 <td class="text-end"><strong><?= number_format($total_weight, 2) ?></strong></td>
                 <td></td>
                 <td class="text-end"><strong><?= number_format($total_dry_weight, 2) ?></strong></td>
