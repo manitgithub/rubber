@@ -32,8 +32,8 @@ $this->params['breadcrumbs'][] = $this->title;
             <?= Html::textInput('run_no', $runNo, ['class' => 'form-control']) ?>
         </div>
         <div class="col-md-3">
-            <?= Html::label('รหัสสมาชิก', 'member_id') ?>
-            <?= Html::textInput('member_id', $memberId, ['class' => 'form-control']) ?>
+            <?= Html::label('รหัสสมาชิก', 'memberid') ?>
+            <?= Html::textInput('memberid', $memberId, ['class' => 'form-control']) ?>
         </div>
         <div class="col-md-2 d-flex align-items-end">
             <?= Html::submitButton('ค้นหา', ['class' => 'btn btn-success w-100']) ?>
@@ -58,7 +58,6 @@ $this->params['breadcrumbs'][] = $this->title;
                 <tr>
                     <th>วันที่</th>
                     <th>เล่ม/เลขที่</th>
-                    <th>รหัสสมาชิก</th>
                     <th>ชื่อสมาชิก</th>
                     <th class="text-end">จำนวนเงิน</th>
                     <th>จัดการ</th>
@@ -69,7 +68,6 @@ $this->params['breadcrumbs'][] = $this->title;
                     <tr>
                         <td><?= Yii::$app->helpers->DateThai($receipt->receipt_date) ?></td>
                         <td><?= Html::encode($receipt->book_no) ?>/<?= str_pad($receipt->running_no, 4, '0', STR_PAD_LEFT) ?></td>
-                        <td><?= Html::encode($receipt->member_id) ?></td>
                         <td><?= Html::encode($receipt->member->fullname) ?></td>
                         <td class="text-end"><?= number_format($receipt->total_amount, 2) ?> บาท</td>
                         <td class="text-center">
