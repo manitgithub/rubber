@@ -7,19 +7,19 @@ $(document).ready(function () {
     },
     pagingType: "simple",
     lengthChange: false,
-    dom: "Bfrtip",
-    buttons: [
-      {
-        extend: "excel",
-        text: `<i class="material-icons small">file_download</i> Excel`,
-        className: "text-white bg-success",
-      },
-      {
-        extend: "print",
-        text: `<i class="material-icons small">print</i> พิมพ์`,
-        className: "text-white bg-info",
-      },
-    ],
+    // dom: "Bfrtip",
+    // buttons: [
+    //   {
+    //     extend: "excel",
+    //     text: `<i class="material-icons small">file_download</i> Excel`,
+    //     className: "text-white bg-success",
+    //   },
+    //   {
+    //     extend: "print",
+    //     text: `<i class="material-icons small">print</i> พิมพ์`,
+    //     className: "text-white bg-info",
+    //   },
+    // ],
   //  order: [[0, "desc"]],
   });
 

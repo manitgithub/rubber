@@ -9,7 +9,7 @@ use yii\grid\GridView;
 /** @var yii\web\View $this */
 /** @var yii\data\ActiveDataProvider $dataProvider */
 
-$this->title = 'Prices';
+$this->title = 'จัดการราคายาง';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="prices-index">
@@ -17,7 +17,8 @@ $this->params['breadcrumbs'][] = $this->title;
     <h1><?= Html::encode($this->title) ?></h1>
 
     <p>
-        <?= Html::a('Create Prices', ['create'], ['class' => 'btn btn-success']) ?>
+        <?= Html::a('<i class="bi bi-plus-circle"></i> เพิ่มราคาใหม่', ['create'], ['class' => 'btn btn-success']) ?>
+        <?= Html::a('<i class="bi bi-graph-up-arrow"></i> ดูกราฟราคา', ['chart'], ['class' => 'btn btn-primary']) ?>
     </p>
 
 

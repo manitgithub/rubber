@@ -130,6 +130,15 @@ class PricesController extends Controller
     }
 
     /**
+     * Shows price chart
+     * @return string
+     */
+    public function actionChart()
+    {
+        return $this->render('chart');
+    }
+
+    /**
      * Finds the Prices model based on its primary key value.
      * If the model is not found, a 404 HTTP exception will be thrown.
      * @param int $id ID

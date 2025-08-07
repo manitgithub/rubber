@@ -32,8 +32,145 @@ if($sdate == $edate) {
 $this->title = $showday ? 'รายงานการรับซื้อน้ำยาง <br> วันที่ ' . Yii::$app->helpers->DateThai($sdate) . ' ถึง ' . Yii::$app->helpers->DateThai($edate) : 'รายงานการรับซื้อน้ำยาง <br> วันที่ ' . Yii::$app->helpers->DateThai($sdate);
 
 ?>
-<div class="card card-body mb-4">
+
+<style>
+.report-header {
+    background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+    border-radius: 15px;
+    padding: 1.5rem;
+    color: white;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 4px 15px rgba(40, 167, 69, 0.2);
+}
+
+.report-header h5 {
+    margin: 0;
+    font-size: 1.3rem;
+    font-weight: 600;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.2);
+}
+
+.report-header i {
+    margin-right: 0.5rem;
+    font-size: 1.4rem;
+}
+
+.search-card {
+    background: white;
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+    border: 1px solid #e9ecef;
+    margin-bottom: 1.5rem;
+}
+
+.form-label {
+    font-weight: 600;
+    color: #495057;
+    margin-bottom: 0.5rem;
+}
+
+.form-control {
+    border-radius: 8px;
+    border: 2px solid #e9ecef;
+    transition: all 0.3s ease;
+    padding: 0.6rem 1rem;
+}
+
+.form-control:focus {
+    border-color: #28a745;
+    box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.15);
+}
+
+.btn-success {
+    background: linear-gradient(135deg, #28a745, #20c997);
+    border: none;
+    border-radius: 8px;
+    padding: 0.6rem 1.5rem;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(40, 167, 69, 0.3);
+}
+
+.btn-success:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(40, 167, 69, 0.4);
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #007bff, #6610f2);
+    border: none;
+    border-radius: 8px;
+    padding: 0.6rem 1.5rem;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(0, 123, 255, 0.3);
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 123, 255, 0.4);
+}
+
+.data-summary {
+    background: #f8f9fa;
+    border-radius: 10px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    border-left: 4px solid #28a745;
+}
+
+.data-summary .text-muted {
+    color: #6c757d !important;
+    font-weight: 500;
+}
+
+.table {
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+}
+
+.table thead th {
+    background: linear-gradient(135deg, #343a40, #495057);
+    color: white;
+    font-weight: 600;
+    border: none;
+    padding: 1rem 0.75rem;
+    text-align: center;
+}
+
+.table tbody tr:hover {
+    background-color: #f8f9fa;
+    transform: scale(1.001);
+    transition: all 0.2s ease;
+}
+
+.table-warning {
+    background: linear-gradient(135deg, #fff3cd, #ffeaa7) !important;
+    font-weight: 600;
+}
+
+.alert-warning {
+    background: linear-gradient(135deg, #fff3cd, #ffeaa7);
+    border: none;
+    border-radius: 12px;
+    padding: 2rem;
+    box-shadow: 0 4px 15px rgba(255, 193, 7, 0.2);
+}
+
+.alert-warning i {
+    font-size: 2rem;
+    margin-bottom: 1rem;
+    color: #856404;
+}
+</style>
+
+<div class="report-header">
     <h5><i class="bi bi-file-earmark-text"></i> รายงานสรุปการรับซื้อน้ำยาง</h5>
+</div>
+
+<div class="search-card">
     
 
 <div class="mb-3">
@@ -63,12 +200,16 @@ $this->title = $showday ? 'รายงานการรับซื้อน�
     </form>
 </div>
 
+</div>
+
 
 
 <?php if (!empty($purchases)): ?>
-    <p class="text-muted">
-        <?= $showday ? 'รายงานการรับซื้อน้ำยาง <br>วันที่ ' . Yii::$app->helpers->DateThai($sdate) . ' ถึง ' . Yii::$app->helpers->DateThai($edate) : 'แสดงรายงานการรับซื้อน้ำยาง วันที่ ' . Yii::$app->helpers->DateThai($sdate) ?>
-    </p>
+    <div class="data-summary">
+        <p class="text-muted">
+            <?= $showday ? 'รายงานการรับซื้อน้ำยาง <br>วันที่ ' . Yii::$app->helpers->DateThai($sdate) . ' ถึง ' . Yii::$app->helpers->DateThai($edate) : 'แสดงรายงานการรับซื้อน้ำยาง วันที่ ' . Yii::$app->helpers->DateThai($sdate) ?>
+        </p>
+    </div>
     <table class="table datatable table-striped table-bordered table-hover">
         <thead>
             <tr>
@@ -81,7 +222,6 @@ $this->title = $showday ? 'รายงานการรับซื้อน�
                 <th>นน ยางแห้ง (กก.)</th>
                 <th>ราคา/กก.</th>
                 <th>ยอดรวม</th>
-                <th>ลายมือชื่อผู้ส่ง</th>
 
             </tr>
         </thead>
@@ -97,7 +237,6 @@ $this->title = $showday ? 'รายงานการรับซื้อน�
                 <td><?= number_format($p->dry_weight, 2) ?></td>
                 <td><?= number_format($p->price_per_kg, 2) ?></td>
                 <td><?= number_format($p->total_amount, 2) ?></td>
-                <td></td>
 
             </tr>
             <?php endforeach ?>
@@ -110,7 +249,6 @@ $this->title = $showday ? 'รายงานการรับซื้อน�
                 <td class="text-end"><strong><?= number_format($total_dry_weight, 2) ?></strong></td>
                 <td></td>
                 <td class="text-end"><strong><?= number_format($total_amount, 2) ?></strong></td>
-                                <td></td>
 
             </tr>
         </tfoot>
@@ -140,7 +278,7 @@ $this->title = $showday ? 'รายงานการรับซื้อน�
         <thead>
             <tr>
                 <th style="width: 5%;">ลำดับ</th>
-                <?= $showday ? '<th style="width: 8%;">วันที่</th>' : '' ?>
+                <?= $showday ? '<th style="width: 15%;">วันที่</th>' : '' ?>
                 <th style="width: 20%;">ชื่อ-สกุล</th>
                 <th style="width: 9%;">เลขทะเบียน</th>
                 <th style="width: 9%;">นน.ยางสด(กก.)</th>
@@ -148,7 +286,7 @@ $this->title = $showday ? 'รายงานการรับซื้อน�
                 <th style="width: 9%;">นน.ยางแห้ง(กก.)</th>
                 <th style="width: 9%;">ราคา/กก.</th>
                 <th style="width: 9%;">ยอดรวม</th>
-                <th style="width: 15%;">ลายมือชื่อผู้ส่ง</th>
+                        <?= $showday ? '' : '<td style="width: 15%;"> ลงลายมือชื่อ</td>'?>     
             </tr>
         </thead>
         <tbody>
@@ -163,7 +301,7 @@ $this->title = $showday ? 'รายงานการรับซื้อน�
                 <td style="text-align: right; padding-right: 5px;"><?= number_format($p->dry_weight, 2) ?></td>
                 <td style="text-align: right; padding-right: 5px;"><?= number_format($p->price_per_kg, 2) ?></td>
                 <td style="text-align: right; padding-right: 5px;"><?= number_format($p->total_amount, 2) ?></td>
-                <td>&nbsp;</td>
+                <?= $showday ? '' : '<td></td>'?>
             </tr>
             <?php endforeach ?>
             
@@ -196,7 +334,7 @@ $this->title = $showday ? 'รายงานการรับซื้อน�
                 <td style="text-align: right; padding-right: 5px; font-weight: bold;"><?= number_format($total_dry_weight, 2) ?></td>
                 <td style="text-align: right; padding-right: 5px; font-weight: bold;">51.00</td>
                 <td style="text-align: right; padding-right: 5px; font-weight: bold;"><?= number_format($total_amount, 2) ?></td>
-                <td>&nbsp;</td>
+                <?= $showday ? '' : '<td style="width: 15%;"> </td>'?> 
             </tr>
         </tfoot>
     </table>

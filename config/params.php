@@ -105,17 +105,45 @@ return [
 
         1 => [
             'name' => 'รายงานรับซื้อรายวัน',
-            'description' => '',
-            'icon' => 'show_chart',
+            'description' => 'รายงานการรับซื้อน้ำยางประจำวัน',
+            'icon' => 'receipt',
             'controller' => 'report',
             'action' => 'daily'
         ],
         2 => [
-            'name' => 'รายงานสรุปยอดตามช่วงเวลา',
-            'description' => '',
-            'icon' => 'show_chart',
+            'name' => 'รายงานสรุปยอดรับซื้อตามช่วงเวลา',
+            'description' => 'รายงานสรุปยอดรับซื้อน้ำยางตามช่วงเวลา',
+            'icon' => 'trending_up',
             'controller' => 'report',
             'action' => 'report-summary'
+        ],
+        3 => [
+            'name' => 'รายงานสมาชิกสหกรณ์',
+            'description' => 'รายงานข้อมูลสมาชิกสหกรณ์',
+            'icon' => 'group',
+            'controller' => 'report',
+            'action' => 'member-report'
+        ],
+        4 => [
+            'name' => 'รายงานคุณภาพน้ำยาง',
+            'description' => 'รายงานการตรวจสอบคุณภาพน้ำยาง',
+            'icon' => 'verified',
+            'controller' => 'report',
+            'action' => 'quality-report'
+        ],
+        5 => [
+            'name' => 'รายงานราคารับซื้อ',
+            'description' => 'รายงานการปรับราคารับซื้อน้ำยาง',
+            'icon' => 'attach_money',
+            'controller' => 'report',
+            'action' => 'price-report'
+        ],
+        6 => [
+            'name' => 'กราฟราคายาง',
+            'description' => 'กราฟแสดงแนวโน้มราคายาง',
+            'icon' => 'trending_up',
+            'controller' => 'prices',
+            'action' => 'chart'
         ],
 
 
