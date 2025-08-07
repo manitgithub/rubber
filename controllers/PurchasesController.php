@@ -108,7 +108,7 @@ class PurchasesController extends Controller
         if ($this->request->isPost && $model->load($this->request->post()) && $model->save()) {
                             Yii::$app->session->setFlash('success');
 
-            return $this->redirect(['create', 'id' => $model->id]);
+            return $this->redirect(['create', 'id' => $model->id, 'date' => $model->date]);
         }
 
         return $this->render('create', [
