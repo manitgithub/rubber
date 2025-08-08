@@ -5,9 +5,9 @@ use yii\helpers\Html;
 /* @var $this yii\web\View */
 /* @var $model app\models\ReceiptBook */
 
-$this->title = 'แก้ไข: ' . $model->book_number;
+$this->title = 'แก้ไข: ' . $model->book_no;
 $this->params['breadcrumbs'][] = ['label' => 'จัดการเล่มใบเสร็จ', 'url' => ['index']];
-$this->params['breadcrumbs'][] = ['label' => $model->book_number, 'url' => ['view', 'id' => $model->id]];
+$this->params['breadcrumbs'][] = ['label' => $model->book_no, 'url' => ['view', 'id' => $model->id]];
 $this->params['breadcrumbs'][] = 'แก้ไข';
 ?>
 <div class="receipt-book-update">

@@ -8,7 +8,7 @@ use Yii;
  * This is the model class for table "receipt_books".
  *
  * @property int $id
- * @property string $book_number
+ * @property string $book_no
  * @property int $start_number
  * @property int $end_number
  * @property int $current_number
@@ -22,7 +22,7 @@ class ReceiptBook extends \yii\db\ActiveRecord
      */
     public static function tableName()
     {
-        return 'receipt_books';
+        return 'receipt_book';
     }
 
     /**
@@ -31,10 +31,10 @@ class ReceiptBook extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['book_number', 'start_number', 'end_number'], 'required'],
+            [['book_no', 'start_number', 'end_number'], 'required'],
             [['start_number', 'end_number', 'current_number', 'is_active'], 'integer'],
             [['created_at'], 'safe'],
-            [['book_number'], 'string', 'max' => 10],
+            [['book_no'], 'string', 'max' => 10],
             [['start_number'], 'integer', 'min' => 1],
             [['end_number'], 'integer', 'min' => 1],
             [['end_number'], 'compare', 'compareAttribute' => 'start_number', 'operator' => '>=', 'message' => 'หัวเลขสิ้นสุดต้องมากกว่าหรือเท่ากับหัวเลขเริ่มต้น'],
@@ -53,7 +53,7 @@ class ReceiptBook extends \yii\db\ActiveRecord
     {
         return [
             'id' => 'ID',
-            'book_number' => 'เลขที่เล่มใบเสร็จ',
+            'book_no' => 'เลขที่เล่มใบเสร็จ',
             'start_number' => 'เลขเริ่มต้น',
             'end_number' => 'เลขสิ้นสุด',
             'current_number' => 'เลขปัจจุบัน',
@@ -92,7 +92,7 @@ class ReceiptBook extends \yii\db\ActiveRecord
         $this->current_number++;
         $this->save(false);
         
-        return $this->book_number . sprintf('%06d', $nextNumber);
+        return $this->book_no . sprintf('%06d', $nextNumber);
     }
 
     /**

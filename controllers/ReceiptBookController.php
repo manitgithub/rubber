@@ -141,7 +141,7 @@ class ReceiptBookController extends Controller
         }
 
         if ($model->activate()) {
-            Yii::$app->session->setFlash('success', 'เปิดใช้งานเล่มใบเสร็จ ' . $model->book_number . ' แล้ว');
+            Yii::$app->session->setFlash('success', 'เปิดใช้งานเล่มใบเสร็จ ' . $model->book_no . ' แล้ว');
         } else {
             Yii::$app->session->setFlash('error', 'ไม่สามารถเปิดใช้งานเล่มใบเสร็จได้');
         }
@@ -163,7 +163,7 @@ class ReceiptBookController extends Controller
 
         return [
             'activeBook' => $activeBook ? [
-                'book_number' => $activeBook->book_number,
+                'book_no' => $activeBook->book_no,
                 'remaining' => $activeBook->getRemainingCount(),
                 'usage_percentage' => $activeBook->getUsagePercentage(),
             ] : null,

@@ -131,6 +131,7 @@ $isHomeActive = $currentController === 'site' && $currentAction === 'index';
   <a href="<?= Url::to(['report/index']) ?>" class="<?= $isReportsActive ? 'active' : '' ?>"><i class="fas fa-chart-line"></i> รายงาน</a>
   <a href="<?= Url::to(['purchases/payment']) ?>" class="<?= $isPaymentActive ? 'active' : '' ?>"><i class="fas fa-list"></i> รันเลขใบเสร็จทั้งหมด</a>
   <a href="<?= Url::to(['purchases/bill']) ?>" class="<?= $isBillActive ? 'active' : '' ?>"><i class="fas fa-money-bill-wave"></i> ใบเสร็จ</a>
+  <a href="<?= Url::to(['receipt-book/index']) ?>" class="<?= $currentController === 'receipt-book' ? 'active' : '' ?>"><i class="fas fa-book"></i> เล่มใบเสร็จ</a>
   <div class="user">
      <a href="<?= Url::to(['site/logout']) ?>" data-method="post"><i class="fas fa-sign-out-alt"></i> ออกจากระบบ</a>
   </div>

@@ -6,7 +6,7 @@ use yii\widgets\DetailView;
 /* @var $this yii\web\View */
 /* @var $model app\models\ReceiptBook */
 
-$this->title = 'เล่มใบเสร็จ: ' . $model->book_number;
+$this->title = 'เล่มใบเสร็จ: ' . $model->book_no;
 $this->params['breadcrumbs'][] = ['label' => 'จัดการเล่มใบเสร็จ', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 \yii\web\YiiAsset::register($this);
@@ -307,10 +307,10 @@ $this->params['breadcrumbs'][] = $this->title;
             'options' => ['class' => 'detail-view table'],
             'attributes' => [
                 [
-                    'attribute' => 'book_number',
+                    'attribute' => 'book_no',
                     'label' => 'เลขที่เล่ม',
                     'format' => 'raw',
-                    'value' => '<strong class="text-primary fs-5">' . Html::encode($model->book_number) . '</strong>',
+                    'value' => '<strong class="text-primary fs-5">' . Html::encode($model->book_no) . '</strong>',
                 ],
                 [
                     'label' => 'ช่วงเลขใบเสร็จ',
@@ -330,7 +330,7 @@ $this->params['breadcrumbs'][] = $this->title;
                         if ($model->isFinished()) {
                             return '<span class="text-danger"><i class="bi bi-x-circle me-1"></i>เล่มหมดแล้ว</span>';
                         }
-                        return '<strong class="text-success">' . $model->book_number . sprintf('%06d', $model->current_number) . '</strong>';
+                        return '<strong class="text-success">' . $model->book_no . sprintf('%06d', $model->current_number) . '</strong>';
                     },
                 ],
                 [

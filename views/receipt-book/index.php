@@ -284,7 +284,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 <i class="bi bi-list-ul me-2 text-primary"></i>
                 <strong>รายการเล่มใบเสร็จ</strong>
             </h5>
-            <?= Html::a('<i class="bi bi-plus-circle me-2"></i>เพิ่มเล่มใหม่', ['create'], ['class' => 'btn btn-create']) ?>
+            <?= Html::a('<i class="bi bi-plus-circle me-2"></i>เพิ่มเล่มใหม่', ['create'], ['class' => 'btn btn-create', 'style' => 'color: white;']) ?>
         </div>
     </div>
 
@@ -297,11 +297,11 @@ $this->params['breadcrumbs'][] = $this->title;
             'layout' => "{items}\n{pager}",
             'columns' => [
                 [
-                    'attribute' => 'book_number',
+                    'attribute' => 'book_no',
                     'label' => 'เลขที่เล่ม',
                     'format' => 'raw',
                     'value' => function($model) {
-                        return '<strong class="text-primary">' . Html::encode($model->book_number) . '</strong>';
+                        return '<strong class="text-primary">' . Html::encode($model->book_no) . '</strong>';
                     }
                 ],
                 [
@@ -366,7 +366,7 @@ $this->params['breadcrumbs'][] = $this->title;
                     'buttons' => [
                         'activate' => function ($url, $model, $key) {
                             if (!$model->is_active && !$model->isFinished()) {
-                                return Html::a('<i class="bi bi-play-circle"></i>', ['activate', 'id' => $model->id], [
+                                return Html::a('<i class="fa fa-play-circle"></i>', ['activate', 'id' => $model->id], [
                                     'class' => 'btn btn-activate btn-sm',
                                     'title' => 'เปิดใช้งาน',
                                     'data-confirm' => 'คุณต้องการเปิดใช้งานเล่มนี้หรือไม่?',
@@ -376,20 +376,20 @@ $this->params['breadcrumbs'][] = $this->title;
                             return '';
                         },
                         'view' => function ($url, $model, $key) {
-                            return Html::a('<i class="bi bi-eye"></i>', ['view', 'id' => $model->id], [
+                            return Html::a('<i class="fa fa-eye"></i>', ['view', 'id' => $model->id], [
                                 'class' => 'btn btn-view btn-sm',
                                 'title' => 'ดูรายละเอียด',
                             ]);
                         },
                         'update' => function ($url, $model, $key) {
-                            return Html::a('<i class="bi bi-pencil"></i>', ['update', 'id' => $model->id], [
+                            return Html::a('<i class="fa fa-pencil"></i>', ['update', 'id' => $model->id], [
                                 'class' => 'btn btn-edit btn-sm',
                                 'title' => 'แก้ไข',
                             ]);
                         },
                         'delete' => function ($url, $model, $key) {
                             if (!$model->is_active) {
-                                return Html::a('<i class="bi bi-trash"></i>', ['delete', 'id' => $model->id], [
+                                return Html::a('<i class="fa fa-trash"></i>', ['delete', 'id' => $model->id], [
                                     'class' => 'btn btn-delete btn-sm',
                                     'title' => 'ลบ',
                                     'data-confirm' => 'คุณต้องการลบเล่มนี้หรือไม่?',
@@ -421,7 +421,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 document.getElementById('finished-books').textContent = data.finishedBooks;
                 
                 if (data.activeBook) {
-                    document.getElementById('active-book').textContent = data.activeBook.book_number;
+                    document.getElementById('active-book').textContent = data.activeBook.book_no;
                 } else {
                     document.getElementById('active-book').textContent = 'ไม่มี';
                 }

@@ -175,7 +175,7 @@ use yii\widgets\ActiveForm;
                 <i class="bi bi-journal me-2"></i>ข้อมูลพื้นฐาน
             </h4>
             
-            <?= $form->field($model, 'book_number')->textInput([
+            <?= $form->field($model, 'book_no')->textInput([
                 'maxlength' => true,
                 'placeholder' => 'เช่น A001, B002',
                 'class' => 'form-control'

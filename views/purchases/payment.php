@@ -397,11 +397,11 @@ if (empty($endDate)) {
             <div class="row align-items-end">
                 <div class="col-md-4 mb-3">
                     <?= Html::label('วันที่เริ่มต้น', 'start_date', ['class' => 'form-label']) ?>
-                    <?= Html::input('date', 'start_date', $startDate, ['class' => 'form-control ']) ?>
+                    <?= Html::input('date', 'start_date', $startDate, ['class' => 'form-control datepicker']) ?>
                 </div>
                 <div class="col-md-4 mb-3">
                     <?= Html::label('วันที่สิ้นสุด', 'end_date', ['class' => 'form-label']) ?>
-                    <?= Html::input('date', 'end_date', $endDate, ['class' => 'form-control']) ?>
+                    <?= Html::input('date', 'end_date', $endDate, ['class' => 'form-control datepicker']) ?>
                 </div>
                 <div class="col-md-4 mb-3">
                     <?= Html::submitButton('<i class="bi bi-search me-2"></i>ค้นหา', ['class' => 'btn btn-search w-100']) ?>

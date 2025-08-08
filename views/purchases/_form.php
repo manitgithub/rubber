@@ -92,7 +92,7 @@ if(isset($_GET['date']) && !empty($_GET['date'])) {
                     <?= $form->field($model, 'date', ['template' => '{input}'])->textInput([
                         'type' => 'date', 
                         'value' => $date, 
-                        'class' => 'form-control',
+                        'class' => 'form-control datepicker',
                         'onchange' => 'location.href = "?date=" + this.value'
                     ]) ?>
                 </div>
