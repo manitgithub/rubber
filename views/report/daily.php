@@ -278,15 +278,15 @@ $this->title = $showday ? 'รายงานการรับซื้อน�
         <thead>
             <tr>
                 <th style="width: 5%;">ลำดับ</th>
-                <?= $showday ? '<th style="width: 15%;">วันที่</th>' : '' ?>
-                <th style="width: 20%;">ชื่อ-สกุล</th>
-                <th style="width: 9%;">เลขทะเบียน</th>
-                <th style="width: 9%;">นน.ยางสด(กก.)</th>
-                <th style="width: 7%;">%DRC</th>
-                <th style="width: 9%;">นน.ยางแห้ง(กก.)</th>
-                <th style="width: 9%;">ราคา/กก.</th>
-                <th style="width: 9%;">ยอดรวม</th>
-                        <?= $showday ? '' : '<td style="width: 15%;"> ลงลายมือชื่อ</td>'?>     
+                <?= $showday ? '<th style="width: 12%;">วันที่</th>' : '' ?>
+                <th style="width: 30%;">ชื่อ-สกุล</th>
+                <th style="width: 8%;">เลขทะเบียน</th>
+                <th style="width: 8%;">นน.ยางสด(กก.)</th>
+                <th style="width: 6%;">%DRC</th>
+                <th style="width: 8%;">นน.ยางแห้ง(กก.)</th>
+                <th style="width: 8%;">ราคา/กก.</th>
+                <th style="width: 8%;">ยอดรวม</th>
+                        <?= $showday ? '' : '<td style="width: 12%;"> ลงลายมือชื่อ</td>'?>     
             </tr>
         </thead>
         <tbody>
@@ -294,7 +294,7 @@ $this->title = $showday ? 'รายงานการรับซื้อน�
             <tr>
                 <td><?= $i + 1 ?></td>
                 <?= $showday ? '<td>' . Yii::$app->helpers->DateThai($p->date) . '</td>' : '' ?>
-                <td style="text-align: left; padding-left: 5px;"><?= Html::encode($p->members->fullname2) ?></td>
+                <td style="text-align: left; padding-left: 5px; font-size: 20px; "><?= Html::encode($p->members->fullname2) ?></td>
                 <td><?= Html::encode($p->members->memberid) ?></td>
                 <td style="text-align: right; padding-right: 5px;"><?= number_format($p->weight, 2) ?></td>
                 <td style="text-align: right; padding-right: 5px;"><?= number_format($p->percentage, 2) ?></td>
@@ -341,14 +341,14 @@ $this->title = $showday ? 'รายงานการรับซื้อน�
     
     <div class="signature-section">
         <div class="signature-left">
-            <p>ลงชื่อ ................................................ </p>
-            <p style="margin-left: 50px; margin-top: 5px;">( นางวัญเพ็ญ  ดำเพ็ง )</p>
-            <p style="margin-left: 50px;">ผู้รับน้ำยาง</p>
+            <p style="font-size: 18px;">ลงชื่อ ................................................ </p>
+            <p style="margin-left: 50px; margin-top: 8px; font-size: 20px; font-weight: bold;">( นางวัญเพ็ญ  ดำเพ็ง )</p>
+            <p style="margin-left: 50px; font-size: 16px;">ผู้รับน้ำยาง</p>
         </div>
         <div class="signature-right">
-            <p>ลงชื่อ ................................................ </p>
-            <p style="margin-left: 50px; margin-top: 5px;">( นายสุภาพ  ใจห้าว )</p>
-            <p style="margin-left: 50px;">เหรัญญิก/รักษาการในตำแหน่งประธานฯ</p>
+            <p style="font-size: 18px;">ลงชื่อ ................................................ </p>
+            <p style="margin-left: 50px; margin-top: 8px; font-size: 20px; font-weight: bold;">( นายสุภาพ  ใจห้าว )</p>
+            <p style="margin-left: 50px; font-size: 16px;">เหรัญญิก/รักษาการในตำแหน่งประธานฯ</p>
         </div>
     </div>
     <?php endif; ?>
@@ -409,6 +409,21 @@ $this->title = $showday ? 'รายงานการรับซื้อน�
         min-height: 25px;
     }
     
+    /* ปรับการจัดรูปแบบของช่องรายชื่อ */
+    .print-table td:nth-child(2),
+    .print-table td:nth-child(3) {
+        text-align: left;
+        padding-left: 8px;
+        word-wrap: break-word;
+        white-space: normal;
+    }
+    
+    /* เพิ่มขนาดฟอนต์สำหรับชื่อในตาราง */
+    .print-table td:nth-child(3) {
+        font-size: 20px !important;
+        font-weight: bold !important;
+    }
+    
     .print-table th {
         background-color: #f0f0f0;
         font-weight: bold;
@@ -438,7 +453,8 @@ $this->title = $showday ? 'รายงานการรับซื้อน�
         margin-top: 40px;
         display: flex;
         justify-content: space-between;
-        font-size: 16px;
+        font-size: 18px;
+        padding: 20px 0;
     }
     
     .signature-left,
@@ -544,6 +560,21 @@ function printReportNewWindow() {
                     min-height: 25px;
                 }
                 
+                /* ปรับการจัดรูปแบบของช่องรายชื่อใน JavaScript */
+                .print-table td:nth-child(2),
+                .print-table td:nth-child(3) {
+                    text-align: left;
+                    padding-left: 8px;
+                    word-wrap: break-word;
+                    white-space: normal;
+                }
+                
+                /* เพิ่มขนาดฟอนต์สำหรับชื่อในตาราง JavaScript */
+                .print-table td:nth-child(3) {
+                    font-size: 20px !important;
+                    font-weight: bold !important;
+                }
+                
                 .print-table th {
                     background-color: #f0f0f0;
                     font-weight: bold;
@@ -573,7 +604,8 @@ function printReportNewWindow() {
                     margin-top: 40px;
                     display: flex;
                     justify-content: space-between;
-                    font-size: 16px;
+                    font-size: 18px;
+                    padding: 20px 0;
                 }
                 
                 .signature-left,

@@ -108,8 +108,10 @@ class ReportController extends Controller
     $edate = Yii::$app->request->get('edate', date('Y-m-d'));
 
     $purchases = \app\models\Purchases::find()
-        ->where(['between', 'date', $sdate, $edate])
-        ->andWhere(['flagdel' => 0])
+        ->joinWith('members')
+        ->where(['between', 'purchases.date', $sdate, $edate])
+        ->andWhere(['purchases.flagdel' => 0])
+        ->orderBy(['members.memberid' => SORT_ASC])
         ->all();
 
     $total_weight = $total_dry_weight = $total_amount = 0;
