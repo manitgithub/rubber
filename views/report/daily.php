@@ -330,7 +330,7 @@ $this->title = $showday ? 'รายงานการรับซื้อน�
             <tr class="total-row">
                 <td colspan="<?= $showday ? '4' : '3' ?>" style="text-align: center; font-weight: bold;">รวม</td>
                 <td style="text-align: right; padding-right: 5px; font-weight: bold;"><?= number_format($total_weight, 2) ?></td>
-                <td style="text-align: right; padding-right: 5px; font-weight: bold;"><?= number_format($total_weight * 100 / $total_dry_weight , 2) ?></td>
+                <td style="text-align: right; padding-right: 5px; font-weight: bold;"><?= number_format($total_dry_weight * 100 / $total_weight , 2) ?></td>
                 <td style="text-align: right; padding-right: 5px; font-weight: bold;"><?= number_format($total_dry_weight, 1) ?></td>
                 <td style="text-align: right; padding-right: 5px; font-weight: bold;">
                     <?= count($purchases) > 0 ? number_format(array_sum(array_column($purchases, 'price_per_kg')) / count($purchases), 2) : '0.00' ?> 
