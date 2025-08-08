@@ -155,6 +155,15 @@ body {
     font-weight: 500;
 }
 
+/* จัดตัวเลขให้ชิดขวา */
+.table td:nth-child(4),  /* น้ำหนัก */
+.table td:nth-child(5),  /* เปอร์เซ็นต์ */
+.table td:nth-child(6),  /* น้ำหนักแห้ง */
+.table td:nth-child(7),  /* ราคาต่อกก */
+.table td:nth-child(8) { /* จำนวนเงิน */
+    text-align: right !important;
+}
+
 .table tbody tr:last-child {
     border-bottom: none;
 }
@@ -330,7 +339,7 @@ body {
                     <div class="stat-label">น้ำหนักรวม (กก.)</div>
                 </div>
                 <div class="stat-card">
-                    <div class="stat-value"><?= number_format($total_dry_weight, 2) ?></div>
+                    <div class="stat-value"><?= number_format($total_dry_weight, 1) ?></div>
                     <div class="stat-label">น้ำหนักแห้ง (กก.)</div>
                 </div>
                 <div class="stat-card">
@@ -379,7 +388,7 @@ body {
                                         <span class="text-warning"><?= number_format($p->percentage, 2) ?>%</span>
                                     </td>
                                     <td class="text-end">
-                                        <strong class="text-info"><?= number_format($p->dry_weight, 2) ?></strong>
+                                        <strong class="text-info"><?= number_format($p->dry_weight, 1) ?></strong>
                                     </td>
                                     <td class="text-end">
                                         <span class="text-secondary">฿<?= number_format($p->price_per_kg, 2) ?></span>

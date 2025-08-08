@@ -249,10 +249,13 @@ document.addEventListener("DOMContentLoaded", function () {
     function calculateDryWeight() {
         var weight = parseFloat(document.getElementById('purchases-weight').value) || 0;
         var percentage = parseFloat(document.getElementById('purchases-percentage').value) || 0;
-        var dryWeight = (weight * percentage / 100).toFixed(1);
+        var dryWeightCalculated = weight * percentage / 100;
+        
+        // ตัดทศนิยมให้เหลือ 1 ตำแหน่ง (truncate ไม่ใช่ round)
+        var dryWeight = Math.floor(dryWeightCalculated * 10) / 10;
         
         var dryWeightField = document.getElementById('purchases-dry_weight');
-        dryWeightField.value = dryWeight;
+        dryWeightField.value = dryWeight.toFixed(1);
 
         var price = parseFloat(document.getElementById('purchases-price_per_kg').value) || 0;
         var total = (dryWeight * price).toFixed(2);

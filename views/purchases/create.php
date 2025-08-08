@@ -218,7 +218,7 @@ if (isset($_GET['date']) && !empty($_GET['date'])) {
                                                         'title' => 'แก้ไข',
                                                         'data-bs-toggle' => 'tooltip'
                                                     ]) ?>
-                                                    <?= Html::a('<i class="fas fa-trash"></i>', ['delete', 'id' => $purchase->id], [
+                                                    <?= Html::a('<i class="fas fa-trash"></i>', ['delete', 'id' => $purchase->id, 'date' => $date], [
                                                         'class' => 'btn btn-outline-danger btn-sm',
                                                         'title' => 'ลบ',
                                                         'data-bs-toggle' => 'tooltip',

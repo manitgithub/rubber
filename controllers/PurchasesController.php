@@ -155,7 +155,7 @@ class PurchasesController extends Controller
         $model->save(false);
         Yii::$app->session->setFlash('delete');
 
-        return $this->redirect(['create']);
+        return $this->redirect(['create', 'date' => $model->date]);
     }
 
     /**
