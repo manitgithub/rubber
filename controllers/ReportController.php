@@ -3,6 +3,7 @@
 namespace app\controllers;
 
 use app\models\Employee;
+use app\models\Members;
 use yii\filters\AccessControl;
 use yii\data\ActiveDataProvider;
 use yii\web\Controller;
@@ -51,6 +52,51 @@ class ReportController extends Controller
     {
 
         return $this->render('report-summary');
+    }
+    public function actionMemberReport()
+    {
+        $request = Yii::$app->request;
+        $keyword = $request->get('keyword');
+        $membertype = $request->get('membertype');
+        $sdate = $request->get('sdate');
+        $edate = $request->get('edate');
+
+        $query = Members::find();
+
+        if ($keyword) {
+            $query->andFilterWhere(['or',
+                ['like', 'memberid', $keyword],
+                ['like', 'idcard', $keyword],
+                ['like', 'name', $keyword],
+                ['like', 'surname', $keyword],
+                ['like', 'phone', $keyword],
+            ]);
+        }
+
+        if ($membertype) {
+            $query->andWhere(['membertype' => $membertype]);
+        }
+
+        // Filter by register date (stdate)
+        if ($sdate && $edate) {
+            $query->andWhere(['between', 'stdate', $sdate, $edate]);
+        } elseif ($sdate) {
+            $query->andWhere(['>=', 'stdate', $sdate]);
+        } elseif ($edate) {
+            $query->andWhere(['<=', 'stdate', $edate]);
+        }
+
+        $query->orderBy(['memberid' => SORT_ASC]);
+
+        $members = $query->all();
+
+        return $this->render('member-report', [
+            'members' => $members,
+            'keyword' => $keyword,
+            'membertype' => $membertype,
+            'sdate' => $sdate,
+            'edate' => $edate,
+        ]);
     }
     public function actionDaily()
 {
