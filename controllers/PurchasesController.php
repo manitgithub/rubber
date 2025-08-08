@@ -207,12 +207,12 @@ public function actionRunAllReceipts($start_date = null, $end_date = null)
 
     foreach ($grouped as $memberId => $list) {
         // รันใบเสร็จใหม่ให้แต่ละคน
-        $book->running_no += 1;
+        $book->current_number += 1;
 
         $receipt = new \app\models\Receipt();
         $receipt->member_id = $memberId;
         $receipt->book_no = $book->book_no;
-        $receipt->running_no = $book->running_no;
+        $receipt->running_no = $book->current_number;
         $receipt->receipt_date = date('Y-m-d');
         $receipt->total_amount = array_sum(array_map(fn($p) => $p->total_amount, $list));
         $receipt->created_by = Yii::$app->user->id;
