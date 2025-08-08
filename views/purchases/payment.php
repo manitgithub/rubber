@@ -6,44 +6,19 @@ use yii\helpers\Url;
 
 /** @var yii\web\View $this */
 /** @var array $groupedPayments */
-/** @var string|null $start<div class="container-fluid">
-    <div class="row mb-4">
-        <div class="col-12">
-            <h2 class="page-title">
-                <i class="bi bi-receipt-cutoff"></i> 
-                <?= Html::encode($this->title) ?>
-            </h2>
-        </div>
-    </div>
-
-    <div class="card search-card mb-4 no-print">
-        <div class="card-body">
-            <h5><i class="bi bi-calendar-range me-2"></i> เลือกช่วงวันที่เพื่อรันเลขใบเสร็จ</h5>
-
-            <?php $form = ActiveForm::begin(['method' => 'get', 'action' => ['purchases/payment']]); ?>
-            <div class="row align-items-end">
-                <div class="col-md-4 mb-3">
-                    <?= Html::label('วันที่เริ่มต้น', 'start_date', ['class' => 'form-label fw-bold']) ?>
-                    <?= Html::input('date', 'start_date', $startDate, ['class' => 'form-control']) ?>
-                </div>
-                <div class="col-md-4 mb-3">
-                    <?= Html::label('วันที่สิ้นสุด', 'end_date', ['class' => 'form-label fw-bold']) ?>
-                    <?= Html::input('date', 'end_date', $endDate, ['class' => 'form-control']) ?>
-                </div>
-                <div class="col-md-4 mb-3">
-                    <?= Html::submitButton('<i class="bi bi-search me-2"></i>ค้นหา', ['class' => 'btn btn-search w-100']) ?>
-                </div>
-            </div>
-            <?php ActiveForm::end(); ?>
-        </div>
-    </div>ring|null $endDate */
-
-\yii\bootstrap5\BootstrapAsset::register($this);
-\yii\bootstrap5\BootstrapPluginAsset::register($this);
-\yii\widgets\ActiveFormAsset::register($this);
+/** @var string|null $startDate */
+/** @var string|null $endDate */
 
 $this->title = 'รันเลขใบเสร็จ';
 $this->params['breadcrumbs'][] = $this->title;
+
+// ตั้งค่าวันที่เริ่มต้นถ้ายังไม่มีการเลือก
+if (empty($startDate)) {
+    $startDate = date('Y-m-d', strtotime('-7 days'));
+}
+if (empty($endDate)) {
+    $endDate = date('Y-m-d');
+}
 ?>
 
 <style>
@@ -56,202 +31,384 @@ $this->params['breadcrumbs'][] = $this->title;
     }
 }
 
-.modal-backdrop.show {
-    opacity: 0.3 !important;
-    background-color: #000 !important;
-    z-index: 1040 !important;
-}
-.modal {
-    z-index: 1055 !important;
-    background-color: #fff;
-    box-shadow: 0 0 30px rgba(0, 0, 0, 0.3);
-    border-radius: 10px;
+/* Main container */
+.container-fluid {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 2rem 1rem;
 }
 
-/* Custom styling for better UI */
+/* Page Header */
+.page-header {
+    margin-bottom: 2.5rem;
+    text-align: center;
+}
+
+.page-title {
+    color: #2c3e50;
+    font-weight: 700;
+    font-size: 2.5rem;
+    margin-bottom: 0.5rem;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.page-subtitle {
+    color: #6c757d;
+    font-size: 1.1rem;
+    margin-bottom: 0;
+}
+
+/* Search Card */
 .search-card {
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     color: white;
     border: none;
-    border-radius: 15px;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    border-radius: 20px;
+    box-shadow: 0 10px 40px rgba(102, 126, 234, 0.2);
+    overflow: hidden;
+    margin-bottom: 2rem;
+}
+
+.search-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #ff6b6b, #4ecdc4, #45b7d1, #96ceb4);
 }
 
 .search-card .card-body {
-    padding: 2rem;
+    padding: 2.5rem;
+    position: relative;
 }
 
 .search-card h5 {
     color: white;
     font-weight: 600;
-    margin-bottom: 1.5rem;
+    margin-bottom: 2rem;
+    font-size: 1.3rem;
 }
 
 .form-control {
-    border-radius: 10px;
-    border: 2px solid #e3e6f0;
-    padding: 0.75rem 1rem;
+    border-radius: 12px;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    padding: 0.875rem 1.25rem;
     transition: all 0.3s ease;
+    background: rgba(255, 255, 255, 0.1);
+    color: #333;
+    font-weight: 500;
 }
 
 .form-control:focus {
-    border-color: #667eea;
-    box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+    border-color: rgba(255, 255, 255, 0.8);
+    box-shadow: 0 0 0 0.25rem rgba(255, 255, 255, 0.25);
+    background: rgba(255, 255, 255, 0.9);
+}
+
+.form-label {
+    color: white !important;
+    font-weight: 600;
+    margin-bottom: 0.75rem;
+    font-size: 0.95rem;
 }
 
 .btn-search {
     background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
     border: none;
-    border-radius: 10px;
-    padding: 0.75rem 2rem;
+    border-radius: 12px;
+    padding: 0.875rem 2rem;
     font-weight: 600;
     transition: all 0.3s ease;
-    box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);
+    box-shadow: 0 4px 20px rgba(40, 167, 69, 0.3);
+    color: white;
+    font-size: 1rem;
 }
 
 .btn-search:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(40, 167, 69, 0.4);
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(40, 167, 69, 0.4);
+    color: white;
 }
 
+/* Stats Card */
 .stats-card {
     background: linear-gradient(135deg, #17a2b8 0%, #138496 100%);
     color: white;
     border: none;
-    border-radius: 15px;
-    padding: 1.5rem;
-    margin-bottom: 1.5rem;
-    box-shadow: 0 8px 32px rgba(23, 162, 184, 0.2);
+    border-radius: 20px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 12px 40px rgba(23, 162, 184, 0.25);
+    position: relative;
+    overflow: hidden;
+}
+
+.stats-card::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: repeating-linear-gradient(
+        45deg,
+        transparent,
+        transparent 10px,
+        rgba(255, 255, 255, 0.05) 10px,
+        rgba(255, 255, 255, 0.05) 20px
+    );
+    animation: float 20s linear infinite;
+}
+
+@keyframes float {
+    0% { transform: translate(-50%, -50%) rotate(0deg); }
+    100% { transform: translate(-50%, -50%) rotate(360deg); }
 }
 
 .stats-card .icon {
-    font-size: 2rem;
-    margin-right: 1rem;
+    font-size: 3rem;
+    margin-right: 1.5rem;
+    opacity: 0.9;
+}
+
+.stats-card h4 {
+    font-size: 1.75rem;
+    margin-bottom: 0.5rem;
+    position: relative;
+    z-index: 2;
+}
+
+.stats-card p {
+    font-size: 1.1rem;
+    opacity: 0.9;
+    position: relative;
+    z-index: 2;
+}
+
+/* Header actions */
+.header-actions {
+    background: white;
+    border-radius: 15px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 5px 25px rgba(0, 0, 0, 0.08);
+    border: 1px solid #e9ecef;
 }
 
 .btn-run-all {
     background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
     border: none;
-    border-radius: 10px;
-    padding: 0.75rem 1.5rem;
+    border-radius: 12px;
+    padding: 0.875rem 2rem;
     font-weight: 600;
     transition: all 0.3s ease;
-    box-shadow: 0 4px 15px rgba(0, 123, 255, 0.3);
+    box-shadow: 0 4px 20px rgba(0, 123, 255, 0.3);
+    color: white;
+    font-size: 1rem;
 }
 
 .btn-run-all:hover {
     transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(0, 123, 255, 0.4);
+    box-shadow: 0 8px 30px rgba(0, 123, 255, 0.4);
+    color: white;
 }
 
+/* Data Table */
 .data-table {
     background: white;
-    border-radius: 15px;
+    border-radius: 20px;
     overflow: hidden;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+    border: 1px solid #e9ecef;
 }
 
 .table thead th {
     background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
     border: none;
-    font-weight: 600;
+    font-weight: 700;
     color: #495057;
-    padding: 1rem;
+    padding: 1.5rem 1.25rem;
+    font-size: 0.95rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
 
 .table tbody tr {
     transition: all 0.3s ease;
+    border-bottom: 1px solid #f1f3f4;
 }
 
 .table tbody tr:hover {
-    background-color: #f8f9ff;
-    transform: scale(1.01);
+    background: linear-gradient(135deg, #f8f9ff 0%, #fff5f5 100%);
+    transform: scale(1.005);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
 }
 
 .table tbody td {
-    padding: 1rem;
+    padding: 1.5rem 1.25rem;
     vertical-align: middle;
-    border-color: #e9ecef;
+    border: none;
+    font-weight: 500;
 }
 
+.table tbody tr:last-child {
+    border-bottom: none;
+}
+
+/* Member Avatar */
+.member-avatar {
+    width: 50px;
+    height: 50px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: bold;
+    font-size: 1.2rem;
+    margin-right: 1rem;
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+}
+
+/* Badges */
+.badge-count {
+    background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+    color: white;
+    font-size: 1rem;
+    padding: 0.625rem 1.25rem;
+    border-radius: 25px;
+    font-weight: 600;
+    box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);
+}
+
+.badge {
+    font-size: 0.875rem;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-weight: 600;
+}
+
+/* Action Buttons */
 .btn-view {
     background: linear-gradient(135deg, #6f42c1 0%, #5a32a3 100%);
     border: none;
-    border-radius: 8px;
-    padding: 0.5rem 1rem;
+    border-radius: 10px;
+    padding: 0.625rem 1.25rem;
     color: white;
-    font-weight: 500;
+    font-weight: 600;
     transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(111, 66, 193, 0.3);
 }
 
 .btn-view:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(111, 66, 193, 0.3);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(111, 66, 193, 0.4);
     color: white;
 }
 
+/* Alerts */
 .alert-custom {
     border: none;
-    border-radius: 12px;
-    padding: 1.5rem;
-    margin-bottom: 1.5rem;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-}
-
-.alert-info-custom {
-    background: linear-gradient(135deg, #d1ecf1 0%, #bee5eb 100%);
-    color: #0c5460;
-    border-left: 4px solid #17a2b8;
+    border-radius: 15px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+    text-align: center;
 }
 
 .alert-warning-custom {
     background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
     color: #856404;
-    border-left: 4px solid #ffc107;
+    border-left: 5px solid #ffc107;
 }
 
-.page-title {
-    color: #495057;
-    font-weight: 700;
-    margin-bottom: 2rem;
-    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+.alert-warning-custom i {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    opacity: 0.8;
 }
 
-.badge-count {
-    background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
-    color: white;
-    font-size: 0.9rem;
-    padding: 0.5rem 1rem;
-    border-radius: 20px;
+/* Responsive */
+@media (max-width: 768px) {
+    .container-fluid {
+        padding: 1rem 0.5rem;
+    }
+    
+    .page-title {
+        font-size: 2rem;
+    }
+    
+    .search-card .card-body {
+        padding: 1.5rem;
+    }
+    
+    .stats-card {
+        padding: 1.5rem;
+    }
+    
+    .member-avatar {
+        width: 40px;
+        height: 40px;
+        font-size: 1rem;
+    }
+    
+    .table tbody td {
+        padding: 1rem 0.75rem;
+        font-size: 0.9rem;
+    }
 }
-</style><?php
-$this->registerJsFile(
-    '@web/assets/js/yii.activeForm.js',  // หรือเปลี่ยนเป็น path ที่ใช้จริง
-    ['depends' => [\yii\web\JqueryAsset::class]]
-);
-?>
 
+/* Animation */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
 
-<h4><?= Html::encode($this->title) ?></h4>
+.animate-fade-in {
+    animation: fadeInUp 0.6s ease-out;
+}
+</style>
 
-<div class="card card-body mb-4 no-print">
-    <h5><i class="bi bi-calendar-range"></i> เลือกช่วงวันที่เพื่อรันเลขใบเสร็จ</h5>
-
-    <?php $form = ActiveForm::begin(['method' => 'get', 'action' => ['purchases/payment']]); ?>
-    <div class="row">
-        <div class="col-md-4">
-            <?= Html::label('วันที่เริ่มต้น', 'start_date') ?>
-            <?= Html::input('date', 'start_date', $startDate, ['class' => 'form-control datepicker']) ?>
-        </div>
-        <div class="col-md-4">
-            <?= Html::label('วันที่สิ้นสุด', 'end_date') ?>
-            <?= Html::input('date', 'end_date', $endDate, ['class' => 'form-control datepicker']) ?>
-        </div>
-        <div class="col-md-4 d-flex align-items-end">
-            <?= Html::submitButton('ค้นหา', ['class' => 'btn btn-success']) ?>
-        </div>
+<div class="container-fluid">
+    <!-- Page Header -->
+    <div class="page-header">
+        <h1 class="page-title">
+            <i class="bi bi-receipt-cutoff me-3"></i>
+            <?= Html::encode($this->title) ?>
+        </h1>
+        <p class="page-subtitle">จัดการและรันเลขใบเสร็จสำหรับสมาชิก</p>
     </div>
-    <?php ActiveForm::end(); ?>
+
+    <!-- Search Card -->
+    <div class="search-card no-print">
+        <div class="card-body">
+            <h5><i class="bi bi-calendar-range me-2"></i>เลือกช่วงวันที่เพื่อรันเลขใบเสร็จ</h5>
+
+            <?php $form = ActiveForm::begin(['method' => 'get', 'action' => ['purchases/payment']]); ?>
+            <div class="row align-items-end">
+                <div class="col-md-4 mb-3">
+                    <?= Html::label('วันที่เริ่มต้น', 'start_date', ['class' => 'form-label']) ?>
+                    <?= Html::input('date', 'start_date', $startDate, ['class' => 'form-control ']) ?>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <?= Html::label('วันที่สิ้นสุด', 'end_date', ['class' => 'form-label']) ?>
+                    <?= Html::input('date', 'end_date', $endDate, ['class' => 'form-control']) ?>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <?= Html::submitButton('<i class="bi bi-search me-2"></i>ค้นหา', ['class' => 'btn btn-search w-100']) ?>
+                </div>
+            </div>
+            <?php ActiveForm::end(); ?>
+    </div>
 </div>
 
 <?php if (!empty($startDate) && !empty($endDate)): ?>
@@ -266,7 +423,8 @@ $this->registerJsFile(
     ?>
 
     <?php if (!empty($unprintedGroups)): ?>
-        <div class="stats-card">
+        <!-- Stats Card -->
+        <div class="stats-card animate-fade-in">
             <div class="d-flex align-items-center">
                 <i class="bi bi-people-fill icon"></i>
                 <div>
@@ -276,25 +434,33 @@ $this->registerJsFile(
             </div>
         </div>
 
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <h5 class="mb-0"><i class="bi bi-list-ul me-2"></i>รายการสมาชิกที่ต้องรันใบเสร็จ</h5>
-            <?= Html::a('<i class="bi bi-play-circle-fill me-2"></i>รันเลขใบเสร็จทั้งหมด', 
-                ['purchases/run-all-receipts', 'start_date' => $startDate, 'end_date' => $endDate], [
-                'class' => 'btn btn-run-all',
-                'data-confirm' => 'คุณแน่ใจหรือไม่ว่าต้องการรันเลขใบเสร็จทั้งหมด?'
-            ]) ?>
+        <!-- Header Actions -->
+        <div class="header-actions animate-fade-in">
+            <div class="d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">
+                    <i class="bi bi-list-ul me-2 text-primary"></i>
+                    <strong>รายการสมาชิกที่ต้องรันใบเสร็จ</strong>
+                </h5>
+                <?= Html::a('<i class="bi bi-play-circle-fill me-2"></i>รันเลขใบเสร็จทั้งหมด', 
+                    ['purchases/run-all-receipts', 'start_date' => $startDate, 'end_date' => $endDate], [
+                    'class' => 'btn btn-run-all',
+                    'style' => 'color: white !important;',
+                    'data-confirm' => 'คุณแน่ใจหรือไม่ว่าต้องการรันเลขใบเสร็จทั้งหมด?'
+                ]) ?>
+            </div>
         </div>
 
-        <div class="data-table">
+        <!-- Data Table -->
+        <div class="data-table animate-fade-in">
             <div class="table-responsive">
-                <table class="table table-hover mb-0">
+                <table class="table mb-0">
                     <thead>
                         <tr>
                             <th><i class="bi bi-hash me-2"></i>รหัสสมาชิก</th>
                             <th><i class="bi bi-person-fill me-2"></i>ชื่อสมาชิก</th>
-                            <th><i class="bi bi-list-ol me-2"></i>จำนวนรายการ</th>
-                            <th><i class="bi bi-speedometer me-2"></i>น้ำหนักรวม (กก.)</th>
-                            <th><i class="bi bi-currency-dollar me-2"></i>ยอดรวม (บาท)</th>
+                            <th class="text-center"><i class="bi bi-list-ol me-2"></i>จำนวนรายการ</th>
+                            <th class="text-end"><i class="bi bi-speedometer me-2"></i>น้ำหนักรวม (กก.)</th>
+                            <th class="text-end"><i class="bi bi-currency-dollar me-2"></i>ยอดรวม (บาท)</th>
                             <th class="no-print text-center"><i class="bi bi-eye me-2"></i>ดูรายการ</th>
                         </tr>
                     </thead>
@@ -306,24 +472,26 @@ $this->registerJsFile(
                             $totalAmount = array_sum(array_map(fn($p) => $p->total_amount, $purchases));
                             ?>
                             <tr>
-                                <td><strong><?= Html::encode($memberId) ?></strong></td>
+                                <td>
+                                            <div class="member-avatar">
+                                            <?= $member->memberid ?>
+                                        </div>
+
                                 <td>
                                     <div class="d-flex align-items-center">
-                                        <div class="bg-primary rounded-circle d-flex align-items-center justify-content-center me-3" 
-                                             style="width: 40px; height: 40px; color: white; font-weight: bold;">
-                                            <?= strtoupper(substr($member->fullname, 0, 1)) ?>
+                                        <div>
+                                            <strong><?= Html::encode($member->fullname2) ?></strong>
                                         </div>
-                                        <span><?= Html::encode($member->fullname) ?></span>
                                     </div>
                                 </td>
-                                <td>
+                                <td class="text-center">
                                     <span class="badge bg-info rounded-pill"><?= count($purchases) ?> รายการ</span>
                                 </td>
                                 <td class="text-end">
-                                    <strong><?= number_format($totalWeight, 2) ?></strong>
+                                    <strong class="text-dark"><?= number_format($totalWeight, 2) ?></strong>
                                 </td>
                                 <td class="text-end">
-                                    <strong class="text-success"><?= number_format($totalAmount, 2) ?></strong>
+                                    <strong class="text-success fs-5">฿<?= number_format($totalAmount, 2) ?></strong>
                                 </td>
                                 <td class="text-center">
                                     <button class="btn btn-view btn-sm" 
@@ -338,10 +506,11 @@ $this->registerJsFile(
             </div>
         </div>
     <?php else: ?>
-        <div class="alert alert-warning-custom alert-custom text-center">
-            <i class="bi bi-info-circle-fill me-2" style="font-size: 1.5rem;"></i>
-            <h5 class="mb-2">ไม่พบรายการ</h5>
-            <p class="mb-0">ไม่พบรายการที่ยังไม่ได้รันใบเสร็จในช่วงวันที่ที่เลือก</p>
+        <div class="alert alert-warning-custom alert-custom animate-fade-in">
+            <i class="bi bi-info-circle-fill mb-3"></i>
+            <h5 class="mb-3">ไม่พบรายการ</h5>
+            <p class="mb-0 fs-6">ไม่พบรายการที่ยังไม่ได้รันใบเสร็จในช่วงวันที่ที่เลือก</p>
+            <small class="text-muted mt-2 d-block">กรุณาเลือกช่วงวันที่ใหม่หรือตรวจสอบข้อมูลอีกครั้ง</small>
         </div>
     <?php endif; ?>
 <?php endif; ?>
@@ -360,36 +529,69 @@ $this->registerJsFile(
 
 <script>
 function openReceiptDetail(url) {
-    // เพิ่ม loading effect
-    const modal = document.getElementById('detail-modal');
-    const content = document.getElementById('modal-content');
-    
-    // แสดง loading spinner
-    content.innerHTML = `
-        <div class="text-center p-5">
-            <div class="spinner-border text-primary" role="status">
-                <span class="visually-hidden">Loading...</span>
-            </div>
-            <p class="mt-3">กำลังโหลดข้อมูล...</p>
-        </div>
-    `;
-    
     // เปิด popup window
-    window.open(url, 'receiptDetail', 'width=1000,height=700,scrollbars=yes,resizable=yes');
+    window.open(url, 'receiptDetail', 'width=1200,height=800,scrollbars=yes,resizable=yes,menubar=no,toolbar=no,location=no,status=no');
 }
 
-// เพิ่ม smooth scroll effect
+// Enhanced animations and effects
 document.addEventListener('DOMContentLoaded', function() {
-    // เพิ่มการเคลื่อนไหวเมื่อโหลดหน้า
-    const cards = document.querySelectorAll('.card, .data-table, .stats-card');
-    cards.forEach((card, index) => {
-        card.style.opacity = '0';
-        card.style.transform = 'translateY(20px)';
+    // Animate elements on load
+    const animatedElements = document.querySelectorAll('.search-card, .stats-card, .header-actions, .data-table, .alert-custom');
+    
+    animatedElements.forEach((element, index) => {
+        element.style.opacity = '0';
+        element.style.transform = 'translateY(30px)';
+        
         setTimeout(() => {
-            card.style.transition = 'all 0.5s ease';
-            card.style.opacity = '1';
-            card.style.transform = 'translateY(0)';
-        }, index * 100);
+            element.style.transition = 'all 0.6s cubic-bezier(0.4, 0, 0.2, 1)';
+            element.style.opacity = '1';
+            element.style.transform = 'translateY(0)';
+        }, index * 150);
+    });
+
+    // Add loading animation to buttons
+    const buttons = document.querySelectorAll('.btn');
+    buttons.forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            if (!this.classList.contains('loading')) {
+                this.classList.add('loading');
+                const originalText = this.innerHTML;
+                this.innerHTML = '<i class="bi bi-arrow-clockwise me-2"></i>กำลังดำเนินการ...';
+                
+                setTimeout(() => {
+                    this.classList.remove('loading');
+                    this.innerHTML = originalText;
+                }, 2000);
+            }
+        });
+    });
+
+    // Smooth scroll to search results
+    const searchForm = document.querySelector('form');
+    if (searchForm) {
+        searchForm.addEventListener('submit', function() {
+            setTimeout(() => {
+                const results = document.querySelector('.stats-card, .alert-custom');
+                if (results) {
+                    results.scrollIntoView({ 
+                        behavior: 'smooth', 
+                        block: 'start' 
+                    });
+                }
+            }, 100);
+        });
+    }
+
+    // Add hover effects to table rows
+    const tableRows = document.querySelectorAll('.table tbody tr');
+    tableRows.forEach(row => {
+        row.addEventListener('mouseenter', function() {
+            this.style.transform = 'scale(1.02)';
+        });
+        
+        row.addEventListener('mouseleave', function() {
+            this.style.transform = 'scale(1)';
+        });
     });
 });
 </script>

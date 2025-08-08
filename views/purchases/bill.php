@@ -35,9 +35,17 @@ $this->params['breadcrumbs'][] = $this->title;
 }
 
 .search-card h5 {
-    color: white;
+    color: white !important;
     font-weight: 600;
     margin-bottom: 1.5rem;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+.form-label {
+    color: white !important;
+    font-weight: 600 !important;
+    margin-bottom: 0.5rem;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
 }
 
 .form-control {
@@ -45,11 +53,15 @@ $this->params['breadcrumbs'][] = $this->title;
     border: 2px solid #e3e6f0;
     padding: 0.75rem 1rem;
     transition: all 0.3s ease;
+    background-color: white;
+    color: #495057;
 }
 
 .form-control:focus {
     border-color: #28a745;
     box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.25);
+    background-color: white;
+    color: #495057;
 }
 
 .btn-search {
@@ -60,11 +72,13 @@ $this->params['breadcrumbs'][] = $this->title;
     font-weight: 600;
     transition: all 0.3s ease;
     box-shadow: 0 4px 15px rgba(0, 123, 255, 0.3);
+    color: white !important;
 }
 
 .btn-search:hover {
     transform: translateY(-2px);
     box-shadow: 0 6px 20px rgba(0, 123, 255, 0.4);
+    color: white !important;
 }
 
 .stats-card {
@@ -90,13 +104,15 @@ $this->params['breadcrumbs'][] = $this->title;
     font-weight: 600;
     transition: all 0.3s ease;
     box-shadow: 0 4px 15px rgba(253, 126, 20, 0.3);
-    color: white;
+    color: white !important;
+    text-decoration: none !important;
 }
 
 .btn-print-all:hover {
     transform: translateY(-2px);
     box-shadow: 0 6px 20px rgba(253, 126, 20, 0.4);
-    color: white;
+    color: white !important;
+    text-decoration: none !important;
 }
 
 .data-table {
@@ -134,15 +150,17 @@ $this->params['breadcrumbs'][] = $this->title;
     border: none;
     border-radius: 8px;
     padding: 0.5rem 1rem;
-    color: white;
+    color: white !important;
     font-weight: 500;
     transition: all 0.3s ease;
+    text-decoration: none !important;
 }
 
 .btn-print:hover {
     transform: translateY(-1px);
     box-shadow: 0 4px 12px rgba(23, 162, 184, 0.3);
-    color: white;
+    color: white !important;
+    text-decoration: none !important;
 }
 
 .alert-custom {
@@ -294,10 +312,7 @@ $this->params['breadcrumbs'][] = $this->title;
                                 </td>
                                 <td>
                                     <div class="d-flex align-items-center">
-                                        <div class="bg-info rounded-circle d-flex align-items-center justify-content-center me-3" 
-                                             style="width: 40px; height: 40px; color: white; font-weight: bold;">
-                                            <?= strtoupper(substr($receipt->member->fullname, 0, 1)) ?>
-                                        </div>
+                                    
                                         <span><?= Html::encode($receipt->member->fullname) ?></span>
                                     </div>
                                 </td>

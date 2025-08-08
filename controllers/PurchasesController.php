@@ -286,6 +286,11 @@ public function actionViewMemberItems($member_id, $start_date, $end_date)
 
 public function actionBill($filter_date = null, $book_no = null, $run_no = null, $member_id = null)
 {
+    // ถ้าไม่มีการกรองวันที่ ให้ใช้วันที่ปัจจุบัน
+    if (empty($filter_date)) {
+        $filter_date = date('Y-m-d');
+    }
+
     $query = \app\models\Receipt::find()
         ->joinWith(['member', 'purchases'])
         ->orderBy(['receipt_date' => SORT_ASC]);

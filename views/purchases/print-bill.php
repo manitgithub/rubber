@@ -8,7 +8,44 @@ $this->title = 'พิมพ์ใบเสร็จ';
 $this->registerCss('@media print { .no-print { display: none; } }');
 $this->registerCss("
     .table {
-        font-family: 'Courier New', monospace;
+        font-family: 'Sarabun', 'Arial', sans-serif;
+        font-size: 13px;
+        border: 2px solid #000 !important;
+        border-collapse: collapse !important;
+    }
+    .table th {
+        background-color: #f8f9fa !important;
+        border: 1px solid #000 !important;
+        padding: 8px 6px !important;
+        font-weight: bold !important;
+        text-align: center !important;
+        vertical-align: middle !important;
+    }
+    .table td {
+        border: 1px solid #000 !important;
+        padding: 6px 8px !important;
+        vertical-align: middle !important;
+    }
+    .table tfoot td {
+        background-color: #fff3cd !important;
+        border: 1px solid #000 !important;
+        padding: 8px 6px !important;
+        font-weight: bold !important;
+    }
+    .table .text-end {
+        text-align: right !important;
+    }
+    .table .text-center {
+        text-align: center !important;
+    }
+    @media print {
+        .table { 
+            font-size: 12px !important; 
+            border: 2px solid #000 !important;
+        }
+        .table th, .table td {
+            border: 1px solid #000 !important;
+        }
     }
 ");
 
@@ -25,28 +62,27 @@ $this->registerCss("
             </div>
         </div>
     <div class="text-center mb-4">
-     <h5>   สหกรณ์กองทุนสวนยางฉลองน้ำขาวพัฒนา จำกัด 92 หมู่ 5 ตำบลฉลอง อำเภอสิชล จังหวัดนครศรีฯ </h5> 
+     <h5>   สหกรณ์กองทุนสวนยางฉลองน้ำขาวพัฒนา จำกัด <br>92 หมู่ 5 ตำบลฉลอง อำเภอสิชล จังหวัดนครศรีฯ </h5> 
         <h4>ใบจ่ายเงินเจ้าหนี้ค่าน้ำยาง</h4>
             <strong>วันที่:</strong> <?= Yii::$app->helpers->DateThai($receipt->date) ?><br>
             <strong>ระหว่างวันที่:</strong> <?= Yii::$app->helpers->DateThai($receipt->start_date) ?> ถึง <?= Yii::$app->helpers->DateThai($receipt->end_date) ?><br>    
     </div>
 
     <div class="mb-3">
-        <strong>ชื่อสมาชิก:</strong> <?= Html::encode($receipt->member->fullname) ?>
+        <strong>ชื่อสมาชิก:</strong> <?= Html::encode($receipt->member->fullname2) ?>
         <strong>เบอร์โทร:</strong> <?= Html::encode($receipt->member->phone) ?><br>
-        <br> <strong>ที่อยู่:</strong> <?= Html::encode($receipt->member->address) ?>
     </div>
 </div>
-    <table class="table table-bordered table-sm">
-        <thead class="table-light">
+    <table class="table table-bordered">
+        <thead>
             <tr>
-                <th>วันที่</th>
-                <th>เลขใบรับ</th>
-                <th class="text-end">น้ำหนัก (กก.)</th>
-                <th class="text-end">เปอร์เซ็นต์</th>
-                <th class="text-end">น้ำหนักแห้ง</th>
-                <th class="text-end">ราคาต่อกก.</th>
-                <th class="text-end">จำนวนเงิน</th>
+                <th style="width: 15%;">วันที่</th>
+                <th style="width: 15%;">เลขใบรับ</th>
+                <th style="width: 13%;">น้ำหนัก (กก.)</th>
+                <th style="width: 12%;">เปอร์เซ็นต์</th>
+                <th style="width: 13%;">น้ำหนักแห้ง</th>
+                <th style="width: 12%;">ราคาต่อกก.</th>
+                <th style="width: 15%;">จำนวนเงิน</th>
             </tr>
         </thead>
         <tbody>
@@ -58,9 +94,9 @@ $this->registerCss("
                 $totalDry += $p->dry_weight;
             ?>
             <tr>
-                <td><?= Yii::$app->helpers->DateThai($p->date) ?></td>
-                <td><?= Html::encode($p->receipt_number) ?></td>
-                <td class="text-end"><div style="align: right;"><?= number_format($p->weight, 2) ?></div></td>
+                <td class="text-center"><?= Yii::$app->helpers->DateThai($p->date) ?></td>
+                <td class="text-center"><?= Html::encode($p->receipt_number) ?></td>
+                <td class="text-end"><?= number_format($p->weight, 2) ?></td>
                 <td class="text-end"><?= number_format($p->percentage, 2) ?></td>
                 <td class="text-end"><?= number_format($p->dry_weight, 2) ?></td>
                 <td class="text-end"><?= number_format($p->price_per_kg, 2) ?></td>
@@ -68,13 +104,13 @@ $this->registerCss("
             </tr>
             <?php endforeach; ?>
         </tbody>
-        <tfoot class="table-warning">
+        <tfoot>
             <tr>
-                <td colspan="2"><strong>รวม</strong></td>
+                <td colspan="2" class="text-center"><strong>รวม</strong></td>
                 <td class="text-end"><strong><?= number_format($totalWeight, 2) ?></strong></td>
-                <td></td>
+                <td class="text-center"><strong>-</strong></td>
                 <td class="text-end"><strong><?= number_format($totalDry, 2) ?></strong></td>
-                <td></td>
+                <td class="text-center"><strong>-</strong></td>
                 <td class="text-end"><strong><?= number_format($receipt->total_amount, 2) ?></strong></td>
             </tr>
         </tfoot>
