@@ -69,8 +69,8 @@ $this->registerCss("
     </div>
 
     <div class="mb-3">
-        <strong>ชื่อสมาชิก:</strong> <?= Html::encode($receipt->member->fullname2) ?>
-        <strong>เบอร์โทร:</strong> <?= Html::encode($receipt->member->phone) ?><br>
+        <strong>เลขที่สมาชิก:</strong> <?= Html::encode($receipt->member->memberid) ?>
+        <strong>ชื่อสมาชิก:</strong> <?= Html::encode($receipt->member->fullname2) ?><br>
     </div>
 </div>
     <table class="table table-bordered">
@@ -129,7 +129,7 @@ $this->registerCss("
         <div class="col-6 text-center">
             <strong>ผู้รับเงิน</strong><br><br><br>
             (....................................)<br>
-            <?= Html::encode($receipt->member->fullname) ?>
+            <?= Html::encode($receipt->member->fullname2) ?>
         </div>
     
     </div>
