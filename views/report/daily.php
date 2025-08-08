@@ -330,11 +330,13 @@ $this->title = $showday ? 'รายงานการรับซื้อน�
             <tr class="total-row">
                 <td colspan="<?= $showday ? '4' : '3' ?>" style="text-align: center; font-weight: bold;">รวม</td>
                 <td style="text-align: right; padding-right: 5px; font-weight: bold;"><?= number_format($total_weight, 2) ?></td>
-                <td style="text-align: right; padding-right: 5px; font-weight: bold;"><?= number_format(array_sum(array_column($purchases, 'percentage')) / count($purchases), 2) ?></td>
+                <td style="text-align: right; padding-right: 5px; font-weight: bold;"><?= number_format($total_weight * 100 / $total_dry_weight , 2) ?></td>
                 <td style="text-align: right; padding-right: 5px; font-weight: bold;"><?= number_format($total_dry_weight, 1) ?></td>
-                <td style="text-align: right; padding-right: 5px; font-weight: bold;">51.00</td>
+                <td style="text-align: right; padding-right: 5px; font-weight: bold;">
+                    <?= count($purchases) > 0 ? number_format(array_sum(array_column($purchases, 'price_per_kg')) / count($purchases), 2) : '0.00' ?> 
+                </td>
                 <td style="text-align: right; padding-right: 5px; font-weight: bold;"><?= number_format($total_amount, 2) ?></td>
-                <?= $showday ? '' : '<td style="width: 15%;"> </td>'?> 
+                <?= $showday ? '' : '<td style="width: 12%;"> </td>'?> 
             </tr>
         </tfoot>
     </table>
@@ -450,7 +452,7 @@ $this->title = $showday ? 'รายงานการรับซื้อน�
     }
     
     .signature-section {
-        margin-top: 40px;
+        margin-top: 5px;
         display: flex;
         justify-content: space-between;
         font-size: 18px;
@@ -601,7 +603,7 @@ function printReportNewWindow() {
                 }
                 
                 .signature-section {
-                    margin-top: 40px;
+                    margin-top: 15px;
                     display: flex;
                     justify-content: space-between;
                     font-size: 18px;
