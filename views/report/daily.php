@@ -392,7 +392,7 @@ $this->title = $showday ? 'รายงานการรับซื้อน�
     }
     
     .print-table {
-        font-size: 16px;
+        font-size: 18px;
         width: 100%;
         border-collapse: collapse;
         border: 2px solid #000;
@@ -438,7 +438,7 @@ $this->title = $showday ? 'รายงานการรับซื้อน�
         margin-top: 40px;
         display: flex;
         justify-content: space-between;
-        font-size: 14px;
+        font-size: 16px;
     }
     
     .signature-left,
@@ -506,7 +506,7 @@ function printReportNewWindow() {
                 body {
                     font-family: 'Sarabun', Arial, sans-serif;
                     margin: 0;
-                    font-size: 16px;
+                    font-size: 18px;
                 }
                 
                 .print-header {
@@ -521,7 +521,7 @@ function printReportNewWindow() {
                 }
                 
                 .print-header h4 {
-                    font-size: 16px;
+                    font-size: 18px;
                     margin-bottom: 20px;
                     font-weight: normal;
                 }
@@ -529,7 +529,7 @@ function printReportNewWindow() {
                 .print-table {
                     width: 100%;
                     border-collapse: collapse;
-                    font-size: 16px;
+                    font-size: 18px;
                     border: 2px solid #000;
                     margin-bottom: 25px;
                 }
