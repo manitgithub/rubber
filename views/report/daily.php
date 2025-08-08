@@ -573,7 +573,7 @@ function printReportNewWindow() {
                     margin-top: 40px;
                     display: flex;
                     justify-content: space-between;
-                    font-size: 14px;
+                    font-size: 16px;
                 }
                 
                 .signature-left,
