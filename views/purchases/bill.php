@@ -240,7 +240,7 @@ $this->params['breadcrumbs'][] = $this->title;
             <div class="row g-3 align-items-end">
                 <div class="col-md-3">
                     <?= Html::label('วันที่ออกใบเสร็จ', 'filter_date', ['class' => 'form-label fw-bold']) ?>
-                    <?= Html::input('date', 'filter_date', $filterDate, ['class' => 'form-control']) ?>
+                    <?= Html::input('date', 'filter_date', $filterDate, ['class' => 'form-control datepicker', 'id' => 'filter_date']) ?>
                 </div>
                 <div class="col-md-2">
                     <?= Html::label('เล่มที่', 'book_no', ['class' => 'form-label fw-bold']) ?>

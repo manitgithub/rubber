@@ -4,6 +4,7 @@ namespace app\controllers;
 
 use app\models\Employee;
 use app\models\Members;
+use app\models\Prices;
 use yii\filters\AccessControl;
 use yii\data\ActiveDataProvider;
 use yii\web\Controller;
@@ -128,5 +129,83 @@ class ReportController extends Controller
         'total_amount' => $total_amount,
     ]);
 }
+
+    public function actionQualityReport()
+    {
+        $request = Yii::$app->request;
+        $sdate = $request->get('sdate', date('Y-m-01'));
+        $edate = $request->get('edate', date('Y-m-d'));
+
+        // Aggregate quality metrics by date
+        $results = (new \yii\db\Query())
+            ->select([
+                'date' => 'DATE(date)',
+                'count' => 'COUNT(*)',
+                'avg_percentage' => 'AVG(percentage)',
+                'min_percentage' => 'MIN(percentage)',
+                'max_percentage' => 'MAX(percentage)',
+                'sum_weight' => 'SUM(weight)',
+                'sum_dry_weight' => 'SUM(dry_weight)',
+            ])
+            ->from('purchases')
+            ->where(['between', 'date', $sdate, $edate])
+            ->andWhere(['flagdel' => 0])
+            ->groupBy(['DATE(date)'])
+            ->orderBy(['date' => SORT_ASC])
+            ->all();
+
+        // Overall stats
+        $overall = (new \yii\db\Query())
+            ->select([
+                'count' => 'COUNT(*)',
+                'avg_percentage' => 'AVG(percentage)',
+                'min_percentage' => 'MIN(percentage)',
+                'max_percentage' => 'MAX(percentage)',
+                'sum_weight' => 'SUM(weight)',
+                'sum_dry_weight' => 'SUM(dry_weight)',
+            ])
+            ->from('purchases')
+            ->where(['between', 'date', $sdate, $edate])
+            ->andWhere(['flagdel' => 0])
+            ->one();
+
+        return $this->render('quality-report', [
+            'sdate' => $sdate,
+            'edate' => $edate,
+            'results' => $results,
+            'overall' => $overall,
+        ]);
+    }
+
+    public function actionPriceReport()
+    {
+        $request = Yii::$app->request;
+        $sdate = $request->get('sdate', date('Y-m-01'));
+        $edate = $request->get('edate', date('Y-m-d'));
+
+        $prices = Prices::find()
+            ->where(['between', 'date', $sdate, $edate])
+            ->orderBy(['date' => SORT_ASC])
+            ->all();
+
+        // Aggregate stats
+        $stats = (new \yii\db\Query())
+            ->select([
+                'count' => 'COUNT(*)',
+                'avg_price' => 'AVG(price)',
+                'min_price' => 'MIN(price)',
+                'max_price' => 'MAX(price)',
+            ])
+            ->from(Prices::tableName())
+            ->where(['between', 'date', $sdate, $edate])
+            ->one();
+
+        return $this->render('price-report', [
+            'sdate' => $sdate,
+            'edate' => $edate,
+            'prices' => $prices,
+            'stats' => $stats,
+        ]);
+    }
 
 }
