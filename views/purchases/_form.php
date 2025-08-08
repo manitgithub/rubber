@@ -5,41 +5,7 @@ use yii\widgets\ActiveForm;
 use yii\helpers\ArrayHelper;
 use app\models\Members;
 
-/** @v                <!-- Price and Total -->
-                <div class="col-md-6">
-                    <?php 
-                    $price = \app\models\Prices::find()->where(['flagdel' => 0])->orderBy(['date' => SORT_DESC])->one();
-                    $label = $price ? 'ราคา (' . Yii::$app->helpers->DateThai($price->date) . ')' : 'ราคาน้ำยาง';
-                    ?>
-                    <label class="form-label text-primary fw-semibold mb-1">
-                        <i class="fas fa-tags me-1"></i><?= $label ?>
-                    </label>
-                    <div class="input-group">
-                        <?= $form->field($model, 'price_per_kg', ['template' => '{input}'])->textInput([
-                            'type' => 'number', 
-                            'step' => '0.01', 
-                            'min' => 0, 
-                            'id' => 'purchases-price_per_kg', 
-                            'class' => 'form-control text-end',
-                            'value' => $price ? $price->price : '',
-                            'placeholder' => '0.00'
-                        ]) ?>
-                        <span class="input-group-text bg-primary text-white">บาท/กก.</span>
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <label class="form-label text-success fw-semibold mb-1">
-                        <i class="fas fa-money-bill-wave me-1"></i>ยอดรวม
-                    </label>
-                    <div class="input-group">
-                        <?= $form->field($model, 'total_amount', ['template' => '{input}'])->textInput([
-                            'readonly' => true,
-                            'class' => 'form-control bg-light text-end fw-bold text-success fs-5',
-                            'id' => 'purchases-total_amount'
-                        ]) ?>
-                        <span class="input-group-text bg-success text-white fw-bold">บาท</span>
-                    </div>
-                </div>View $this */
+/** @var yii\web\View $this */
 /** @var app\models\Purchases $model */
 /** @var yii\widgets\ActiveForm $form */
 ?>
@@ -47,7 +13,11 @@ use app\models\Members;
 <div class="purchases-form">
     <div class="card border-0 shadow-sm">
         <div class="card-body p-3">
-            <?php $form = ActiveForm::begin(); ?>
+            <?php $form = ActiveForm::begin([
+                'id' => 'purchases-form',
+                'enableClientValidation' => true,
+                'validateOnSubmit' => true,
+            ]); ?>
 <?php 
 function generateRunningNumberFromPurchases($runDate) {
     $date = new \DateTime($runDate);
@@ -55,7 +25,7 @@ function generateRunningNumberFromPurchases($runDate) {
     $mm = $date->format('m');
     $dd = $date->format('d');
 
-    $sql = "SELECT COUNT(*) as total FROM purchases WHERE DATE(`date`) = :runDate";
+    $sql = "SELECT COUNT(*) as total FROM purchases WHERE DATE(`date`) = :runDate AND flagdel = 0";
     $count = Yii::$app->db->createCommand($sql)
         ->bindValue(':runDate', $runDate)
         ->queryScalar();
@@ -76,12 +46,12 @@ if(isset($_GET['date']) && !empty($_GET['date'])) {
                 <!-- Receipt Number and Date -->
                 <div class="col-md-6">
                     <label class="form-label text-primary fw-semibold mb-1">
-                        <i class="fas fa-receipt me-1"></i>เลขที่ใบเสร็จ
+                        <i class="fas fa-receipt me-1"></i>เลขที่รับ
                     </label>
                     <?= $form->field($model, 'receipt_number', ['template' => '{input}'])->textInput([
                         'maxlength' => true, 
                         'readonly' => true, 
-                        'value' => generateRunningNumberFromPurchases(date('Y-m-d')),
+                        'value' => generateRunningNumberFromPurchases($date),
                         'class' => 'form-control bg-light text-center fw-bold'
                     ]) ?>
                 </div>
@@ -170,11 +140,15 @@ if(isset($_GET['date']) && !empty($_GET['date'])) {
                     <label class="form-label text-success fw-semibold mb-1">
                         <i class="fas fa-money-bill-wave me-1"></i>ยอดรวม
                     </label>
-                    <?= $form->field($model, 'total_amount', ['template' => '{input}'])->textInput([
-                        'readonly' => true,
-                        'class' => 'form-control bg-light text-end fw-bold text-success fs-5',
-                        'id' => 'purchases-total_amount'
+                    <!-- Hidden field สำหรับบันทึกค่าจริง -->
+                    <?= $form->field($model, 'total_amount', ['template' => '{input}'])->hiddenInput([
+                        'id' => 'purchases-total_amount_hidden'
                     ]) ?>
+                    <!-- Display field สำหรับแสดงผล -->
+                    <input type="text" readonly 
+                           class="form-control bg-light text-end fw-bold text-success fs-5" 
+                           id="purchases-total_amount_display" 
+                           placeholder="0.00">
                 </div>
 
                 <!-- Submit Button -->
@@ -266,10 +240,16 @@ if(isset($_GET['date']) && !empty($_GET['date'])) {
 
 <script>
 document.addEventListener("DOMContentLoaded", function () {
+    // // Debug form submission
+    // document.getElementById('purchases-form').addEventListener('submit', function(e) {
+    //     console.log('Form is submitting...');
+    //     console.log('Form data:', new FormData(this));
+    // });
+
     function calculateDryWeight() {
         var weight = parseFloat(document.getElementById('purchases-weight').value) || 0;
         var percentage = parseFloat(document.getElementById('purchases-percentage').value) || 0;
-        var dryWeight = (weight * percentage / 100).toFixed(2);
+        var dryWeight = (weight * percentage / 100).toFixed(1);
         
         var dryWeightField = document.getElementById('purchases-dry_weight');
         dryWeightField.value = dryWeight;
@@ -277,14 +257,20 @@ document.addEventListener("DOMContentLoaded", function () {
         var price = parseFloat(document.getElementById('purchases-price_per_kg').value) || 0;
         var total = (dryWeight * price).toFixed(2);
         
-        var totalField = document.getElementById('purchases-total_amount');
+        // อัพเดท hidden field ด้วยตัวเลขจริง
+        var totalHiddenField = document.getElementById('purchases-total_amount_hidden');
+        totalHiddenField.value = total;
+        
+        // อัพเดท display field ด้วยรูปแบบที่มีคอมม่า
+        var totalDisplayField = document.getElementById('purchases-total_amount_display');
         if (total > 0) {
-            totalField.value = parseFloat(total).toLocaleString('th-TH', {
+            totalDisplayField.value = parseFloat(total).toLocaleString('th-TH', {
                 minimumFractionDigits: 2,
                 maximumFractionDigits: 2
             });
         } else {
-            totalField.value = '';
+            totalDisplayField.value = '';
+            totalHiddenField.value = '';
         }
     }
 

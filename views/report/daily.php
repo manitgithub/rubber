@@ -234,7 +234,7 @@ $this->title = $showday ? 'รายงานการรับซื้อน�
                 <td><?= Html::encode($p->members->memberid) ?></td>
                 <td><?= number_format($p->weight, 2) ?></td>
                 <td><?= number_format($p->percentage, 2) ?></td>
-                <td><?= number_format($p->dry_weight, 2) ?></td>
+                <td><?= number_format($p->dry_weight, 1) ?></td>
                 <td><?= number_format($p->price_per_kg, 2) ?></td>
                 <td><?= number_format($p->total_amount, 2) ?></td>
 
@@ -246,7 +246,7 @@ $this->title = $showday ? 'รายงานการรับซื้อน�
                 <td colspan="<?= $showday ? '4' : '3' ?>" class="text-end"><strong>รวม</strong></td>
                 <td class="text-end"><strong><?= number_format($total_weight, 2) ?></strong></td>
                 <td></td>
-                <td class="text-end"><strong><?= number_format($total_dry_weight, 2) ?></strong></td>
+                <td class="text-end"><strong><?= number_format($total_dry_weight, 1) ?></strong></td>
                 <td></td>
                 <td class="text-end"><strong><?= number_format($total_amount, 2) ?></strong></td>
 
@@ -298,7 +298,7 @@ $this->title = $showday ? 'รายงานการรับซื้อน�
                 <td><?= Html::encode($p->members->memberid) ?></td>
                 <td style="text-align: right; padding-right: 5px;"><?= number_format($p->weight, 2) ?></td>
                 <td style="text-align: right; padding-right: 5px;"><?= number_format($p->percentage, 2) ?></td>
-                <td style="text-align: right; padding-right: 5px;"><?= number_format($p->dry_weight, 2) ?></td>
+                <td style="text-align: right; padding-right: 5px;"><?= number_format($p->dry_weight, 1) ?></td>
                 <td style="text-align: right; padding-right: 5px;"><?= number_format($p->price_per_kg, 2) ?></td>
                 <td style="text-align: right; padding-right: 5px;"><?= number_format($p->total_amount, 2) ?></td>
                 <?= $showday ? '' : '<td></td>'?>
@@ -331,7 +331,7 @@ $this->title = $showday ? 'รายงานการรับซื้อน�
                 <td colspan="<?= $showday ? '4' : '3' ?>" style="text-align: center; font-weight: bold;">รวม</td>
                 <td style="text-align: right; padding-right: 5px; font-weight: bold;"><?= number_format($total_weight, 2) ?></td>
                 <td style="text-align: right; padding-right: 5px; font-weight: bold;"><?= number_format(array_sum(array_column($purchases, 'percentage')) / count($purchases), 2) ?></td>
-                <td style="text-align: right; padding-right: 5px; font-weight: bold;"><?= number_format($total_dry_weight, 2) ?></td>
+                <td style="text-align: right; padding-right: 5px; font-weight: bold;"><?= number_format($total_dry_weight, 1) ?></td>
                 <td style="text-align: right; padding-right: 5px; font-weight: bold;">51.00</td>
                 <td style="text-align: right; padding-right: 5px; font-weight: bold;"><?= number_format($total_amount, 2) ?></td>
                 <?= $showday ? '' : '<td style="width: 15%;"> </td>'?> 

@@ -256,7 +256,7 @@ $total_dw = 0;
                 <td><?= ++$i ?></td>
                 <td><?= Yii::$app->helpers->DateThai($date) ?></td>
                 <td class="text-end"><?= number_format($total_weight, 2) ?></td>
-                <td class="text-end"><?= number_format($total_dry_weight, 2) ?></td>
+                <td class="text-end"><?= number_format($total_dry_weight, 1) ?></td>
                 <td class="text-end"><?= number_format($avg_price, 2) ?></td>
                 <td class="text-end"><?= number_format($total_amount, 2) ?></td>
             </tr>

@@ -64,7 +64,7 @@ $this->title = 'รายงานคุณภาพน้ำยาง';
       <td class="text-end"><?= number_format($r['min_percentage'], 2) ?></td>
       <td class="text-end"><?= number_format($r['max_percentage'], 2) ?></td>
       <td class="text-end"><?= number_format($r['sum_weight'], 2) ?></td>
-      <td class="text-end"><?= number_format($r['sum_dry_weight'], 2) ?></td>
+      <td class="text-end"><?= number_format($r['sum_dry_weight'], 1) ?></td>
     </tr>
     <?php endforeach; ?>
   </tbody>
@@ -76,7 +76,7 @@ $this->title = 'รายงานคุณภาพน้ำยาง';
       <td class="text-end"><strong><?= number_format($overall['min_percentage'], 2) ?></strong></td>
       <td class="text-end"><strong><?= number_format($overall['max_percentage'], 2) ?></strong></td>
       <td class="text-end"><strong><?= number_format($overall['sum_weight'], 2) ?></strong></td>
-      <td class="text-end"><strong><?= number_format($overall['sum_dry_weight'], 2) ?></strong></td>
+      <td class="text-end"><strong><?= number_format($overall['sum_dry_weight'], 1) ?></strong></td>
     </tr>
   </tfoot>
 </table>
@@ -113,7 +113,7 @@ $this->title = 'รายงานคุณภาพน้ำยาง';
         <td><?= number_format($r['min_percentage'], 2) ?></td>
         <td><?= number_format($r['max_percentage'], 2) ?></td>
         <td><?= number_format($r['sum_weight'], 2) ?></td>
-        <td><?= number_format($r['sum_dry_weight'], 2) ?></td>
+        <td><?= number_format($r['sum_dry_weight'], 1) ?></td>
       </tr>
       <?php endforeach; ?>
     </tbody>

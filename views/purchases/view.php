@@ -35,7 +35,10 @@ $this->params['breadcrumbs'][] = $this->title;
             'member_id',
             'weight',
             'percentage',
-            'dry_weight',
+            [
+                'attribute' => 'dry_weight',
+                'value' => number_format($model->dry_weight, 1),
+            ],
             'price_per_kg',
             'total_amount',
             'status',

@@ -42,6 +42,7 @@ class Purchases extends \yii\db\ActiveRecord
             [['weight', 'percentage', 'dry_weight', 'price_per_kg', 'total_amount'], 'number'],
             [['user_at','receipt_id', 'flagdel'], 'integer'],
             [['receipt_number'], 'string', 'max' => 50],
+            //[['receipt_number'], 'unique', 'message' => 'เลขที่รับนี้มีอยู่แล้ว'],
             [['member_id'], 'string', 'max' => 36],
             [['status'], 'string', 'max' => 20],
         ];
@@ -67,6 +68,21 @@ class Purchases extends \yii\db\ActiveRecord
             'user_at' => 'User At',
             'flagdel' => 'Flagdel',
         ];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function beforeSave($insert)
+    {
+        if (parent::beforeSave($insert)) {
+            if ($insert) {
+                $this->created_at = date('Y-m-d H:i:s');
+                $this->flagdel = 0;
+            }
+            return true;
+        }
+        return false;
     }
 
     public function getMembers()

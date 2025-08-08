@@ -71,7 +71,7 @@ if (isset($_GET['date']) && !empty($_GET['date'])) {
                                         <i class="fas fa-list-ol fa-2x me-2"></i>
                                     </div>
                                     <h6 class="text-uppercase mb-1">จำนวนรายการ</h6>
-                                    <h3 class="mb-0 fw-bold"><?= \app\models\Purchases::find()->where(['date' => date('Y-m-d'), 'flagdel' => 0])->count() ?></h3>
+                                    <h3 class="mb-0 fw-bold"><?= \app\models\Purchases::find()->where(['date' => $date, 'flagdel' => 0])->count() ?></h3>
                                     <small class="opacity-75">รายการ</small>
                                 </div>
                             </div>
@@ -83,7 +83,7 @@ if (isset($_GET['date']) && !empty($_GET['date'])) {
                                         <i class="fas fa-weight fa-2x me-2"></i>
                                     </div>
                                     <h6 class="text-uppercase mb-1">น้ำหนักรวม</h6>
-                                    <h3 class="mb-0 fw-bold"><?= number_format(\app\models\Purchases::find()->where(['date' => date('Y-m-d'), 'flagdel' => 0])->sum('weight'), 2) ?></h3>
+                                    <h3 class="mb-0 fw-bold"><?= number_format(\app\models\Purchases::find()->where(['date' => $date, 'flagdel' => 0])->sum('weight'), 2) ?></h3>
                                     <small class="opacity-75">กิโลกรัม</small>
                                 </div>
                             </div>
@@ -99,7 +99,7 @@ if (isset($_GET['date']) && !empty($_GET['date'])) {
                                         <i class="fas fa-money-bill-wave fa-2x me-2"></i>
                                     </div>
                                     <h6 class="text-uppercase mb-1">ยอดเงินรวม</h6>
-                                    <h3 class="mb-0 fw-bold"><?= number_format(\app\models\Purchases::find()->where(['date' => date('Y-m-d'), 'flagdel' => 0])->sum('total_amount'), 2) ?></h3>
+                                    <h3 class="mb-0 fw-bold"><?= number_format(\app\models\Purchases::find()->where(['date' => $date, 'flagdel' => 0])->sum('total_amount'), 2) ?></h3>
                                     <small class="opacity-75">บาท</small>
                                 </div>
                             </div>
@@ -111,7 +111,7 @@ if (isset($_GET['date']) && !empty($_GET['date'])) {
                                         <i class="fas fa-chart-line fa-2x me-2"></i>
                                     </div>
                                     <h6 class="text-uppercase mb-1">น้ำหนักแห้งรวม</h6>
-                                    <h3 class="mb-0 fw-bold"><?= number_format(\app\models\Purchases::find()->where(['date' => date('Y-m-d'), 'flagdel' => 0])->sum('dry_weight'), 2) ?></h3>
+                                    <h3 class="mb-0 fw-bold"><?= number_format(\app\models\Purchases::find()->where(['date' => $date, 'flagdel' => 0])->sum('dry_weight'), 1) ?></h3>
                                     <small class="opacity-75">กิโลกรัม</small>
                                 </div>
                             </div>
@@ -124,8 +124,8 @@ if (isset($_GET['date']) && !empty($_GET['date'])) {
                                     </div>
                                     <h6 class="text-uppercase mb-1">ราคาเฉลี่ย</h6>
                                     <?php 
-                                    $totalWeight = \app\models\Purchases::find()->where(['date' => date('Y-m-d'), 'flagdel' => 0])->sum('dry_weight');
-                                    $totalAmount = \app\models\Purchases::find()->where(['date' => date('Y-m-d'), 'flagdel' => 0])->sum('total_amount');
+                                    $totalWeight = \app\models\Purchases::find()->where(['date' => $date, 'flagdel' => 0])->sum('dry_weight');
+                                    $totalAmount = \app\models\Purchases::find()->where(['date' => $date, 'flagdel' => 0])->sum('total_amount');
                                     $avgPrice = $totalWeight > 0 ? $totalAmount / $totalWeight : 0;
                                     ?>
                                     <h3 class="mb-0 fw-bold"><?= number_format($avgPrice, 2) ?></h3>
@@ -191,9 +191,9 @@ if (isset($_GET['date']) && !empty($_GET['date'])) {
                                             <td class="align-middle">
                                                 <div class="d-flex align-items-center">
                                                     <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-2" style="width: 40px; height: 40px; font-size: 14px;">
-                                                        <?= strtoupper(substr($purchase->members->fullname, 0, 2)) ?>
+                                                        <?= Html::encode($purchase->members->memberid) ?>
                                                     </div>
-                                                    <strong><?= Html::encode($purchase->members->fullname) ?></strong>
+                                                    <strong><?= Html::encode($purchase->members->fullname2) ?></strong>
                                                 </div>
                                             </td>
                                             <td class="text-center align-middle">
@@ -203,7 +203,7 @@ if (isset($_GET['date']) && !empty($_GET['date'])) {
                                                 <span class="badge bg-warning text-dark fs-6"><?= Html::encode($purchase->percentage) ?>%</span>
                                             </td>
                                             <td class="text-center align-middle">
-                                                <span class="badge bg-success fs-6"><?= Html::encode($purchase->dry_weight) ?></span>
+                                                <span class="badge bg-success fs-6"><?= number_format($purchase->dry_weight, 1) ?></span>
                                             </td>
                                             <td class="text-center align-middle">
                                                 <span class="text-primary fw-bold"><?= number_format($purchase->price_per_kg, 2) ?></span>

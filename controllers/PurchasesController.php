@@ -81,11 +81,35 @@ class PurchasesController extends Controller
         $model = new Purchases();
 
         if ($this->request->isPost) {
-            if ($model->load($this->request->post()) && $model->save()) {
-                // Set the status to 'active' after saving
-                Yii::$app->session->setFlash('success');
-                return $this->redirect(['create', 'msg' => 'success', 'date' => $model->date]);
-        } 
+            if ($model->load($this->request->post())) {
+                // Debug: แสดงข้อมูลที่ได้รับ
+                echo "<pre>Debug - ข้อมูลที่ได้รับ:\n";
+                print_r($model->attributes);
+                echo "</pre>";
+                
+                // Debug: ตรวจสอบ validation
+                if ($model->validate()) {
+                    echo "<pre>Debug - Validation ผ่าน</pre>";
+                    
+                    // พยายามบันทึกข้อมูล
+                    if ($model->save()) {
+                        echo "<pre>Debug - บันทึกสำเร็จ</pre>";
+                        Yii::$app->session->setFlash('success');
+                        return $this->redirect(['create', 'msg' => 'success', 'date' => $model->date]);
+                    } else {
+                        echo "<pre>Debug - บันทึกไม่สำเร็จ:\n";
+                        print_r($model->errors);
+                        echo "</pre>";
+                    }
+                } else {
+                    echo "<pre>Debug - Validation ไม่ผ่าน:\n";
+                    print_r($model->errors);
+                    echo "</pre>";
+                }
+            } else {
+                echo "<pre>Debug - โหลดข้อมูลไม่สำเร็จ</pre>";
+            }
+        } else {
             $model->loadDefaultValues();
         }
 

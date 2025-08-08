@@ -98,7 +98,7 @@ $this->registerCss("
                 <td class="text-center"><?= Html::encode($p->receipt_number) ?></td>
                 <td class="text-end"><?= number_format($p->weight, 2) ?></td>
                 <td class="text-end"><?= number_format($p->percentage, 2) ?></td>
-                <td class="text-end"><?= number_format($p->dry_weight, 2) ?></td>
+                <td class="text-end"><?= number_format($p->dry_weight, 1) ?></td>
                 <td class="text-end"><?= number_format($p->price_per_kg, 2) ?></td>
                 <td class="text-end"><?= number_format($p->total_amount, 2) ?></td>
             </tr>
@@ -109,7 +109,7 @@ $this->registerCss("
                 <td colspan="2" class="text-center"><strong>รวม</strong></td>
                 <td class="text-end"><strong><?= number_format($totalWeight, 2) ?></strong></td>
                 <td class="text-center"><strong>-</strong></td>
-                <td class="text-end"><strong><?= number_format($totalDry, 2) ?></strong></td>
+                <td class="text-end"><strong><?= number_format($totalDry, 1) ?></strong></td>
                 <td class="text-center"><strong>-</strong></td>
                 <td class="text-end"><strong><?= number_format($receipt->total_amount, 2) ?></strong></td>
             </tr>
