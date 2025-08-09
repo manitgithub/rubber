@@ -70,7 +70,9 @@ $(document).ready(function () {
   // });
   $(".datepicker").flatpickr({
     locale: "th",
-    dateFormat: "d-m-Y",
+    dateFormat: "Y-m-d",
+    altInput: true,
+    altFormat: "d/m/Y",
   });
 
   $(".datepicker-time").flatpickr({
