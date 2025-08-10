@@ -129,6 +129,28 @@ class Helpers extends Component
         return $thai_date_return;
     }
 
+        public function DateThaiAbb($date)
+    {
+        $date = strtotime($date);
+        $thai_month_arr = array(
+            "0" => "",
+            "1" => "ม.ค.",
+            "2" => "ก.พ.",
+            "3" => "มี.ค.",
+            "4" => "เม.ย.",
+            "5" => "พ.ค.",
+            "6" => "มิ.ย.",
+            "7" => "ก.ค.",
+            "8" => "ส.ค.",
+            "9" => "ก.ย.",
+            "10" => "ต.ค.",
+            "11" => "พ.ย.",
+            "12" => "ธ.ค."
+        );
+        $thai_date_return = date("j", $date) . " " . $thai_month_arr[date("n", $date)] . " " . (date("Y", $date) + 543);
+        return $thai_date_return;
+    }
+
     public function DatetimeThai($date)
     {
         $date = strtotime($date);
@@ -151,15 +173,7 @@ class Helpers extends Component
         return $thai_date_return;
     }
 
-    public function leaveCount($userid, $type, $year, $status)
-    {
-        $sum = 0;
-        $leave = Leave::find()->where(['userid' => $userid, 'type' => $type, 'status' => $status])->andWhere(['like', 'startdate', $year])->all();
-        foreach ($leave as $leave) {
-            $sum += date_diff(date_create($leave->startdate), date_create($leave->enddate))->format('%a') + 1;
-        }
-        return $sum;
-    }
+
 
 public function ReadNumber($number)
 {

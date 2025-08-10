@@ -237,6 +237,7 @@ public function actionRunAllReceipts($start_date = null, $end_date = null)
         $receipt->member_id = $memberId;
         $receipt->book_no = $book->book_no;
         $receipt->running_no = $book->current_number;
+        $receipt->receipt_no = $p->receipt_number; // Assuming this is set in the Purchases model
         $receipt->receipt_date = date('Y-m-d');
         $receipt->total_amount = array_sum(array_map(fn($p) => $p->total_amount, $list));
         $receipt->created_by = Yii::$app->user->id;
