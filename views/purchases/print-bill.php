@@ -9,30 +9,34 @@ $this->registerCss('@media print { .no-print { display: none; } }');
 $this->registerCss("
     @page {
         size: 9in 5.5in;
-        margin: 0.18in 0.75in;
+        margin: 0.3in;
     }
     body {
         font-family: 'Sarabun', 'Arial', sans-serif;
-        font-size: 18px;
+        font-size: 22px;
         line-height: 1.6;
         margin: 0;
         padding: 0;
     }
     .container {
         max-width: 100% !important;
+        width: 100%;
+        height: auto;
         padding: 0 !important;
         margin: 0 !important;
+        border: none;
+        box-sizing: border-box;
     }
     .receipt-header {
         margin-bottom: 8px;
     }
     h4, h5 {
-        font-size: 20px;
+        font-size: 24px;
         margin: 3px 0;
         font-weight: bold;
     }
     .table {
-        font-size: 18px;
+        font-size: 24px;
         border: none !important;
         border-collapse: collapse !important;
         width: 100%;
@@ -45,13 +49,13 @@ $this->registerCss("
         font-weight: bold !important;
         text-align: center !important;
         vertical-align: middle !important;
-        font-size: 16px;
+        font-size: 18px;
     }
     .table td {
         border: none !important;
         padding: 4px 6px !important;
         vertical-align: middle !important;
-        font-size: 16px;
+        font-size: 20px;
     }
     .table tfoot td {
         border: none !important;
@@ -106,16 +110,29 @@ $this->registerCss("
     }
     @media print {
         body { 
-            font-size: 18px !important;
+            font-size: 22px !important;
             -webkit-print-color-adjust: exact;
             print-color-adjust: exact;
         }
+        .container {
+            border: none !important;
+            margin: 0 !important;
+            max-width: 100% !important;
+            width: 100% !important;
+            height: auto !important;
+            padding: 0 !important;
+        }
         .table { 
-            font-size: 20px !important; 
+            font-size: 22px !important; 
             border: none !important;
         }
         .table th, .table td {
             border: none !important;
+            font-size: 20px !important;
+        }
+        h4, h5 {
+            font-size: 26px !important;
+        }
             font-size: 18px !important;
         }
         h4, h5 {
@@ -188,7 +205,7 @@ $this->registerCss("
                 <td class="text-end"><?= number_format($p->percentage, 2) ?></td>
                 <td class="text-end"><?= number_format($p->dry_weight, 1) ?></td>
                 <td class="text-end"><?= number_format($p->price_per_kg, 0) ?></td>
-                <td class="text-end"><?= number_format($p->total_amount, 0) ?></td>
+                <td class="text-end"><?= number_format($p->total_amount, 2) ?></td>
             </tr>
             <?php endforeach; ?>
         </tbody>
@@ -199,7 +216,7 @@ $this->registerCss("
                 <td class="text-center"></td>
                 <td class="text-end"><strong><?= number_format($totalDry, 1) ?></strong></td>
                 <td class="text-center"></td>
-                <td class="text-end"><strong><?= number_format($receipt->total_amount, 0) ?></strong></td>
+                <td class="text-end"><strong><?= number_format($receipt->total_amount, 2) ?></strong></td>
             </tr>
         <tr>
                 <td colspan="3" class="text-right">
