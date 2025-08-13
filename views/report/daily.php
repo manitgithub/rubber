@@ -325,8 +325,6 @@ $this->title = $showday ? 'รายงานการรับซื้อน�
                 }
             }
             ?>
-        </tbody>
-        <tfoot>
             <tr class="total-row">
                 <td colspan="<?= $showday ? '4' : '3' ?>" style="text-align: center; font-weight: bold;">รวม</td>
                 <td style="text-align: right; padding-right: 5px; font-weight: bold;"><?= number_format($total_weight, 2) ?></td>
@@ -338,7 +336,8 @@ $this->title = $showday ? 'รายงานการรับซื้อน�
                 <td style="text-align: right; padding-right: 5px; font-weight: bold;"><?= number_format($total_amount, 2) ?></td>
                 <?= $showday ? '' : '<td style="width: 12%;"> </td>'?> 
             </tr>
-        </tfoot>
+            </tbody>
+
     </table>
     
     <div class="signature-section">

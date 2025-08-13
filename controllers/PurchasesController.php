@@ -178,6 +178,7 @@ class PurchasesController extends Controller
         {
     $startDate = Yii::$app->request->get('start_date');
     $endDate = Yii::$app->request->get('end_date');
+    $receiptDate = Yii::$app->request->get('receipt_date');
 
     $query = \app\models\Purchases::find()
         ->andFilterWhere(['>=', 'date', $startDate])
@@ -197,14 +198,20 @@ class PurchasesController extends Controller
         'groupedPayments' => $groupedPayments,
         'startDate' => $startDate,
         'endDate' => $endDate,
+        'receiptDate' => $receiptDate,
     ]);
     }
 
-public function actionRunAllReceipts($start_date = null, $end_date = null)
+public function actionRunAllReceipts($start_date = null, $end_date = null, $receipt_date = null)
 {
     if (empty($start_date) || empty($end_date)) {
         Yii::$app->session->setFlash('error', 'กรุณาระบุช่วงวันที่ให้ครบถ้วน');
         return $this->redirect(['purchases/payment']);
+    }
+
+    // ตั้งค่าวันที่ใบเสร็จเป็นวันปัจจุบันหากไม่ได้ระบุ
+    if (empty($receipt_date)) {
+        $receipt_date = date('Y-m-d');
     }
 
     // ดึงรายการที่ยังไม่มีใบเสร็จ (เช็คว่ารายการยังไม่ถูกเชื่อมกับ receipts)
@@ -238,13 +245,13 @@ public function actionRunAllReceipts($start_date = null, $end_date = null)
         $receipt->book_no = $book->book_no;
         $receipt->running_no = $book->current_number;
         $receipt->receipt_no = $p->receipt_number; // Assuming this is set in the Purchases model
-        $receipt->receipt_date = date('Y-m-d');
+        $receipt->receipt_date = $receipt_date; // ใช้วันที่ที่เลือก
         $receipt->total_amount = array_sum(array_map(fn($p) => $p->total_amount, $list));
         $receipt->created_by = Yii::$app->user->id;
         $receipt->created_at = date('Y-m-d H:i:s');
         $receipt->start_date = $start_date;
         $receipt->end_date = $end_date;
-        $receipt->date = date('Y-m-d');
+        $receipt->date = $receipt_date; // ใช้วันที่ที่เลือก
         $receipt->save(false);
 
         foreach ($list as $p) {
@@ -260,7 +267,7 @@ public function actionRunAllReceipts($start_date = null, $end_date = null)
     $book->save(false);
 
     Yii::$app->session->setFlash('success', "สร้างใบเสร็จเรียบร้อยแล้ว ($countReceipts ใบ)");
-    return $this->redirect(['purchases/payment', 'start_date' => $start_date, 'end_date' => $end_date]);
+    return $this->redirect(['purchases/payment', 'start_date' => $start_date, 'end_date' => $end_date, 'receipt_date' => $receipt_date]);
 }
 
 public function actionPrintAllBills($filter_date = null, $book_no = null, $run_no = null, $member_id = null)
@@ -288,10 +295,15 @@ public function actionPrintAllBills($filter_date = null, $book_no = null, $run_n
     ]);
 }
 
-public function actionViewMemberItems($member_id, $start_date, $end_date)
+public function actionViewMemberItems($member_id, $start_date, $end_date, $receipt_date = null)
 {
     $this->layout = 'blank';
         $member = \app\models\Members::findOne($member_id);
+
+    // ตั้งค่าวันที่ใบเสร็จเป็นวันปัจจุบันหากไม่ได้ระบุ
+    if (empty($receipt_date)) {
+        $receipt_date = date('Y-m-d');
+    }
 
     $purchases = \app\models\Purchases::find()
         ->where(['member_id' => $member_id])
@@ -306,6 +318,7 @@ public function actionViewMemberItems($member_id, $start_date, $end_date)
         'purchases' => $purchases,
         'startDate' => $start_date,
         'endDate' => $end_date,
+        'receiptDate' => $receipt_date,
     ]);
 }
 

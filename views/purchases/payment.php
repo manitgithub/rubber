@@ -395,15 +395,23 @@ if (empty($endDate)) {
 
             <?php $form = ActiveForm::begin(['method' => 'get', 'action' => ['purchases/payment']]); ?>
             <div class="row align-items-end">
-                <div class="col-md-4 mb-3">
+                <div class="col-md-3 mb-3">
                     <?= Html::label('วันที่เริ่มต้น', 'start_date', ['class' => 'form-label']) ?>
                     <?= Html::input('date', 'start_date', $startDate, ['class' => 'form-control datepicker']) ?>
                 </div>
-                <div class="col-md-4 mb-3">
+                <div class="col-md-3 mb-3">
                     <?= Html::label('วันที่สิ้นสุด', 'end_date', ['class' => 'form-label']) ?>
                     <?= Html::input('date', 'end_date', $endDate, ['class' => 'form-control datepicker']) ?>
                 </div>
-                <div class="col-md-4 mb-3">
+                <div class="col-md-3 mb-3">
+                    <?= Html::label('วันที่ใบเสร็จ', 'receipt_date', ['class' => 'form-label']) ?>
+                    <?= Html::input('date', 'receipt_date', Yii::$app->request->get('receipt_date', date('Y-m-d')), [
+                        'class' => 'form-control datepicker',
+                        'title' => 'วันที่ที่จะบันทึกในใบเสร็จ'
+                    ]) ?>
+                    <small class="form-text text-light">วันที่ที่จะบันทึกในใบเสร็จ</small>
+                </div>
+                <div class="col-md-3 mb-3">
                     <?= Html::submitButton('<i class="bi bi-search me-2"></i>ค้นหา', ['class' => 'btn btn-search w-100']) ?>
                 </div>
             </div>
@@ -442,7 +450,11 @@ if (empty($endDate)) {
                     <strong>รายการสมาชิกที่ต้องรันใบเสร็จ</strong>
                 </h5>
                 <?= Html::a('<i class="bi bi-play-circle-fill me-2"></i>รันเลขใบเสร็จทั้งหมด', 
-                    ['purchases/run-all-receipts', 'start_date' => $startDate, 'end_date' => $endDate], [
+                    ['purchases/run-all-receipts', 
+                     'start_date' => $startDate, 
+                     'end_date' => $endDate,
+                     'receipt_date' => Yii::$app->request->get('receipt_date', date('Y-m-d'))
+                    ], [
                     'class' => 'btn btn-run-all',
                     'style' => 'color: white !important;',
                     'data-confirm' => 'คุณแน่ใจหรือไม่ว่าต้องการรันเลขใบเสร็จทั้งหมด?'
@@ -495,7 +507,7 @@ if (empty($endDate)) {
                                 </td>
                                 <td class="text-center">
                                     <button class="btn btn-view btn-sm" 
-                                            onclick="openReceiptDetail('<?= Url::to(['purchases/view-member-items', 'member_id' => $memberId, 'start_date' => $startDate, 'end_date' => $endDate]) ?>')">
+                                            onclick="openReceiptDetail('<?= Url::to(['purchases/view-member-items', 'member_id' => $memberId, 'start_date' => $startDate, 'end_date' => $endDate, 'receipt_date' => Yii::$app->request->get('receipt_date', date('Y-m-d'))]) ?>')">
                                         <i class="bi bi-eye me-1"></i>ดูรายละเอียด
                                     </button>
                                 </td>
