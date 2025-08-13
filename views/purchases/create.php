@@ -51,15 +51,28 @@ if (isset($_GET['date']) && !empty($_GET['date'])) {
                     <!-- Statistics Row -->
                     <div class="row mb-4">
                         <div class="col-lg-6 mb-3">
-                            <div class="alert alert-warning border-left-warning h-100">
+                            <div class="alert alert-info border-left-info h-100">
                                 <div class="d-flex align-items-center">
                                     <div class="alert-icon me-3">
-                                        <i class="fas fa-info-circle fa-2x text-warning"></i>
+                                        <i class="fas fa-clock fa-2x text-info"></i>
                                     </div>
                                     <div>
-                                        <h6 class="alert-heading mb-2"><strong>หมายเหตุ:</strong></h6>
-                                        <p class="mb-1">1. น้ำหนักแห้ง = น้ำหนักน้ำยาง × เปอร์เซ็นต์ ÷ 100</p>
-                                        <p class="mb-0">2. ยอดรวม = ราคายาง * น้ำหนักแห้ง</p>
+                                        <h6 class="alert-heading mb-2"><strong>รายการบันทึกล่าสุด:</strong></h6>
+                                        <?php 
+                                        $latestPurchase = \app\models\Purchases::find()
+                                            ->joinWith('members')
+                                            ->where(['purchases.date' => $date, 'purchases.flagdel' => 0])
+                                            ->orderBy(['purchases.id' => SORT_DESC])
+                                            ->limit(1)
+                                            ->one();
+                                        ?>
+                                        <?php if ($latestPurchase): ?>
+                                            <p class="mb-1"><strong>สมาชิก:</strong> <?= Html::encode($latestPurchase->members->fullname2) ?> (<?= Html::encode($latestPurchase->members->memberid) ?>)</p>
+                                            <p class="mb-1"><strong>วันที่:</strong> <?= Yii::$app->helpers->DateThai($latestPurchase->date) ?></p>
+                                            <p class="mb-0"><strong>น้ำหนัก:</strong> <?= Html::encode($latestPurchase->weight) ?> กก. | <strong>ยอดเงิน:</strong> <?= number_format($latestPurchase->total_amount, 2) ?> บาท</p>
+                                        <?php else: ?>
+                                            <p class="mb-0 text-muted">ยังไม่มีการบันทึกรายการในวันที่นี้</p>
+                                        <?php endif; ?>
                                     </div>
                                 </div>
                             </div>
@@ -171,7 +184,11 @@ if (isset($_GET['date']) && !empty($_GET['date'])) {
                                 </tr>
                             </thead>
                             <tbody>
-                                <?php $model = \app\models\Purchases::find()->where(['date' => $date, 'flagdel' => 0])->orderBy(['id' => SORT_DESC])->all(); ?>
+                                <?php $model = \app\models\Purchases::find()
+                                    ->joinWith('members')
+                                    ->where(['purchases.date' => $date, 'purchases.flagdel' => 0])
+                                    ->orderBy(['members.memberid' => SORT_ASC])
+                                    ->all(); ?>
                                 <?php if (empty($model)): ?>
                                     <tr>
                                         <td colspan="7" class="text-center py-4">
@@ -246,6 +263,10 @@ if (isset($_GET['date']) && !empty($_GET['date'])) {
         border-left: 4px solid #ffc107 !important;
     }
     
+    .border-left-info {
+        border-left: 4px solid #17a2b8 !important;
+    }
+    
     .card {
         transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
     }
@@ -290,6 +311,36 @@ if (isset($_GET['date']) && !empty($_GET['date'])) {
     .empty-state small {
         font-size: 0.8rem;
         font-style: italic;
+    }
+    
+    /* Duplicate member alert styling */
+    #duplicate-member-alert {
+        border-left: 4px solid #ffc107 !important;
+        background-color: #fff3cd;
+        border-color: #ffeaa7;
+        animation: slideDown 0.3s ease-in-out;
+    }
+    
+    @keyframes slideDown {
+        from {
+            opacity: 0;
+            transform: translateY(-10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    #duplicate-member-alert .btn-outline-warning {
+        border-color: #ffc107;
+        color: #856404;
+    }
+    
+    #duplicate-member-alert .btn-outline-warning:hover {
+        background-color: #ffc107;
+        border-color: #ffc107;
+        color: #212529;
     }
     
     @media (max-width: 768px) {

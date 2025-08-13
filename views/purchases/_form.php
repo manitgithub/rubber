@@ -63,7 +63,7 @@ if(isset($_GET['date']) && !empty($_GET['date'])) {
                         'type' => 'date', 
                         'value' => $date, 
                         'class' => 'form-control datepicker',
-                        'onchange' => 'location.href = "?date=" + this.value'
+                        'onchange' => 'location.href = "?date=" + this.value + (new URLSearchParams(window.location.search).get("id") ? "&id=" + new URLSearchParams(window.location.search).get("id") : "")'
                     ]) ?>
                 </div>
 
@@ -74,8 +74,13 @@ if(isset($_GET['date']) && !empty($_GET['date'])) {
                     </label>
                     <?= $form->field($model, 'member_id', ['template' => '{input}'])->dropDownList(
                         ArrayHelper::map(Members::find()->all(), 'id', 'fullname'),
-                        ['prompt' => 'เลือกสมาชิก', 'class' => 'form-control select2']
+                        ['prompt' => 'เลือกสมาชิก', 'class' => 'form-control select2', 'id' => 'member-select']
                     ) ?>
+                    <!-- Alert for duplicate member -->
+                    <div id="duplicate-member-alert" class="alert alert-warning mt-2" style="display: none;">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        <strong>คำเตือน:</strong> สมาชิกท่านนี้มีการบันทึกในวันที่ <span id="duplicate-date"></span> แล้ว
+                    </div>
                 </div>
                 <div class="col-md-3">
                     <label class="form-label text-info fw-semibold mb-1">
@@ -294,6 +299,100 @@ document.addEventListener("DOMContentLoaded", function () {
                 }
             });
         });
+    }
+
+    // Duplicate member check functionality
+    const memberSelect = document.getElementById('member-select');
+    const duplicateAlert = document.getElementById('duplicate-member-alert');
+    const duplicateDate = document.getElementById('duplicate-date');
+    let existingPurchaseId = null;
+
+    // Wait for select2 to be initialized
+    setTimeout(function() {
+        // Check if select2 is initialized
+        if ($('#member-select').data('select2')) {
+            $('#member-select').on('select2:select', function (e) {
+                const memberId = e.params.data.id;
+                const currentDate = document.querySelector('input[name="Purchases[date]"]').value || '<?= $date ?>';
+                
+                if (memberId) {
+                    checkDuplicateMember(memberId, currentDate);
+                } else {
+                    hideDuplicateAlert();
+                }
+            });
+
+            $('#member-select').on('select2:unselect', function (e) {
+                hideDuplicateAlert();
+            });
+        } else {
+            // Fallback for regular select
+            if (memberSelect) {
+                memberSelect.addEventListener('change', function() {
+                    const memberId = this.value;
+                    const currentDate = document.querySelector('input[name="Purchases[date]"]').value || '<?= $date ?>';
+                    
+                    if (memberId) {
+                        checkDuplicateMember(memberId, currentDate);
+                    } else {
+                        hideDuplicateAlert();
+                    }
+                });
+            }
+        }
+    }, 1000);
+
+    function checkDuplicateMember(memberId, date) {
+        // Make AJAX request to check for existing purchase
+        fetch('<?= \yii\helpers\Url::to(['purchases/check-duplicate']) ?>', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+            },
+            body: JSON.stringify({
+                member_id: memberId,
+                date: date
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.exists) {
+                showDuplicateAlert(data.date, data.purchase_id);
+            } else {
+                hideDuplicateAlert();
+            }
+        })
+        .catch(error => {
+            console.error('Error checking duplicate member:', error);
+            hideDuplicateAlert();
+        });
+    }
+
+    function showDuplicateAlert(date, purchaseId) {
+        existingPurchaseId = purchaseId;
+        duplicateDate.textContent = date;
+        duplicateAlert.style.display = 'block';
+        
+        // Show simple alert without action buttons
+        if (typeof Swal !== 'undefined') {
+            Swal.fire({
+                title: 'คำเตือน!',
+                text: 'สมาชิกท่านนี้มีการบันทึกในวันที่ ' + date + ' แล้ว',
+                icon: 'warning',
+                confirmButtonColor: '#ffc107',
+                confirmButtonText: 'ตกลง',
+                timer: 4000,
+                timerProgressBar: true
+            });
+        } else {
+            alert('คำเตือน!\nสมาชิกท่านนี้มีการบันทึกในวันที่ ' + date + ' แล้ว');
+        }
+    }
+
+    function hideDuplicateAlert() {
+        duplicateAlert.style.display = 'none';
+        existingPurchaseId = null;
     }
 });
 </script>

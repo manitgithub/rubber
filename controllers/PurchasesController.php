@@ -81,33 +81,9 @@ class PurchasesController extends Controller
         $model = new Purchases();
 
         if ($this->request->isPost) {
-            if ($model->load($this->request->post())) {
-                // Debug: แสดงข้อมูลที่ได้รับ
-                echo "<pre>Debug - ข้อมูลที่ได้รับ:\n";
-                print_r($model->attributes);
-                echo "</pre>";
-                
-                // Debug: ตรวจสอบ validation
-                if ($model->validate()) {
-                    echo "<pre>Debug - Validation ผ่าน</pre>";
-                    
-                    // พยายามบันทึกข้อมูล
-                    if ($model->save()) {
-                        echo "<pre>Debug - บันทึกสำเร็จ</pre>";
-                        Yii::$app->session->setFlash('success');
-                        return $this->redirect(['create', 'msg' => 'success', 'date' => $model->date]);
-                    } else {
-                        echo "<pre>Debug - บันทึกไม่สำเร็จ:\n";
-                        print_r($model->errors);
-                        echo "</pre>";
-                    }
-                } else {
-                    echo "<pre>Debug - Validation ไม่ผ่าน:\n";
-                    print_r($model->errors);
-                    echo "</pre>";
-                }
-            } else {
-                echo "<pre>Debug - โหลดข้อมูลไม่สำเร็จ</pre>";
+            if ($model->load($this->request->post()) && $model->save()) {
+                Yii::$app->session->setFlash('success');
+                return $this->redirect(['create', 'date' => $model->date]);
             }
         } else {
             $model->loadDefaultValues();
@@ -128,11 +104,12 @@ class PurchasesController extends Controller
     public function actionUpdate($id)
     {
         $model = $this->findModel($id);
+        $date = Yii::$app->request->get('date', $model->date);
 
         if ($this->request->isPost && $model->load($this->request->post()) && $model->save()) {
                             Yii::$app->session->setFlash('success');
 
-            return $this->redirect(['create', 'id' => $model->id, 'date' => $model->date]);
+            return $this->redirect(['create', 'date' => $date]);
         }
 
         return $this->render('create', [
@@ -375,6 +352,46 @@ public function actionPrintBill($id)
     return $this->render('print-bill', [
         'receipt' => $receipt,
     ]);
+}
+
+/**
+ * Check for duplicate member purchase on the same date
+ * @return array JSON response
+ */
+public function actionCheckDuplicate()
+{
+    Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+    
+    $request = Yii::$app->request;
+    if (!$request->isPost) {
+        return ['error' => 'Invalid request method'];
+    }
+    
+    $data = json_decode($request->getRawBody(), true);
+    $memberId = $data['member_id'] ?? null;
+    $date = $data['date'] ?? null;
+    
+    if (!$memberId || !$date) {
+        return ['exists' => false];
+    }
+    
+    // Check for existing purchase record
+    $existingPurchase = Purchases::find()
+        ->where(['member_id' => $memberId, 'date' => $date, 'flagdel' => 0])
+        ->one();
+    
+    if ($existingPurchase) {
+        return [
+            'exists' => true,
+            'purchase_id' => $existingPurchase->id,
+            'date' => Yii::$app->helpers->DateThai($existingPurchase->date),
+            'member_name' => $existingPurchase->members->fullname2 ?? 'Unknown',
+            'weight' => $existingPurchase->weight,
+            'total_amount' => $existingPurchase->total_amount
+        ];
+    }
+    
+    return ['exists' => false];
 }
 
 
