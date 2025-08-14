@@ -265,7 +265,7 @@ public function actionPrintAllBills($filter_date = null, $book_no = null, $run_n
         $query->andWhere(['member_id' => $member_id]);
     }
 
-    $receipts = $query->orderBy(['member_id' => SORT_ASC])->all();
+    $receipts = $query->orderBy(['running_no' => SORT_ASC])->all();
 
     return $this->render('print-all-bills', [
         'receipts' => $receipts,
@@ -308,7 +308,7 @@ public function actionBill($filter_date = null, $book_no = null, $run_no = null,
 
     $query = \app\models\Receipt::find()
         ->joinWith(['member', 'purchases'])
-        ->orderBy(['receipt_date' => SORT_ASC]);
+        ->orderBy(['running_no' => SORT_ASC]);
 
     if ($filter_date) {
         $query->andWhere(['DATE(receipt_date)' => $filter_date]);
@@ -325,6 +325,7 @@ public function actionBill($filter_date = null, $book_no = null, $run_no = null,
     if (!empty($member_id)) {
         $query->andWhere(['member_id' => $member_id]);
     }
+
 
     $receipts = $query->all();
 
