@@ -17,7 +17,11 @@ if (empty($startDate)) {
     $startDate = date('Y-m-d', strtotime('-7 days'));
 }
 if (empty($endDate)) {
-    $endDate = date('Y-m-d');
+    $endDate = date('Y-m-d', strtotime('-1 days'));
+}
+
+if (empty($printDate)) {
+    $printDate = date('Y-m-d', strtotime('+1 days'));
 }
 ?>
 
@@ -405,7 +409,7 @@ if (empty($endDate)) {
                 </div>
                 <div class="col-md-3 mb-3">
                     <?= Html::label('วันที่ใบเสร็จ', 'receipt_date', ['class' => 'form-label']) ?>
-                    <?= Html::input('date', 'receipt_date', Yii::$app->request->get('receipt_date', date('Y-m-d')), [
+                    <?= Html::input('date', 'receipt_date', Yii::$app->request->get('receipt_date', $printDate), [
                         'class' => 'form-control datepicker',
                         'title' => 'วันที่ที่จะบันทึกในใบเสร็จ'
                     ]) ?>
@@ -428,6 +432,12 @@ if (empty($endDate)) {
             $unprintedGroups[$memberId] = $unpaid;
         }
     }
+    // Sort by memberid
+    uasort($unprintedGroups, function($a, $b) {
+        $memberA = $a[0]->members;
+        $memberB = $b[0]->members;
+        return strcmp($memberA->memberid, $memberB->memberid);
+    });
     ?>
 
     <?php if (!empty($unprintedGroups)): ?>
@@ -488,7 +498,6 @@ if (empty($endDate)) {
                                             <div class="member-avatar">
                                             <?= $member->memberid ?>
                                         </div>
-
                                 <td>
                                     <div class="d-flex align-items-center">
                                         <div>

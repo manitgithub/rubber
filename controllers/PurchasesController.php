@@ -205,6 +205,13 @@ public function actionRunAllReceipts($start_date = null, $end_date = null, $rece
         $grouped[$p->member_id][] = $p;
     }
 
+    uasort($grouped, function($a, $b) {
+        $memberA = $a[0]->members;
+        $memberB = $b[0]->members;
+        return strcmp($memberA->memberid, $memberB->memberid);
+    });
+
+
     $book = \app\models\ReceiptBook::find()->where(['is_active' => 1])->one();
     if (!$book) {
         Yii::$app->session->setFlash('error', 'ไม่พบเล่มใบเสร็จที่กำลังใช้งาน');
