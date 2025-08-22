@@ -301,19 +301,19 @@ $total_dw = 0;
             </div>
             <div class="col-md-3">
                 <div class="stat-card">
-                    <div class="stat-number"><?= number_format($total_w, 0) ?></div>
+                    <div class="stat-number"><?= number_format($total_w, 2) ?></div>
                     <div class="stat-label">ยางสดรวม (กก.)</div>
                 </div>
             </div>
             <div class="col-md-3">
                 <div class="stat-card">
-                    <div class="stat-number"><?= number_format($total_dw, 0) ?></div>
+                    <div class="stat-number"><?= number_format($total_dw, 2) ?></div>
                     <div class="stat-label">ยางแห้งรวม (กก.)</div>
                 </div>
             </div>
             <div class="col-md-3">
                 <div class="stat-card">
-                    <div class="stat-number"><?= number_format($total_a, 0) ?></div>
+                    <div class="stat-number"><?= number_format($total_a, 2) ?></div>
                     <div class="stat-label">รายได้รวม (บาท)</div>
                 </div>
             </div>
