@@ -419,6 +419,40 @@ if (empty($printDate)) {
                     <?= Html::submitButton('<i class="bi bi-search me-2"></i>ค้นหา', ['class' => 'btn btn-search w-100']) ?>
                 </div>
             </div>
+            
+            <!-- Price Type Selection -->
+            <div class="row mt-4">
+                <div class="col-md-6 mb-3">
+                    <?= Html::label('ประเภทการคำนวณราคา', 'price_type', ['class' => 'form-label']) ?>
+                    <?= Html::dropDownList('price_type', Yii::$app->request->get('price_type', 'daily'), [
+                        'daily' => 'ราคาตามวัน (ราคาแต่ละวันที่ซื้อ)',
+                        'fixed' => 'ราคาเดียวกันทั้งหมด'
+                    ], [
+                        'class' => 'form-control form-select',
+                        'id' => 'price-type-select',
+                        'style' => 'font-size: 1.2rem; padding: 1rem 1.25rem; height: 60px;'
+                    ]) ?>
+                </div>
+                <div class="col-md-3 mb-3" id="fixed-price-container" style="display: none;">
+                    <?= Html::label('ราคาต่อกิโลกรัมแห้ง (บาท)', 'fixed_price', ['class' => 'form-label']) ?>
+                    <?= Html::input('number', 'fixed_price', Yii::$app->request->get('fixed_price', ''), [
+                        'class' => 'form-control',
+                        'step' => '0.01',
+                        'min' => '0',
+                        'placeholder' => 'กรอกราคาต่อกิโลกรัมแห้ง',
+                        'style' => 'font-size: 1.2rem; padding: 1rem 1.25rem; height: 60px;'
+                    ]) ?>
+                    <small class="form-text text-light">คำนวณจากน้ำหนักแห้ง</small>
+                </div>
+                <div class="col-md-3 mb-3" id="preview-container" style="display: none;">
+                    <div class="mt-4">
+                        <div class="alert alert-info">
+                            <i class="bi bi-info-circle me-2"></i>
+                            <span id="price-preview">กรอกราคาเพื่อดูตัวอย่าง</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
             <?php ActiveForm::end(); ?>
     </div>
 </div>
@@ -463,11 +497,15 @@ if (empty($printDate)) {
                     ['purchases/run-all-receipts', 
                      'start_date' => $startDate, 
                      'end_date' => $endDate,
-                     'receipt_date' => Yii::$app->request->get('receipt_date', date('Y-m-d'))
+                     'receipt_date' => Yii::$app->request->get('receipt_date', date('Y-m-d')),
+                     'price_type' => Yii::$app->request->get('price_type', 'daily'),
+                     'fixed_price' => Yii::$app->request->get('fixed_price', '')
                     ], [
                     'class' => 'btn btn-run-all',
                     'style' => 'color: white !important;',
-                    'data-confirm' => 'คุณแน่ใจหรือไม่ว่าต้องการรันเลขใบเสร็จทั้งหมด?'
+                    'data-confirm' => 'คุณแน่ใจหรือไม่ว่าต้องการรันเลขใบเสร็จทั้งหมด?' . 
+                        (Yii::$app->request->get('price_type') === 'fixed' ? 
+                            ' (ราคาเดียวกันทั้งหมด ' . number_format((float)Yii::$app->request->get('fixed_price', 0), 2) . ' บาท/กก.)' : '')
                 ]) ?>
             </div>
         </div>
@@ -488,20 +526,29 @@ if (empty($printDate)) {
                     </thead>
                     <tbody>
                         <?php foreach ($unprintedGroups as $memberId => $purchases): ?>
-                            <?php
-                            $member = $purchases[0]->members;
-                            $totalWeight = array_sum(array_map(fn($p) => $p->weight, $purchases));
-                            $totalAmount = array_sum(array_map(fn($p) => $p->total_amount, $purchases));
-                            ?>
+                    <?php
+                    $totalWeight = array_sum(array_map(fn($p) => $p->weight, $purchases));
+                    $totalDryWeight = array_sum(array_map(fn($p) => $p->dry_weight, $purchases));
+                    $totalAmount = array_sum(array_map(fn($p) => $p->total_amount, $purchases));
+                    
+                    // คำนวณราคาใหม่ถ้าเลือกราคาเดียวกันทั้งหมด
+                    $priceType = Yii::$app->request->get('price_type', 'daily');
+                    $fixedPrice = (float)Yii::$app->request->get('fixed_price', 0);
+                    
+                    if ($priceType === 'fixed' && $fixedPrice > 0) {
+                        $totalAmount = $totalDryWeight * $fixedPrice; // ใช้น้ำหนักแห้ง
+                    }
+                    ?>
                             <tr>
                                 <td>
-                                            <div class="member-avatar">
-                                            <?= $member->memberid ?>
-                                        </div>
+                                    <div class="member-avatar">
+                                        <?= $purchases[0]->members->memberid ?>
+                                    </div>
+                                </td>
                                 <td>
                                     <div class="d-flex align-items-center">
                                         <div>
-                                            <strong><?= Html::encode($member->fullname2) ?></strong>
+                                            <strong><?= Html::encode($purchases[0]->members->fullname2) ?></strong>
                                         </div>
                                     </div>
                                 </td>
@@ -516,7 +563,14 @@ if (empty($printDate)) {
                                 </td>
                                 <td class="text-center">
                                     <button class="btn btn-view btn-sm" 
-                                            onclick="openReceiptDetail('<?= Url::to(['purchases/view-member-items', 'member_id' => $memberId, 'start_date' => $startDate, 'end_date' => $endDate, 'receipt_date' => Yii::$app->request->get('receipt_date', date('Y-m-d'))]) ?>')">
+                                            onclick="openReceiptDetail('<?= Url::to(['purchases/view-member-items', 
+                                                'member_id' => $memberId, 
+                                                'start_date' => $startDate, 
+                                                'end_date' => $endDate, 
+                                                'receipt_date' => Yii::$app->request->get('receipt_date', date('Y-m-d')),
+                                                'price_type' => Yii::$app->request->get('price_type', 'daily'),
+                                                'fixed_price' => Yii::$app->request->get('fixed_price', '')
+                                            ]) ?>')">
                                         <i class="bi bi-eye me-1"></i>ดูรายละเอียด
                                     </button>
                                 </td>
@@ -549,6 +603,45 @@ if (empty($printDate)) {
 <?php Modal::end(); ?>
 
 <script>
+// Price type handling
+document.addEventListener('DOMContentLoaded', function() {
+    const priceTypeSelect = document.getElementById('price-type-select');
+    const fixedPriceContainer = document.getElementById('fixed-price-container');
+    const previewContainer = document.getElementById('preview-container');
+    const fixedPriceInput = document.querySelector('input[name="fixed_price"]');
+    
+    function updatePriceType() {
+        const selectedType = priceTypeSelect.value;
+        
+        if (selectedType === 'fixed') {
+            fixedPriceContainer.style.display = 'block';
+            previewContainer.style.display = 'block';
+        } else {
+            fixedPriceContainer.style.display = 'none';
+            previewContainer.style.display = 'none';
+        }
+    }
+    
+    function updatePreview() {
+        const fixedPrice = parseFloat(fixedPriceInput.value) || 0;
+        const previewElement = document.getElementById('price-preview');
+        
+        if (fixedPrice > 0) {
+            previewElement.innerHTML = `ราคา ${fixedPrice.toFixed(2)} บาท/กก.แห้ง`;
+        } else {
+            previewElement.innerHTML = 'กรอกราคาเพื่อดูตัวอย่าง';
+        }
+    }
+    
+    // Initialize on page load
+    updatePriceType();
+    updatePreview();
+    
+    // Event listeners
+    priceTypeSelect.addEventListener('change', updatePriceType);
+    fixedPriceInput.addEventListener('input', updatePreview);
+});
+
 function openReceiptDetail(url) {
     // เปิด popup window
     window.open(url, 'receiptDetail', 'width=1200,height=800,scrollbars=yes,resizable=yes,menubar=no,toolbar=no,location=no,status=no');

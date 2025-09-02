@@ -345,7 +345,7 @@ $total_dw = 0;
         <tbody>
             <?php 
             $i = 0;
-            $sql = "SELECT SUM(weight) AS total_weight, SUM(dry_weight) AS total_dry_weight, SUM(total_amount) AS total_amount, AVG(price_per_kg) AS avg_price, DATE(date) as date FROM purchases WHERE date BETWEEN :sdate AND :edate
+            $sql = "SELECT SUM(weight) AS total_weight, SUM(dry_weight) AS total_dry_weight, SUM(total_amount) AS total_amount, AVG(price_per_kg) AS avg_price, DATE(date) as date FROM purchases WHERE date BETWEEN :sdate AND :edate and flagdel = 0
             GROUP BY DATE(date)"; 
             $command = Yii::$app->db->createCommand($sql);
             $command->bindValue(':sdate', $sdate);

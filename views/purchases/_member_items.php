@@ -321,12 +321,28 @@ body {
             $total_amount = 0;
             $total_items = count($purchases);
             
+            // ตรวจสอบประเภทราคา
+            $priceType = $priceType ?? 'daily';
+            $fixedPrice = $fixedPrice ?? null;
+            
             foreach ($purchases as $p) {
                 $total_weight += $p->weight;
                 $total_dry_weight += $p->dry_weight;
-                $total_amount += $p->total_amount;
+                
+                if ($priceType === 'fixed' && !empty($fixedPrice)) {
+                    $total_amount += $p->weight * (float)$fixedPrice;
+                } else {
+                    $total_amount += $p->total_amount;
+                }
             }
             ?>
+            
+            <?php if ($priceType === 'fixed' && !empty($fixedPrice)): ?>
+                <div class="alert alert-custom mb-3">
+                    <i class="bi bi-info-circle me-2"></i>
+                    <strong>การคำนวณราคา:</strong> ใช้ราคาเดียวกันทั้งหมด <?= number_format($fixedPrice, 2) ?> บาท/กก.
+                </div>
+            <?php endif; ?>
             
             <!-- Summary Statistics -->
             <div class="stats-summary">
@@ -369,7 +385,15 @@ body {
                             $i = 1;
                             $running_total = 0;
                             foreach ($purchases as $p):
-                                $running_total += $p->total_amount;
+                                // คำนวณราคาและยอดตามประเภท
+                                if (isset($displayData) && isset($displayData[$p->id])) {
+                                    $displayPrice = $displayData[$p->id]['price'];
+                                    $displayAmount = $displayData[$p->id]['amount'];
+                                } else {
+                                    $displayPrice = $p->price_per_kg;
+                                    $displayAmount = $p->total_amount;
+                                }
+                                $running_total += $displayAmount;
                             ?>
                                 <tr>
                                     <td class="text-center">
@@ -391,10 +415,15 @@ body {
                                         <strong class="text-info"><?= number_format($p->dry_weight, 1) ?></strong>
                                     </td>
                                     <td class="text-end">
-                                        <span class="text-secondary">฿<?= number_format($p->price_per_kg, 2) ?></span>
+                                        <?php if ($priceType === 'fixed' && !empty($fixedPrice)): ?>
+                                            <span class="text-warning">฿<?= number_format($displayPrice, 2) ?></span>
+                                            <small class="d-block text-muted">(ราคาเดียวกัน)</small>
+                                        <?php else: ?>
+                                            <span class="text-secondary">฿<?= number_format($displayPrice, 2) ?></span>
+                                        <?php endif; ?>
                                     </td>
                                     <td class="text-end">
-                                        <strong class="text-success fs-6">฿<?= number_format($p->total_amount, 2) ?></strong>
+                                        <strong class="text-success fs-6">฿<?= number_format($displayAmount, 2) ?></strong>
                                     </td>
                                 </tr>
                             <?php endforeach; ?>

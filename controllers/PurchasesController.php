@@ -179,11 +179,20 @@ class PurchasesController extends Controller
     ]);
     }
 
-public function actionRunAllReceipts($start_date = null, $end_date = null, $receipt_date = null)
+public function actionRunAllReceipts($start_date = null, $end_date = null, $receipt_date = null, $price_type = 'daily', $fixed_price = null)
 {
     if (empty($start_date) || empty($end_date)) {
         Yii::$app->session->setFlash('error', 'กรุณาระบุช่วงวันที่ให้ครบถ้วน');
         return $this->redirect(['purchases/payment']);
+    }
+
+    // ตรวจสอบราคาเดียวกันทั้งหมด
+    if ($price_type === 'fixed') {
+        $fixed_price = (float)$fixed_price;
+        if ($fixed_price <= 0) {
+            Yii::$app->session->setFlash('error', 'กรุณาระบุราคาต่อกิโลกรัมที่ถูกต้อง');
+            return $this->redirect(['purchases/payment', 'start_date' => $start_date, 'end_date' => $end_date]);
+        }
     }
 
     // ตั้งค่าวันที่ใบเสร็จเป็นวันปัจจุบันหากไม่ได้ระบุ
@@ -211,7 +220,6 @@ public function actionRunAllReceipts($start_date = null, $end_date = null, $rece
         return strcmp($memberA->memberid, $memberB->memberid);
     });
 
-
     $book = \app\models\ReceiptBook::find()->where(['is_active' => 1])->one();
     if (!$book) {
         Yii::$app->session->setFlash('error', 'ไม่พบเล่มใบเสร็จที่กำลังใช้งาน');
@@ -219,38 +227,74 @@ public function actionRunAllReceipts($start_date = null, $end_date = null, $rece
     }
 
     $countReceipts = 0;
+    $transaction = Yii::$app->db->beginTransaction();
 
-    foreach ($grouped as $memberId => $list) {
-        // รันใบเสร็จใหม่ให้แต่ละคน
-        $book->current_number += 1;
+    try {
+        foreach ($grouped as $memberId => $list) {
+            // รันใบเสร็จใหม่ให้แต่ละคน
+            $book->current_number += 1;
 
-        $receipt = new \app\models\Receipt();
-        $receipt->member_id = $memberId;
-        $receipt->book_no = $book->book_no;
-        $receipt->running_no = $book->current_number;
-        $receipt->receipt_no = $p->receipt_number; // Assuming this is set in the Purchases model
-        $receipt->receipt_date = $receipt_date; // ใช้วันที่ที่เลือก
-        $receipt->total_amount = array_sum(array_map(fn($p) => $p->total_amount, $list));
-        $receipt->created_by = Yii::$app->user->id;
-        $receipt->created_at = date('Y-m-d H:i:s');
-        $receipt->start_date = $start_date;
-        $receipt->end_date = $end_date;
-        $receipt->date = $receipt_date; // ใช้วันที่ที่เลือก
-        $receipt->save(false);
+            // คำนวณยอดรวม
+            $totalAmount = 0;
+            $totalWeight = 0;
+            $totalDryWeight = 0;
+            
+            foreach ($list as $p) {
+                $totalWeight += $p->weight;
+                $totalDryWeight += $p->dry_weight;
+                
+                if ($price_type === 'fixed') {
+                    // ใช้ราคาเดียวกันทั้งหมด: อัพเดทราคาในฐานข้อมูล และใช้น้ำหนักแห้ง
+                    $p->price_per_kg = $fixed_price;
+                    $p->total_amount = $p->dry_weight * $fixed_price; // ใช้น้ำหนักแห้ง
+                    $p->save(false);
+                    $totalAmount += $p->total_amount;
+                } else {
+                    // ใช้ราคาตามวันที่เดิม
+                    $totalAmount += $p->total_amount;
+                }
+            }
 
-        foreach ($list as $p) {
-            $p->receipt_id = $receipt->id;
-            $p->status = 'PAID';
-            $p->save(false);
+            $receipt = new \app\models\Receipt();
+            $receipt->member_id = $memberId;
+            $receipt->book_no = $book->book_no;
+            $receipt->running_no = $book->current_number;
+            $receipt->receipt_no = sprintf('%s-%04d', $book->book_no, $book->current_number);
+            $receipt->receipt_date = $receipt_date; // ใช้วันที่ที่เลือก
+            $receipt->total_amount = $totalAmount;
+            $receipt->created_by = Yii::$app->user->id ?? 1;
+            $receipt->created_at = date('Y-m-d H:i:s');
+            $receipt->start_date = $start_date;
+            $receipt->end_date = $end_date;
+            $receipt->date = $receipt_date; // ใช้วันที่ที่เลือก
+            
+            $receipt->save(false);
+
+            foreach ($list as $p) {
+                $p->receipt_id = $receipt->id;
+                $p->status = 'PAID';
+                $p->save(false);
+            }
+
+            $countReceipts++;
         }
 
-        $countReceipts++;
+        $book->updated_at = date('Y-m-d H:i:s');
+        $book->save(false);
+
+        $transaction->commit();
+
+        if ($price_type === 'fixed') {
+            Yii::$app->session->setFlash('success', "สร้างใบเสร็จเรียบร้อยแล้ว ($countReceipts ใบ) ด้วยราคาเดียวกันทั้งหมด " . number_format($fixed_price, 2) . " บาท/กก.");
+        } else {
+            Yii::$app->session->setFlash('success', "สร้างใบเสร็จเรียบร้อยแล้ว ($countReceipts ใบ) ด้วยราคาตามวัน");
+        }
+
+    } catch (\Exception $e) {
+        $transaction->rollBack();
+        Yii::$app->session->setFlash('error', 'เกิดข้อผิดพลาด: ' . $e->getMessage());
     }
 
-    $book->updated_at = date('Y-m-d H:i:s');
-    $book->save(false);
-
-    Yii::$app->session->setFlash('success', "สร้างใบเสร็จเรียบร้อยแล้ว ($countReceipts ใบ)");
     return $this->redirect(['purchases/payment', 'start_date' => $start_date, 'end_date' => $end_date, 'receipt_date' => $receipt_date]);
 }
 
@@ -279,10 +323,10 @@ public function actionPrintAllBills($filter_date = null, $book_no = null, $run_n
     ]);
 }
 
-public function actionViewMemberItems($member_id, $start_date, $end_date, $receipt_date = null)
+public function actionViewMemberItems($member_id, $start_date, $end_date, $receipt_date = null, $price_type = 'daily', $fixed_price = null)
 {
     $this->layout = 'blank';
-        $member = \app\models\Members::findOne($member_id);
+    $member = \app\models\Members::findOne($member_id);
 
     // ตั้งค่าวันที่ใบเสร็จเป็นวันปัจจุบันหากไม่ได้ระบุ
     if (empty($receipt_date)) {
@@ -297,12 +341,36 @@ public function actionViewMemberItems($member_id, $start_date, $end_date, $recei
         ->orderBy(['date' => SORT_ASC])
         ->all();
 
+    // คำนวณราคาใหม่ถ้าเลือกราคาเดียวกันทั้งหมด
+    if ($price_type === 'fixed' && !empty($fixed_price)) {
+        $fixed_price = (float)$fixed_price;
+        // ใช้น้ำหนักแห้ง (dry_weight) ในการคำนวณ
+        $displayData = [];
+        foreach ($purchases as $purchase) {
+            $displayData[$purchase->id] = [
+                'price' => $fixed_price,
+                'amount' => $purchase->dry_weight * $fixed_price
+            ];
+        }
+    } else {
+        $displayData = [];
+        foreach ($purchases as $purchase) {
+            $displayData[$purchase->id] = [
+                'price' => $purchase->price_per_kg,
+                'amount' => $purchase->total_amount
+            ];
+        }
+    }
+
     return $this->render('_member_items', [
         'member' => $member,
         'purchases' => $purchases,
         'startDate' => $start_date,
         'endDate' => $end_date,
         'receiptDate' => $receipt_date,
+        'priceType' => $price_type,
+        'fixedPrice' => $fixed_price,
+        'displayData' => $displayData,
     ]);
 }
 
