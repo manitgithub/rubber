@@ -335,6 +335,43 @@ if (empty($printDate)) {
     opacity: 0.8;
 }
 
+/* SweetAlert custom styles */
+.swal-wide {
+    font-family: "Noto Sans Thai", system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif !important;
+}
+
+.swal2-popup {
+    border-radius: 20px !important;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15) !important;
+}
+
+.swal2-title {
+    font-size: 1.5rem !important;
+    font-weight: 600 !important;
+    color: #2c3e50 !important;
+    margin-bottom: 1.5rem !important;
+}
+
+.swal2-html-container {
+    font-size: 1rem !important;
+    line-height: 1.6 !important;
+    color: #495057 !important;
+}
+
+.swal2-confirm {
+    font-weight: 600 !important;
+    padding: 0.875rem 2rem !important;
+    border-radius: 12px !important;
+    font-size: 1rem !important;
+}
+
+.swal2-cancel {
+    font-weight: 600 !important;
+    padding: 0.875rem 2rem !important;
+    border-radius: 12px !important;
+    font-size: 1rem !important;
+}
+
 /* Responsive */
 @media (max-width: 768px) {
     .container-fluid {
@@ -494,18 +531,23 @@ if (empty($printDate)) {
                     <strong>รายการสมาชิกที่ต้องรันใบเสร็จ</strong>
                 </h5>
                 <?= Html::a('<i class="bi bi-play-circle-fill me-2"></i>รันเลขใบเสร็จทั้งหมด', 
-                    ['purchases/run-all-receipts', 
-                     'start_date' => $startDate, 
-                     'end_date' => $endDate,
-                     'receipt_date' => Yii::$app->request->get('receipt_date', date('Y-m-d')),
-                     'price_type' => Yii::$app->request->get('price_type', 'daily'),
-                     'fixed_price' => Yii::$app->request->get('fixed_price', '')
-                    ], [
+                    'javascript:void(0)', [
                     'class' => 'btn btn-run-all',
                     'style' => 'color: white !important;',
-                    'data-confirm' => 'คุณแน่ใจหรือไม่ว่าต้องการรันเลขใบเสร็จทั้งหมด?' . 
-                        (Yii::$app->request->get('price_type') === 'fixed' ? 
-                            ' (ราคาเดียวกันทั้งหมด ' . number_format((float)Yii::$app->request->get('fixed_price', 0), 2) . ' บาท/กก.)' : '')
+                    'id' => 'btn-run-all-receipts',
+                    'data-url' => Url::to(['purchases/run-all-receipts', 
+                        'start_date' => $startDate, 
+                        'end_date' => $endDate,
+                        'receipt_date' => Yii::$app->request->get('receipt_date', date('Y-m-d')),
+                        'price_type' => Yii::$app->request->get('price_type', 'daily'),
+                        'fixed_price' => Yii::$app->request->get('fixed_price', '')
+                    ]),
+                    'data-start-date' => date('d/m/Y', strtotime($startDate)),
+                    'data-end-date' => date('d/m/Y', strtotime($endDate)),
+                    'data-receipt-date' => date('d/m/Y', strtotime(Yii::$app->request->get('receipt_date', date('Y-m-d')))),
+                    'data-price-type' => Yii::$app->request->get('price_type', 'daily'),
+                    'data-fixed-price' => Yii::$app->request->get('fixed_price', ''),
+                    'data-member-count' => count($unprintedGroups)
                 ]) ?>
             </div>
         </div>
@@ -601,6 +643,8 @@ if (empty($printDate)) {
 ]); ?>
 <div id="modal-content"></div>
 <?php Modal::end(); ?>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <script>
 // Price type handling
@@ -707,5 +751,144 @@ document.addEventListener('DOMContentLoaded', function() {
             this.style.transform = 'scale(1)';
         });
     });
+});
+
+// SweetAlert for run all receipts
+document.addEventListener('DOMContentLoaded', function() {
+    const runAllBtn = document.getElementById('btn-run-all-receipts');
+    
+    if (runAllBtn) {
+        runAllBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            
+            const url = this.getAttribute('data-url');
+            const startDate = this.getAttribute('data-start-date');
+            const endDate = this.getAttribute('data-end-date');
+            const receiptDate = this.getAttribute('data-receipt-date');
+            const priceType = this.getAttribute('data-price-type');
+            const fixedPrice = this.getAttribute('data-fixed-price');
+            const memberCount = this.getAttribute('data-member-count');
+            
+            let priceInfo = '';
+            if (priceType === 'fixed' && fixedPrice) {
+                const price = parseFloat(fixedPrice);
+                priceInfo = `<div class="alert alert-info mt-3 mb-0">
+                    <i class="bi bi-cash-coin me-2"></i>
+                    ราคาเดียวกันทั้งหมด: <strong>${price.toLocaleString('th-TH', {minimumFractionDigits: 2})} บาท/กก.แห้ง</strong>
+                </div>`;
+            } else {
+                priceInfo = `<div class="alert alert-warning mt-3 mb-0">
+                    <i class="bi bi-calendar-event me-2"></i>
+                    ใช้ราคาตามวันที่ซื้อแต่ละรายการ
+                </div>`;
+            }
+            
+            Swal.fire({
+                title: '<i class="bi bi-receipt-cutoff me-2 text-primary"></i>รันเลขใบเสร็จทั้งหมด',
+                html: `
+                    <div class="text-start">
+                        <div class="row mb-3">
+                            <div class="col-6">
+                                <div class="card bg-light">
+                                    <div class="card-body py-2">
+                                        <small class="text-muted">ข้อมูลจากวันที่</small>
+                                        <div class="fw-bold text-primary">${startDate}</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="card bg-light">
+                                    <div class="card-body py-2">
+                                        <small class="text-muted">ถึงวันที่</small>
+                                        <div class="fw-bold text-primary">${endDate}</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row mb-3">
+                            <div class="col-6">
+                                <div class="card bg-light">
+                                    <div class="card-body py-2">
+                                        <small class="text-muted">วันที่ใบเสร็จ</small>
+                                        <div class="fw-bold text-success">${receiptDate}</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="card bg-light">
+                                    <div class="card-body py-2">
+                                        <small class="text-muted">จำนวนสมาชิก</small>
+                                        <div class="fw-bold text-danger">${memberCount} คน</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        ${priceInfo}
+                        
+                        <div class="alert alert-warning mt-4 mb-0">
+                            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                            <strong>หมายเหตุ:</strong> การดำเนินการนี้ไม่สามารถยกเลิกได้ กรุณาตรวจสอบข้อมูลให้ถูกต้องก่อนดำเนินการ
+                        </div>
+                    </div>
+                `,
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonText: '<i class="bi bi-play-circle-fill me-2"></i>ดำเนินการรันใบเสร็จ',
+                cancelButtonText: '<i class="bi bi-x-circle me-2"></i>ยกเลิก',
+                confirmButtonColor: '#007bff',
+                cancelButtonColor: '#6c757d',
+                width: '600px',
+                customClass: {
+                    popup: 'swal-wide',
+                    confirmButton: 'btn btn-primary px-4',
+                    cancelButton: 'btn btn-secondary px-4'
+                },
+                showLoaderOnConfirm: true,
+                preConfirm: () => {
+                    return fetch(url, {
+                        method: 'GET',
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest'
+                        }
+                    })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('เกิดข้อผิดพลาดในการเชื่อมต่อเซิร์ฟเวอร์');
+                        }
+                        return response.text();
+                    })
+                    .then(data => {
+                        return data;
+                    })
+                    .catch(error => {
+                        Swal.showValidationMessage(`เกิดข้อผิดพลาด: ${error.message}`);
+                    });
+                },
+                allowOutsideClick: () => !Swal.isLoading()
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    Swal.fire({
+                        title: '<i class="bi bi-check-circle-fill me-2 text-success"></i>สำเร็จ!',
+                        html: `
+                            <div class="text-center">
+                                <div class="mb-3">
+                                    <i class="bi bi-receipt text-success" style="font-size: 4rem;"></i>
+                                </div>
+                                <p class="mb-2">รันเลขใบเสร็จเสร็จสิ้นแล้ว</p>
+                                <small class="text-muted">ระบบได้ทำการสร้างเลขใบเสร็จสำหรับสมาชิก ${memberCount} คนแล้ว</small>
+                            </div>
+                        `,
+                        icon: 'success',
+                        confirmButtonText: '<i class="bi bi-arrow-clockwise me-2"></i>โหลดหน้าใหม่',
+                        confirmButtonColor: '#28a745'
+                    }).then(() => {
+                        location.reload();
+                    });
+                }
+            });
+        });
+    }
 });
 </script>
