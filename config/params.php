@@ -145,6 +145,13 @@ return [
             'controller' => 'prices',
             'action' => 'chart'
         ],
+        7 => [
+            'name' => 'รายงานการขายรายบุคคล',
+            'description' => 'รายงานการขายของสมาชิกแต่ละคน',
+            'icon' => 'person',
+            'controller' => 'report',
+            'action' => 'sales-by-member'
+        ],
 
 
 
