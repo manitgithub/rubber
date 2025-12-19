@@ -219,6 +219,23 @@ class ReportController extends Controller
         $edate = $request->get('edate', date('Y-m-d')); // Default to today
         $view_mode = $request->get('view_mode', 'daily'); // 'daily' or 'monthly'
 
+        // Convert Buddhist Era to Christian Era if needed
+        if ($sdate && preg_match('/^(\d{4})-(\d{2})-(\d{2})$/', $sdate, $matches)) {
+            $year = (int) $matches[1];
+            if ($year > 2500) { // Buddhist Era
+                $year = $year - 543;
+                $sdate = $year . '-' . $matches[2] . '-' . $matches[3];
+            }
+        }
+
+        if ($edate && preg_match('/^(\d{4})-(\d{2})-(\d{2})$/', $edate, $matches)) {
+            $year = (int) $matches[1];
+            if ($year > 2500) { // Buddhist Era
+                $year = $year - 543;
+                $edate = $year . '-' . $matches[2] . '-' . $matches[3];
+            }
+        }
+
         // Get all members for dropdown
         $members = Members::find()
             ->orderBy(['memberid' => SORT_ASC])
