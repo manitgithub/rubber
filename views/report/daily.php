@@ -33,6 +33,26 @@ if ($sdate == $edate) {
 }
 
 $this->title = $showday ? 'รายงานการรับซื้อน้ำยาง <br> วันที่ ' . Yii::$app->helpers->dateThai($sdate) . ' ถึง ' . Yii::$app->helpers->dateThai($edate) : 'รายงานการรับซื้อน้ำยาง <br> วันที่ ' . Yii::$app->helpers->dateThai($sdate);
+// Sort purchases and member_summary by memberid so the table displays in memberid order
+// Safe-guard: if $purchases or $member_summary are not arrays, try to cast them or skip
+if (isset($purchases) && is_iterable($purchases)) {
+    // Ensure we have a plain array for usort
+    $purchases = is_array($purchases) ? $purchases : iterator_to_array($purchases);
+    usort($purchases, function ($a, $b) {
+        $ida = isset($a->members->memberid) ? (string)$a->members->memberid : '';
+        $idb = isset($b->members->memberid) ? (string)$b->members->memberid : '';
+        // numeric-like ids still compare correctly as strings; keeps leading zeros if any
+        return strcmp($ida, $idb);
+    });
+}
+
+if (isset($member_summary) && is_array($member_summary)) {
+    usort($member_summary, function ($a, $b) {
+        $ma = isset($a['member']->memberid) ? (string)$a['member']->memberid : '';
+        $mb = isset($b['member']->memberid) ? (string)$b['member']->memberid : '';
+        return strcmp($ma, $mb);
+    });
+}
 
 ?>
 
@@ -358,10 +378,10 @@ $this->title = $showday ? 'รายงานการรับซื้อน�
 <!-- Print-only content -->
 <div id="printContent" class="d-none">
     <div class="print-header text-center mb-4">
-        <h2>สหกรณ์การกองทุนยางฉลองน้ำขาวพัฒนา จำกัด</h2>
+        <h2>สหกรณ์กองทุนยางฉลองน้ำขาวพัฒนา จำกัด</h2>
         <h2><?= $view_mode === 'summary' ? 'รายงานสรุปการรับซื้อน้ำยางรายบุคคล' : 'ใบรับน้ำยาง' ?></h2>
 
-        <h2>รับซื้อน้ำยาสดประจำ<?= $showday ? 'วันที่ ' . Yii::$app->helpers->dateThai($sdate) . ' ถึง ' . Yii::$app->helpers->dateThai($edate) : 'วันที่ ' . Yii::$app->helpers->dateThai($sdate) ?>
+        <h2>รับซื้อน้ำยางสดประจำ<?= $showday ? 'วันที่ ' . Yii::$app->helpers->dateThai($sdate) . ' ถึง ' . Yii::$app->helpers->dateThai($edate) : 'วันที่ ' . Yii::$app->helpers->dateThai($sdate) ?>
         </h2>
         <hr style="border: 1px solid #000; margin: 10px 0;">
     </div>
