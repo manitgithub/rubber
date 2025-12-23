@@ -105,31 +105,72 @@ class ReportController extends Controller
         $model = new \yii\base\DynamicModel(['date']);
         $model->addRule('date', 'required');
 
-        $sdate = Yii::$app->request->get('sdate', date('Y-m-d'));
-        $edate = Yii::$app->request->get('edate', date('Y-m-d'));
+        $request = Yii::$app->request;
+        $sdate = $request->get('sdate', date('Y-m-d'));
+        $edate = $request->get('edate', date('Y-m-d'));
+        $view_mode = $request->get('view_mode', 'daily'); // 'daily' or 'summary'
 
-        $purchases = \app\models\Purchases::find()
-            ->joinWith('members')
-            ->where(['between', 'purchases.date', $sdate, $edate])
-            ->andWhere(['purchases.flagdel' => 0])
-            ->orderBy(['members.memberid' => SORT_ASC])
-            ->all();
-
+        $purchases = [];
+        $member_summary = [];
         $total_weight = $total_dry_weight = $total_amount = 0;
-        foreach ($purchases as $p) {
-            $total_weight += $p->weight;
-            $total_dry_weight += $p->dry_weight;
-            $total_amount += $p->total_amount;
+        $total_count = 0;
+
+        if ($view_mode === 'daily') {
+            // Daily view - show individual transactions
+            $purchases = \app\models\Purchases::find()
+                ->joinWith('members')
+                ->where(['between', 'purchases.date', $sdate, $edate])
+                ->andWhere(['purchases.flagdel' => 0])
+                ->orderBy(['members.memberid' => SORT_ASC])
+                ->all();
+
+            foreach ($purchases as $p) {
+                $total_weight += $p->weight;
+                $total_dry_weight += $p->dry_weight;
+                $total_amount += $p->total_amount;
+            }
+            $total_count = count($purchases);
+        } else {
+            // Summary view - aggregate by member
+            $member_summary = (new \yii\db\Query())
+                ->select([
+                    'member_id',
+                    'count' => 'COUNT(*)',
+                    'total_weight' => 'SUM(weight)',
+                    'total_dry_weight' => 'SUM(dry_weight)',
+                    'avg_percentage' => 'AVG(percentage)',
+                    'avg_price' => 'AVG(price_per_kg)',
+                    'total_amount' => 'SUM(total_amount)',
+                ])
+                ->from('purchases')
+                ->where(['between', 'date', $sdate, $edate])
+                ->andWhere(['flagdel' => 0])
+                ->groupBy(['member_id'])
+                ->orderBy(['member_id' => SORT_ASC])
+                ->all();
+
+            // Load member details and calculate totals
+            foreach ($member_summary as &$row) {
+                $member = Members::findOne($row['member_id']);
+                $row['member'] = $member;
+                $total_weight += $row['total_weight'];
+                $total_dry_weight += $row['total_dry_weight'];
+                $total_amount += $row['total_amount'];
+                $total_count += $row['count'];
+            }
         }
 
         return $this->render('daily', [
             'model' => $model,
             'sdate' => $sdate,
             'edate' => $edate,
+            'view_mode' => $view_mode,
             'purchases' => $purchases,
+            'member_summary' => $member_summary,
             'total_weight' => $total_weight,
             'total_dry_weight' => $total_dry_weight,
             'total_amount' => $total_amount,
+            'total_count' => $total_count,
         ]);
     }
 
