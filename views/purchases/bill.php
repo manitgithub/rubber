@@ -297,12 +297,20 @@ $this->params['breadcrumbs'][] = $this->title;
                         </tr>
                     </thead>
                     <tbody>
-                        <?php foreach ($receipts as $receipt): ?>
+                        <?php foreach ($receipts as $receipt): 
+                            // คำนวณ total_amount จาก Purchases โดยตรง (กรองเฉพาะ flagdel = 0)
+                            $calculatedTotal = 0;
+                            foreach ($receipt->purchases as $p) {
+                                if ($p->flagdel == 0) {
+                                    $calculatedTotal += $p->total_amount;
+                                }
+                            }
+                        ?>
                             <tr>
                                 <td>
                                     <div class="d-flex align-items-center">
                                         <i class="bi bi-calendar3 text-primary me-2"></i>
-                                        <span><?= Yii::$app->helpers->DateThai($receipt->receipt_date) ?></span>
+                                        <span><?= Yii::$app->helpers->dateThai($receipt->receipt_date) ?></span>
                                     </div>
                                 </td>
                                 <td>
@@ -318,7 +326,7 @@ $this->params['breadcrumbs'][] = $this->title;
                                 </td>
                                 <td class="text-end">
                                     <span class="amount-badge">
-                                        <?= number_format($receipt->total_amount, 2) ?> บาท
+                                        <?= number_format($calculatedTotal, 2) ?> บาท
                                     </span>
                                 </td>
                                 <td class="text-center no-print">

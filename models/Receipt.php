@@ -71,12 +71,12 @@ class Receipt extends \yii\db\ActiveRecord
      */
     public function getPurchases()
     {
-        return $this->hasMany(Purchases::class, ['receipt_id' => 'id']);
+        return $this->hasMany(Purchases::class, ['receipt_id' => 'id'])->orderBy(['date' => SORT_ASC]);
     }
-public function getMember()
-{
-    return $this->hasOne(Members::class, ['id' => 'member_id']);
-}
+    public function getMember()
+    {
+        return $this->hasOne(Members::class, ['id' => 'member_id']);
+    }
 
 
 
