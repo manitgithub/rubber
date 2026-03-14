@@ -107,7 +107,7 @@ class PurchasesController extends Controller
         $date = Yii::$app->request->get('date', $model->date);
 
         if ($this->request->isPost && $model->load($this->request->post()) && $model->save()) {
-                            Yii::$app->session->setFlash('success');
+            Yii::$app->session->setFlash('success');
 
             return $this->redirect(['create', 'date' => $date]);
         }
@@ -126,7 +126,7 @@ class PurchasesController extends Controller
      */
     public function actionDelete($id)
     {
-    //    $this->findModel($id);
+        //    $this->findModel($id);
         $model = Purchases::findOne($id);
         $model->flagdel = 1;
         $model->save(false);
@@ -152,323 +152,363 @@ class PurchasesController extends Controller
     }
 
     public function actionPayment()
-        {
-    $startDate = Yii::$app->request->get('start_date');
-    $endDate = Yii::$app->request->get('end_date');
-    $receiptDate = Yii::$app->request->get('receipt_date');
+    {
+        $startDate = Yii::$app->request->get('start_date');
+        $endDate = Yii::$app->request->get('end_date');
+        $receiptDate = Yii::$app->request->get('receipt_date');
 
-    $query = \app\models\Purchases::find()
-        ->andFilterWhere(['>=', 'date', $startDate])
-        ->andFilterWhere(['<=', 'date', $endDate])
-        ->andFilterWhere(['flagdel' => 0])
-        ->andFilterWhere(['status' => 'UNPAID'])
-        ->orderBy(['member_id' => SORT_ASC, 'date' => SORT_ASC]);
+        $query = \app\models\Purchases::find()
+            ->andFilterWhere(['>=', 'date', $startDate])
+            ->andFilterWhere(['<=', 'date', $endDate])
+            ->andFilterWhere(['flagdel' => 0])
+            ->andFilterWhere(['status' => 'UNPAID'])
+            ->orderBy(['member_id' => SORT_ASC, 'date' => SORT_ASC]);
 
-    $payments = $query->all();
+        $payments = $query->all();
 
-    $groupedPayments = [];
-    foreach ($payments as $payment) {
-        $groupedPayments[$payment->member_id][] = $payment;
-    }
-
-    return $this->render('payment', [
-        'groupedPayments' => $groupedPayments,
-        'startDate' => $startDate,
-        'endDate' => $endDate,
-        'receiptDate' => $receiptDate,
-    ]);
-    }
-
-public function actionRunAllReceipts($start_date = null, $end_date = null, $receipt_date = null, $price_type = 'daily', $fixed_price = null)
-{
-    if (empty($start_date) || empty($end_date)) {
-        Yii::$app->session->setFlash('error', 'กรุณาระบุช่วงวันที่ให้ครบถ้วน');
-        return $this->redirect(['purchases/payment']);
-    }
-
-    // ตรวจสอบราคาเดียวกันทั้งหมด
-    if ($price_type === 'fixed') {
-        $fixed_price = (float)$fixed_price;
-        if ($fixed_price <= 0) {
-            Yii::$app->session->setFlash('error', 'กรุณาระบุราคาต่อกิโลกรัมที่ถูกต้อง');
-            return $this->redirect(['purchases/payment', 'start_date' => $start_date, 'end_date' => $end_date]);
-        }
-    }
-
-    // ตั้งค่าวันที่ใบเสร็จเป็นวันปัจจุบันหากไม่ได้ระบุ
-    if (empty($receipt_date)) {
-        $receipt_date = date('Y-m-d');
-    }
-
-    // ดึงรายการที่ยังไม่มีใบเสร็จ (เช็คว่ารายการยังไม่ถูกเชื่อมกับ receipts)
-    $purchases = \app\models\Purchases::find()
-        ->where(['between', 'date', $start_date, $end_date])
-        ->andWhere(['flagdel' => 0])
-        ->andWhere(['status' => 'UNPAID'])
-        ->andWhere(['receipt_id' => null])
-        ->orderBy(['member_id' => SORT_ASC, 'date' => SORT_ASC])
-        ->all();
-
-    $grouped = [];
-    foreach ($purchases as $p) {
-        $grouped[$p->member_id][] = $p;
-    }
-
-    uasort($grouped, function($a, $b) {
-        $memberA = $a[0]->members;
-        $memberB = $b[0]->members;
-        return strcmp($memberA->memberid, $memberB->memberid);
-    });
-
-    $book = \app\models\ReceiptBook::find()->where(['is_active' => 1])->one();
-    if (!$book) {
-        Yii::$app->session->setFlash('error', 'ไม่พบเล่มใบเสร็จที่กำลังใช้งาน');
-        return $this->redirect(['purchases/payment']);
-    }
-
-    $countReceipts = 0;
-    $transaction = Yii::$app->db->beginTransaction();
-
-    try {
-        foreach ($grouped as $memberId => $list) {
-            // รันใบเสร็จใหม่ให้แต่ละคน
-            $book->current_number += 1;
-
-            // คำนวณยอดรวม
-            $totalAmount = 0;
-            $totalWeight = 0;
-            $totalDryWeight = 0;
-            
-            foreach ($list as $p) {
-                $totalWeight += $p->weight;
-                $totalDryWeight += $p->dry_weight;
-                
-                if ($price_type === 'fixed') {
-                    // ใช้ราคาเดียวกันทั้งหมด: อัพเดทราคาในฐานข้อมูล และใช้น้ำหนักแห้ง
-                    $p->price_per_kg = $fixed_price;
-                    $p->total_amount = $p->dry_weight * $fixed_price; // ใช้น้ำหนักแห้ง
-                    $p->save(false);
-                    $totalAmount += $p->total_amount;
-                } else {
-                    // ใช้ราคาตามวันที่เดิม
-                    $totalAmount += $p->total_amount;
-                }
-            }
-
-            $receipt = new \app\models\Receipt();
-            $receipt->member_id = $memberId;
-            $receipt->book_no = $book->book_no;
-            $receipt->running_no = $book->current_number;
-            $receipt->receipt_no = sprintf('%s-%04d', $book->book_no, $book->current_number);
-            $receipt->receipt_date = $receipt_date; // ใช้วันที่ที่เลือก
-            $receipt->total_amount = $totalAmount;
-            $receipt->created_by = Yii::$app->user->id ?? 1;
-            $receipt->created_at = date('Y-m-d H:i:s');
-            $receipt->start_date = $start_date;
-            $receipt->end_date = $end_date;
-            $receipt->date = $receipt_date; // ใช้วันที่ที่เลือก
-            
-            $receipt->save(false);
-
-            foreach ($list as $p) {
-                $p->receipt_id = $receipt->id;
-                $p->status = 'PAID';
-                $p->save(false);
-            }
-
-            $countReceipts++;
+        $groupedPayments = [];
+        foreach ($payments as $payment) {
+            $groupedPayments[$payment->member_id][] = $payment;
         }
 
-        $book->updated_at = date('Y-m-d H:i:s');
-        $book->save(false);
+        return $this->render('payment', [
+            'groupedPayments' => $groupedPayments,
+            'startDate' => $startDate,
+            'endDate' => $endDate,
+            'receiptDate' => $receiptDate,
+        ]);
+    }
 
-        $transaction->commit();
+    public function actionRunAllReceipts($start_date = null, $end_date = null, $receipt_date = null, $price_type = 'daily', $fixed_price = null)
+    {
+        if (empty($start_date) || empty($end_date)) {
+            Yii::$app->session->setFlash('error', 'กรุณาระบุช่วงวันที่ให้ครบถ้วน');
+            return $this->redirect(['purchases/payment']);
+        }
 
+        // ตรวจสอบราคาเดียวกันทั้งหมด
         if ($price_type === 'fixed') {
-            Yii::$app->session->setFlash('success', "สร้างใบเสร็จเรียบร้อยแล้ว ($countReceipts ใบ) ด้วยราคาเดียวกันทั้งหมด " . number_format($fixed_price, 2) . " บาท/กก.");
+            $fixed_price = (float) $fixed_price;
+            if ($fixed_price <= 0) {
+                Yii::$app->session->setFlash('error', 'กรุณาระบุราคาต่อกิโลกรัมที่ถูกต้อง');
+                return $this->redirect(['purchases/payment', 'start_date' => $start_date, 'end_date' => $end_date]);
+            }
+        }
+
+        // ตั้งค่าวันที่ใบเสร็จเป็นวันปัจจุบันหากไม่ได้ระบุ
+        if (empty($receipt_date)) {
+            $receipt_date = date('Y-m-d');
+        }
+
+        // ดึงรายการที่ยังไม่มีใบเสร็จ (เช็คว่ารายการยังไม่ถูกเชื่อมกับ receipts)
+        $purchases = \app\models\Purchases::find()
+            ->where(['between', 'date', $start_date, $end_date])
+            ->andWhere(['flagdel' => 0])
+            ->andWhere(['status' => 'UNPAID'])
+            ->andWhere(['receipt_id' => null])
+            ->orderBy(['member_id' => SORT_ASC, 'date' => SORT_ASC])
+            ->all();
+
+        $grouped = [];
+        foreach ($purchases as $p) {
+            $grouped[$p->member_id][] = $p;
+        }
+
+        uasort($grouped, function ($a, $b) {
+            $memberA = $a[0]->members;
+            $memberB = $b[0]->members;
+            return strcmp($memberA->memberid, $memberB->memberid);
+        });
+
+        $book = \app\models\ReceiptBook::find()->where(['is_active' => 1])->one();
+        if (!$book) {
+            Yii::$app->session->setFlash('error', 'ไม่พบเล่มใบเสร็จที่กำลังใช้งาน');
+            return $this->redirect(['purchases/payment']);
+        }
+
+        $countReceipts = 0;
+        $transaction = Yii::$app->db->beginTransaction();
+
+        try {
+            foreach ($grouped as $memberId => $list) {
+                // รันใบเสร็จใหม่ให้แต่ละคน
+                $book->current_number += 1;
+
+                // คำนวณยอดรวม
+                $totalAmount = 0;
+                $totalWeight = 0;
+                $totalDryWeight = 0;
+
+                foreach ($list as $p) {
+                    $totalWeight += $p->weight;
+                    $totalDryWeight += $p->dry_weight;
+
+                    if ($price_type === 'fixed') {
+                        // ใช้ราคาเดียวกันทั้งหมด: อัพเดทราคาในฐานข้อมูล และใช้น้ำหนักแห้ง
+                        $p->price_per_kg = $fixed_price;
+                        $p->total_amount = $p->dry_weight * $fixed_price; // ใช้น้ำหนักแห้ง
+                        $p->save(false);
+                        $totalAmount += $p->total_amount;
+                    } else {
+                        // ใช้ราคาตามวันที่เดิม
+                        $totalAmount += $p->total_amount;
+                    }
+                }
+
+                $receipt = new \app\models\Receipt();
+                $receipt->member_id = $memberId;
+                $receipt->book_no = $book->book_no;
+                $receipt->running_no = $book->current_number;
+                $receipt->receipt_no = sprintf('%s-%04d', $book->book_no, $book->current_number);
+                $receipt->receipt_date = $receipt_date; // ใช้วันที่ที่เลือก
+                $receipt->total_amount = $totalAmount;
+                $receipt->created_by = Yii::$app->user->id ?? 1;
+                $receipt->created_at = date('Y-m-d H:i:s');
+                $receipt->start_date = $start_date;
+                $receipt->end_date = $end_date;
+                $receipt->date = $receipt_date; // ใช้วันที่ที่เลือก
+
+                $receipt->save(false);
+
+                foreach ($list as $p) {
+                    $p->receipt_id = $receipt->id;
+                    $p->status = 'PAID';
+                    $p->save(false);
+                }
+
+                $countReceipts++;
+            }
+
+            $book->updated_at = date('Y-m-d H:i:s');
+            $book->save(false);
+
+            $transaction->commit();
+
+            if ($price_type === 'fixed') {
+                Yii::$app->session->setFlash('success', "สร้างใบเสร็จเรียบร้อยแล้ว ($countReceipts ใบ) ด้วยราคาเดียวกันทั้งหมด " . number_format($fixed_price, 2) . " บาท/กก.");
+            } else {
+                Yii::$app->session->setFlash('success', "สร้างใบเสร็จเรียบร้อยแล้ว ($countReceipts ใบ) ด้วยราคาตามวัน");
+            }
+
+        } catch (\Exception $e) {
+            $transaction->rollBack();
+            Yii::$app->session->setFlash('error', 'เกิดข้อผิดพลาด: ' . $e->getMessage());
+        }
+
+        return $this->redirect(['purchases/payment', 'start_date' => $start_date, 'end_date' => $end_date, 'receipt_date' => $receipt_date]);
+    }
+
+    public function actionPrintAllBills($filter_date = null, $book_no = null, $run_no = null, $member_id = null)
+    {
+        $this->layout = 'print';
+        $query = \app\models\Receipt::find();
+
+        if ($filter_date) {
+            $query->andWhere(['DATE(receipt_date)' => $filter_date]);
+        }
+        if ($book_no) {
+            $query->andWhere(['book_no' => $book_no]);
+        }
+        if ($run_no) {
+            $query->andWhere(['running_no' => $run_no]);
+        }
+        if ($member_id) {
+            $query->andWhere(['member_id' => $member_id]);
+        }
+
+        $receipts = $query->orderBy(['running_no' => SORT_ASC])->all();
+
+        return $this->render('print-all-bills', [
+            'receipts' => $receipts,
+        ]);
+    }
+
+    public function actionViewMemberItems($member_id, $start_date, $end_date, $receipt_date = null, $price_type = 'daily', $fixed_price = null)
+    {
+        $this->layout = 'blank';
+        $member = \app\models\Members::findOne($member_id);
+
+        // ตั้งค่าวันที่ใบเสร็จเป็นวันปัจจุบันหากไม่ได้ระบุ
+        if (empty($receipt_date)) {
+            $receipt_date = date('Y-m-d');
+        }
+
+        $purchases = \app\models\Purchases::find()
+            ->where(['member_id' => $member_id])
+            ->andWhere(['between', 'date', $start_date, $end_date])
+            ->andWhere(['status' => 'UNPAID'])
+            ->andWhere(['receipt_id' => null])
+            ->orderBy(['date' => SORT_ASC])
+            ->all();
+
+        // คำนวณราคาใหม่ถ้าเลือกราคาเดียวกันทั้งหมด
+        if ($price_type === 'fixed' && !empty($fixed_price)) {
+            $fixed_price = (float) $fixed_price;
+            // ใช้น้ำหนักแห้ง (dry_weight) ในการคำนวณ
+            $displayData = [];
+            foreach ($purchases as $purchase) {
+                $displayData[$purchase->id] = [
+                    'price' => $fixed_price,
+                    'amount' => $purchase->dry_weight * $fixed_price
+                ];
+            }
         } else {
-            Yii::$app->session->setFlash('success', "สร้างใบเสร็จเรียบร้อยแล้ว ($countReceipts ใบ) ด้วยราคาตามวัน");
+            $displayData = [];
+            foreach ($purchases as $purchase) {
+                $displayData[$purchase->id] = [
+                    'price' => $purchase->price_per_kg,
+                    'amount' => $purchase->total_amount
+                ];
+            }
         }
 
-    } catch (\Exception $e) {
-        $transaction->rollBack();
-        Yii::$app->session->setFlash('error', 'เกิดข้อผิดพลาด: ' . $e->getMessage());
+        return $this->render('_member_items', [
+            'member' => $member,
+            'purchases' => $purchases,
+            'startDate' => $start_date,
+            'endDate' => $end_date,
+            'receiptDate' => $receipt_date,
+            'priceType' => $price_type,
+            'fixedPrice' => $fixed_price,
+            'displayData' => $displayData,
+        ]);
     }
 
-    return $this->redirect(['purchases/payment', 'start_date' => $start_date, 'end_date' => $end_date, 'receipt_date' => $receipt_date]);
-}
+    public function actionBill($filter_date = null, $book_no = null, $run_no = null, $member_id = null)
+    {
+        // ถ้าไม่มีการกรองวันที่ ให้ใช้วันที่ปัจจุบัน
+        if (empty($filter_date)) {
+            $filter_date = date('Y-m-d');
+        }
 
-public function actionPrintAllBills($filter_date = null, $book_no = null, $run_no = null, $member_id = null)
-{
-    $this->layout = 'print';
-    $query = \app\models\Receipt::find();
+        $query = \app\models\Receipt::find()
+            ->joinWith(['member', 'purchases'])
+            ->orderBy(['running_no' => SORT_ASC]);
 
-    if ($filter_date) {
-        $query->andWhere(['DATE(receipt_date)' => $filter_date]);
+        if ($filter_date) {
+            $query->andWhere(['DATE(receipt_date)' => $filter_date]);
+        }
+
+        if (!empty($book_no)) {
+            $query->andWhere(['book_no' => $book_no]);
+        }
+
+        if (!empty($run_no)) {
+            $query->andWhere(['running_no' => $run_no]);
+        }
+
+        if (!empty($member_id)) {
+            $query->andWhere(['member_id' => $member_id]);
+        }
+
+
+        $receipts = $query->all();
+
+        return $this->render('bill', [
+            'receipts' => $receipts,
+            'filterDate' => $filter_date,
+            'bookNo' => $book_no,
+            'runNo' => $run_no,
+            'memberId' => $member_id,
+        ]);
     }
-    if ($book_no) {
-        $query->andWhere(['book_no' => $book_no]);
-    }
-    if ($run_no) {
-        $query->andWhere(['running_no' => $run_no]);
-    }
-    if ($member_id) {
-        $query->andWhere(['member_id' => $member_id]);
-    }
 
-    $receipts = $query->orderBy(['running_no' => SORT_ASC])->all();
+    public function actionPrintBill($id)
+    {
+        $this->layout = 'print';
+        $receipt = \app\models\Receipt::find()
+            ->with(['member', 'purchases'])
+            ->where(['id' => $id])
+            ->one();
 
-    return $this->render('print-all-bills', [
-        'receipts' => $receipts,
-    ]);
-}
+        if (!$receipt) {
+            throw new NotFoundHttpException("ไม่พบใบเสร็จนี้");
+        }
 
-public function actionViewMemberItems($member_id, $start_date, $end_date, $receipt_date = null, $price_type = 'daily', $fixed_price = null)
-{
-    $this->layout = 'blank';
-    $member = \app\models\Members::findOne($member_id);
-
-    // ตั้งค่าวันที่ใบเสร็จเป็นวันปัจจุบันหากไม่ได้ระบุ
-    if (empty($receipt_date)) {
-        $receipt_date = date('Y-m-d');
+        return $this->render('print-bill', [
+            'receipt' => $receipt,
+        ]);
     }
 
-    $purchases = \app\models\Purchases::find()
-        ->where(['member_id' => $member_id])
-        ->andWhere(['between', 'date', $start_date, $end_date])
-        ->andWhere(['status' => 'UNPAID'])
-        ->andWhere(['receipt_id' => null])
-        ->orderBy(['date' => SORT_ASC])
-        ->all();
+    /**
+     * Update all prices for a specific date
+     * @return array JSON response
+     */
+    public function actionUpdateAllPrices()
+    {
+        Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
 
-    // คำนวณราคาใหม่ถ้าเลือกราคาเดียวกันทั้งหมด
-    if ($price_type === 'fixed' && !empty($fixed_price)) {
-        $fixed_price = (float)$fixed_price;
-        // ใช้น้ำหนักแห้ง (dry_weight) ในการคำนวณ
-        $displayData = [];
-        foreach ($purchases as $purchase) {
-            $displayData[$purchase->id] = [
-                'price' => $fixed_price,
-                'amount' => $purchase->dry_weight * $fixed_price
+        $request = Yii::$app->request;
+        if (!$request->isPost) {
+            return ['success' => false, 'message' => 'Invalid request method'];
+        }
+
+        $data = json_decode($request->getRawBody(), true);
+        $date = $data['date'] ?? null;
+        $newPrice = (float) ($data['price'] ?? 0);
+
+        if (!$date || $newPrice <= 0) {
+            return ['success' => false, 'message' => 'ข้อมูลไม่ครบถ้วนหรือไม่ถูกต้อง'];
+        }
+
+        $transaction = Yii::$app->db->beginTransaction();
+        try {
+            Yii::$app->db->createCommand()
+                ->update('purchases', [
+                    'price_per_kg' => $newPrice,
+                    'total_amount' => new \yii\db\Expression('dry_weight * :price', [':price' => $newPrice])
+                ], [
+                    'date' => $date,
+                    'flagdel' => 0
+                ])->execute();
+
+            $transaction->commit();
+            return ['success' => true, 'message' => 'ปรับราคาทั้งหมดเรียบร้อยแล้ว'];
+        } catch (\Exception $e) {
+            $transaction->rollBack();
+            return ['success' => false, 'message' => $e->getMessage()];
+        }
+    }
+
+    /**
+     * Check for duplicate member purchase on the same date
+     * @return array JSON response
+     */
+    public function actionCheckDuplicate()
+    {
+        Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+
+        $request = Yii::$app->request;
+        if (!$request->isPost) {
+            return ['error' => 'Invalid request method'];
+        }
+
+        $data = json_decode($request->getRawBody(), true);
+        $memberId = $data['member_id'] ?? null;
+        $date = $data['date'] ?? null;
+
+        if (!$memberId || !$date) {
+            return ['exists' => false];
+        }
+
+        // Check for existing purchase record
+        $existingPurchase = Purchases::find()
+            ->where(['member_id' => $memberId, 'date' => $date, 'flagdel' => 0])
+            ->one();
+
+        if ($existingPurchase) {
+            return [
+                'exists' => true,
+                'purchase_id' => $existingPurchase->id,
+                'date' => Yii::$app->helpers->DateThai($existingPurchase->date),
+                'member_name' => $existingPurchase->members->fullname2 ?? 'Unknown',
+                'weight' => $existingPurchase->weight,
+                'total_amount' => $existingPurchase->total_amount
             ];
         }
-    } else {
-        $displayData = [];
-        foreach ($purchases as $purchase) {
-            $displayData[$purchase->id] = [
-                'price' => $purchase->price_per_kg,
-                'amount' => $purchase->total_amount
-            ];
-        }
-    }
 
-    return $this->render('_member_items', [
-        'member' => $member,
-        'purchases' => $purchases,
-        'startDate' => $start_date,
-        'endDate' => $end_date,
-        'receiptDate' => $receipt_date,
-        'priceType' => $price_type,
-        'fixedPrice' => $fixed_price,
-        'displayData' => $displayData,
-    ]);
-}
-
-public function actionBill($filter_date = null, $book_no = null, $run_no = null, $member_id = null)
-{
-    // ถ้าไม่มีการกรองวันที่ ให้ใช้วันที่ปัจจุบัน
-    if (empty($filter_date)) {
-        $filter_date = date('Y-m-d');
-    }
-
-    $query = \app\models\Receipt::find()
-        ->joinWith(['member', 'purchases'])
-        ->orderBy(['running_no' => SORT_ASC]);
-
-    if ($filter_date) {
-        $query->andWhere(['DATE(receipt_date)' => $filter_date]);
-    }
-
-    if (!empty($book_no)) {
-        $query->andWhere(['book_no' => $book_no]);
-    }
-
-    if (!empty($run_no)) {
-        $query->andWhere(['running_no' => $run_no]);
-    }
-
-    if (!empty($member_id)) {
-        $query->andWhere(['member_id' => $member_id]);
-    }
-
-
-    $receipts = $query->all();
-
-    return $this->render('bill', [
-        'receipts' => $receipts,
-        'filterDate' => $filter_date,
-        'bookNo' => $book_no,
-        'runNo' => $run_no,
-        'memberId' => $member_id,
-    ]);
-}
-
-public function actionPrintBill($id)
-{
-    $this->layout = 'print';
-    $receipt = \app\models\Receipt::find()
-        ->with(['member', 'purchases'])
-        ->where(['id' => $id])
-        ->one();
-
-    if (!$receipt) {
-        throw new NotFoundHttpException("ไม่พบใบเสร็จนี้");
-    }
-
-    return $this->render('print-bill', [
-        'receipt' => $receipt,
-    ]);
-}
-
-/**
- * Check for duplicate member purchase on the same date
- * @return array JSON response
- */
-public function actionCheckDuplicate()
-{
-    Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-    
-    $request = Yii::$app->request;
-    if (!$request->isPost) {
-        return ['error' => 'Invalid request method'];
-    }
-    
-    $data = json_decode($request->getRawBody(), true);
-    $memberId = $data['member_id'] ?? null;
-    $date = $data['date'] ?? null;
-    
-    if (!$memberId || !$date) {
         return ['exists' => false];
     }
-    
-    // Check for existing purchase record
-    $existingPurchase = Purchases::find()
-        ->where(['member_id' => $memberId, 'date' => $date, 'flagdel' => 0])
-        ->one();
-    
-    if ($existingPurchase) {
-        return [
-            'exists' => true,
-            'purchase_id' => $existingPurchase->id,
-            'date' => Yii::$app->helpers->DateThai($existingPurchase->date),
-            'member_name' => $existingPurchase->members->fullname2 ?? 'Unknown',
-            'weight' => $existingPurchase->weight,
-            'total_amount' => $existingPurchase->total_amount
-        ];
-    }
-    
-    return ['exists' => false];
-}
 
 
 }

@@ -36,16 +36,21 @@ if (isset($_GET['date']) && !empty($_GET['date'])) {
             </div>
         </div>
     </div>
-    
+
     <!-- Data List Section -->
     <div class="row">
         <div class="col-12">
             <div class="card shadow-lg border-0">
                 <div class="card-header bg-success text-white">
-                    <h4 class="mb-0">
-                        <i class="fas fa-list me-2"></i>
-                        รายการบันทึกการซื้อน้ำยาง <?=Yii::$app->helpers->DateThai($date) ?>
-                    </h4>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h4 class="mb-0">
+                            <i class="fas fa-list me-2"></i>
+                            รายการบันทึกการซื้อน้ำยาง <?= Yii::$app->helpers->DateThai($date) ?>
+                        </h4>
+                        <button type="button" class="btn btn-warning btn-sm fw-bold" id="btn-update-all-prices">
+                            <i class="fas fa-edit me-1"></i> เปลี่ยนราคาทั้งหมด
+                        </button>
+                    </div>
                 </div>
                 <div class="card-body">
                     <!-- Statistics Row -->
@@ -58,7 +63,7 @@ if (isset($_GET['date']) && !empty($_GET['date'])) {
                                     </div>
                                     <div>
                                         <h6 class="alert-heading mb-2"><strong>รายการบันทึกล่าสุด:</strong></h6>
-                                        <?php 
+                                        <?php
                                         $latestPurchase = \app\models\Purchases::find()
                                             ->joinWith('members')
                                             ->where(['purchases.date' => $date, 'purchases.flagdel' => 0])
@@ -67,9 +72,14 @@ if (isset($_GET['date']) && !empty($_GET['date'])) {
                                             ->one();
                                         ?>
                                         <?php if ($latestPurchase): ?>
-                                            <p class="mb-1"><strong>สมาชิก:</strong> <?= Html::encode($latestPurchase->members->fullname2) ?> (<?= Html::encode($latestPurchase->members->memberid) ?>)</p>
-                                            <p class="mb-1"><strong>วันที่:</strong> <?= Yii::$app->helpers->DateThai($latestPurchase->date) ?></p>
-                                            <p class="mb-0"><strong>น้ำหนัก:</strong> <?= Html::encode($latestPurchase->weight) ?> กก. | <strong>ยอดเงิน:</strong> <?= number_format($latestPurchase->total_amount, 2) ?> บาท</p>
+                                            <p class="mb-1"><strong>สมาชิก:</strong>
+                                                <?= Html::encode($latestPurchase->members->fullname2) ?>
+                                                (<?= Html::encode($latestPurchase->members->memberid) ?>)</p>
+                                            <p class="mb-1"><strong>วันที่:</strong>
+                                                <?= Yii::$app->helpers->DateThai($latestPurchase->date) ?></p>
+                                            <p class="mb-0"><strong>น้ำหนัก:</strong>
+                                                <?= Html::encode($latestPurchase->weight) ?> กก. | <strong>ยอดเงิน:</strong>
+                                                <?= number_format($latestPurchase->total_amount, 2) ?> บาท</p>
                                         <?php else: ?>
                                             <p class="mb-0 text-muted">ยังไม่มีการบันทึกรายการในวันที่นี้</p>
                                         <?php endif; ?>
@@ -84,7 +94,9 @@ if (isset($_GET['date']) && !empty($_GET['date'])) {
                                         <i class="fas fa-list-ol fa-2x me-2"></i>
                                     </div>
                                     <h6 class="text-uppercase mb-1">จำนวนรายการ</h6>
-                                    <h3 class="mb-0 fw-bold"><?= \app\models\Purchases::find()->where(['date' => $date, 'flagdel' => 0])->count() ?></h3>
+                                    <h3 class="mb-0 fw-bold">
+                                        <?= \app\models\Purchases::find()->where(['date' => $date, 'flagdel' => 0])->count() ?>
+                                    </h3>
                                     <small class="opacity-75">รายการ</small>
                                 </div>
                             </div>
@@ -96,13 +108,15 @@ if (isset($_GET['date']) && !empty($_GET['date'])) {
                                         <i class="fas fa-weight fa-2x me-2"></i>
                                     </div>
                                     <h6 class="text-uppercase mb-1">น้ำหนักรวม</h6>
-                                    <h3 class="mb-0 fw-bold"><?= number_format(\app\models\Purchases::find()->where(['date' => $date, 'flagdel' => 0])->sum('weight'), 2) ?></h3>
+                                    <h3 class="mb-0 fw-bold">
+                                        <?= number_format(\app\models\Purchases::find()->where(['date' => $date, 'flagdel' => 0])->sum('weight'), 2) ?>
+                                    </h3>
                                     <small class="opacity-75">กิโลกรัม</small>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    
+
                     <!-- Additional Stats Row -->
                     <div class="row mb-4">
                         <div class="col-lg-4 col-md-6 mb-3">
@@ -112,7 +126,9 @@ if (isset($_GET['date']) && !empty($_GET['date'])) {
                                         <i class="fas fa-money-bill-wave fa-2x me-2"></i>
                                     </div>
                                     <h6 class="text-uppercase mb-1">ยอดเงินรวม</h6>
-                                    <h3 class="mb-0 fw-bold"><?= number_format(\app\models\Purchases::find()->where(['date' => $date, 'flagdel' => 0])->sum('total_amount'), 2) ?></h3>
+                                    <h3 class="mb-0 fw-bold">
+                                        <?= number_format(\app\models\Purchases::find()->where(['date' => $date, 'flagdel' => 0])->sum('total_amount'), 2) ?>
+                                    </h3>
                                     <small class="opacity-75">บาท</small>
                                 </div>
                             </div>
@@ -124,7 +140,9 @@ if (isset($_GET['date']) && !empty($_GET['date'])) {
                                         <i class="fas fa-chart-line fa-2x me-2"></i>
                                     </div>
                                     <h6 class="text-uppercase mb-1">น้ำหนักแห้งรวม</h6>
-                                    <h3 class="mb-0 fw-bold"><?= number_format(\app\models\Purchases::find()->where(['date' => $date, 'flagdel' => 0])->sum('dry_weight'), 1) ?></h3>
+                                    <h3 class="mb-0 fw-bold">
+                                        <?= number_format(\app\models\Purchases::find()->where(['date' => $date, 'flagdel' => 0])->sum('dry_weight'), 1) ?>
+                                    </h3>
                                     <small class="opacity-75">กิโลกรัม</small>
                                 </div>
                             </div>
@@ -136,7 +154,7 @@ if (isset($_GET['date']) && !empty($_GET['date'])) {
                                         <i class="fas fa-calculator fa-2x me-2"></i>
                                     </div>
                                     <h6 class="text-uppercase mb-1">ราคาเฉลี่ย</h6>
-                                    <?php 
+                                    <?php
                                     $totalWeight = \app\models\Purchases::find()->where(['date' => $date, 'flagdel' => 0])->sum('dry_weight');
                                     $totalAmount = \app\models\Purchases::find()->where(['date' => $date, 'flagdel' => 0])->sum('total_amount');
                                     $avgPrice = $totalWeight > 0 ? $totalAmount / $totalWeight : 0;
@@ -147,7 +165,7 @@ if (isset($_GET['date']) && !empty($_GET['date'])) {
                             </div>
                         </div>
                     </div>
-                    
+
                     <!-- Data Table Section -->
                     <div class="table-responsive">
                         <table class="table table-hover table-striped datatable">
@@ -194,10 +212,13 @@ if (isset($_GET['date']) && !empty($_GET['date'])) {
                                         <td colspan="7" class="text-center py-4">
                                             <div class="empty-state">
                                                 <div class="empty-icon mb-3">
-                                                    <i class="fas fa-clipboard-list text-muted" style="font-size: 3rem; opacity: 0.5;"></i>
+                                                    <i class="fas fa-clipboard-list text-muted"
+                                                        style="font-size: 3rem; opacity: 0.5;"></i>
                                                 </div>
                                                 <h6 class="text-muted mb-2">ไม่มีข้อมูล</h6>
-                                                <p class="text-muted small mb-0">ยังไม่มีการบันทึกการซื้อน้ำยางในวันที่ <?= Yii::$app->helpers->DateThai($date) ?></p>
+                                                <p class="text-muted small mb-0">ยังไม่มีการบันทึกการซื้อน้ำยางในวันที่
+                                                    <?= Yii::$app->helpers->DateThai($date) ?>
+                                                </p>
                                                 <small class="text-muted">เริ่มต้นโดยกรอกฟอร์มด้านบน</small>
                                             </div>
                                         </td>
@@ -207,7 +228,8 @@ if (isset($_GET['date']) && !empty($_GET['date'])) {
                                         <tr class="<?= $index % 2 == 0 ? 'table-light' : '' ?>">
                                             <td class="align-middle">
                                                 <div class="d-flex align-items-center">
-                                                    <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-2" style="width: 40px; height: 40px; font-size: 14px;">
+                                                    <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-2"
+                                                        style="width: 40px; height: 40px; font-size: 14px;">
                                                         <?= Html::encode($purchase->members->memberid) ?>
                                                     </div>
                                                     <strong><?= Html::encode($purchase->members->fullname2) ?></strong>
@@ -217,16 +239,20 @@ if (isset($_GET['date']) && !empty($_GET['date'])) {
                                                 <span class="badge bg-info fs-6"><?= Html::encode($purchase->weight) ?></span>
                                             </td>
                                             <td class="text-center align-middle">
-                                                <span class="badge bg-warning text-dark fs-6"><?= Html::encode($purchase->percentage) ?>%</span>
+                                                <span
+                                                    class="badge bg-warning text-dark fs-6"><?= Html::encode($purchase->percentage) ?>%</span>
                                             </td>
                                             <td class="text-center align-middle">
-                                                <span class="badge bg-success fs-6"><?= number_format($purchase->dry_weight, 1) ?></span>
+                                                <span
+                                                    class="badge bg-success fs-6"><?= number_format($purchase->dry_weight, 1) ?></span>
                                             </td>
                                             <td class="text-center align-middle">
-                                                <span class="text-primary fw-bold"><?= number_format($purchase->price_per_kg, 2) ?></span>
+                                                <span
+                                                    class="text-primary fw-bold"><?= number_format($purchase->price_per_kg, 2) ?></span>
                                             </td>
                                             <td class="text-center align-middle">
-                                                <span class="text-success fw-bold fs-5"><?= number_format($purchase->total_amount, 2) ?></span>
+                                                <span
+                                                    class="text-success fw-bold fs-5"><?= number_format($purchase->total_amount, 2) ?></span>
                                             </td>
                                             <td class="text-center align-middle">
                                                 <div class="btn-group" role="group">
@@ -262,57 +288,57 @@ if (isset($_GET['date']) && !empty($_GET['date'])) {
     .border-left-warning {
         border-left: 4px solid #ffc107 !important;
     }
-    
+
     .border-left-info {
         border-left: 4px solid #17a2b8 !important;
     }
-    
+
     .card {
         transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
     }
-    
+
     .card:hover {
         transform: translateY(-2px);
-        box-shadow: 0 8px 25px rgba(0,0,0,0.15) !important;
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15) !important;
     }
-    
+
     .table th {
         font-weight: 600;
         border-bottom: 2px solid #dee2e6;
     }
-    
+
     .btn-group .btn {
         margin: 0 2px;
     }
-    
+
     .badge {
         font-size: 0.8em;
         padding: 0.5em 0.75em;
     }
-    
+
     .empty-state {
         padding: 2rem 1rem;
     }
-    
+
     .empty-state .empty-icon {
         margin-bottom: 1rem;
     }
-    
+
     .empty-state h6 {
         font-size: 1.1rem;
         font-weight: 600;
     }
-    
+
     .empty-state p {
         font-size: 0.9rem;
         margin-bottom: 0.5rem;
     }
-    
+
     .empty-state small {
         font-size: 0.8rem;
         font-style: italic;
     }
-    
+
     /* Duplicate member alert styling */
     #duplicate-member-alert {
         border-left: 4px solid #ffc107 !important;
@@ -320,38 +346,39 @@ if (isset($_GET['date']) && !empty($_GET['date'])) {
         border-color: #ffeaa7;
         animation: slideDown 0.3s ease-in-out;
     }
-    
+
     @keyframes slideDown {
         from {
             opacity: 0;
             transform: translateY(-10px);
         }
+
         to {
             opacity: 1;
             transform: translateY(0);
         }
     }
-    
+
     #duplicate-member-alert .btn-outline-warning {
         border-color: #ffc107;
         color: #856404;
     }
-    
+
     #duplicate-member-alert .btn-outline-warning:hover {
         background-color: #ffc107;
         border-color: #ffc107;
         color: #212529;
     }
-    
+
     @media (max-width: 768px) {
         .table-responsive {
             font-size: 0.875rem;
         }
-        
+
         .card-body {
             padding: 1rem;
         }
-        
+
         .btn-group .btn {
             padding: 0.25rem 0.5rem;
             font-size: 0.75rem;
@@ -361,38 +388,100 @@ if (isset($_GET['date']) && !empty($_GET['date'])) {
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-<?php if(Yii::$app->session->hasFlash('success')): ?>
-<script>
-Swal.fire({
-    title: "สำเร็จ!",
-    text: "บันทึกการซื้อน้ำยางเรียบร้อยแล้ว",
-    icon: "success",
-    confirmButtonColor: "#28a745",
-    timer: 3000,
-    timerProgressBar: true
-});
-</script>
+<?php if (Yii::$app->session->hasFlash('success')): ?>
+    <script>
+        Swal.fire({
+            title: "สำเร็จ!",
+            text: "บันทึกการซื้อน้ำยางเรียบร้อยแล้ว",
+            icon: "success",
+            confirmButtonColor: "#28a745",
+            timer: 3000,
+            timerProgressBar: true
+        });
+    </script>
 <?php endif; ?>
 
-<?php if(Yii::$app->session->hasFlash('delete')): ?>
-<script>
-Swal.fire({
-    title: "สำเร็จ!",
-    text: "ลบรายการเรียบร้อยแล้ว",
-    icon: "success",
-    confirmButtonColor: "#28a745",
-    timer: 3000,
-    timerProgressBar: true
-});
-</script>
+<?php if (Yii::$app->session->hasFlash('delete')): ?>
+    <script>
+        Swal.fire({
+            title: "สำเร็จ!",
+            text: "ลบรายการเรียบร้อยแล้ว",
+            icon: "success",
+            confirmButtonColor: "#28a745",
+            timer: 3000,
+            timerProgressBar: true
+        });
+    </script>
 <?php endif; ?>
 
 <script>
-// Initialize tooltips
-document.addEventListener('DOMContentLoaded', function() {
-    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
-        return new bootstrap.Tooltip(tooltipTriggerEl);
+    document.addEventListener('DOMContentLoaded', function () {
+        // Initialize tooltips
+        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+        var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl);
+        });
+
+        // Update all prices logic
+        document.getElementById('btn-update-all-prices')?.addEventListener('click', function () {
+            const currentDate = '<?= $date ?>';
+
+            Swal.fire({
+                title: 'เปลี่ยนราคาทั้งหมด',
+                text: 'กรุณาระบุราคาต่อกิโลกรัมที่จะปรับปรุงทุกรายการของวันที่ ' + '<?= Yii::$app->helpers->DateThai($date) ?>',
+                input: 'number',
+                inputAttributes: {
+                    step: '0.01',
+                    min: '0'
+                },
+                showCancelButton: true,
+                confirmButtonText: 'ตกลง',
+                cancelButtonText: 'ยกเลิก',
+                confirmButtonColor: '#ffc107',
+                cancelButtonColor: '#6c757d',
+                showLoaderOnConfirm: true,
+                preConfirm: (price) => {
+                    if (!price || price <= 0) {
+                        Swal.showValidationMessage('กรุณาระบุราคาที่ถูกต้อง');
+                        return false;
+                    }
+                    return fetch('<?= \yii\helpers\Url::to(['update-all-prices']) ?>', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-Token': '<?= Yii::$app->request->csrfToken ?>'
+                        },
+                        body: JSON.stringify({
+                            date: currentDate,
+                            price: price
+                        })
+                    })
+                        .then(response => {
+                            if (!response.ok) {
+                                throw new Error(response.statusText);
+                            }
+                            return response.json();
+                        })
+                        .catch(error => {
+                            Swal.showValidationMessage(`Request failed: ${error}`);
+                        });
+                },
+                allowOutsideClick: () => !Swal.isLoading()
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    if (result.value.success) {
+                        Swal.fire({
+                            title: 'สำเร็จ!',
+                            text: result.value.message,
+                            icon: 'success'
+                        }).then(() => {
+                            location.reload();
+                        });
+                    } else {
+                        Swal.fire('ข้อผิดพลาด', result.value.message, 'error');
+                    }
+                }
+            });
+        });
     });
-});
 </script>
