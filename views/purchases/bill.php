@@ -234,7 +234,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
     <div class="card search-card mb-4 no-print">
         <div class="card-body">
-            <h5><i class="bi bi-funnel-fill me-2"></i> ค้นหาใบเสร็จ</h5>
+            <h5><i class="bi bi-funnel-fill mr-2"></i> ค้นหาใบเสร็จ</h5>
 
             <?php $form = ActiveForm::begin(['method' => 'get', 'action' => ['purchases/bill']]); ?>
             <div class="row g-3 align-items-end">
@@ -255,7 +255,7 @@ $this->params['breadcrumbs'][] = $this->title;
                     <?= Html::textInput('memberid', $memberId, ['class' => 'form-control', 'placeholder' => 'กรอกรหัสสมาชิก']) ?>
                 </div>
                 <div class="col-md-2">
-                    <?= Html::submitButton('<i class="bi bi-search me-2"></i>ค้นหา', ['class' => 'btn btn-search w-100']) ?>
+                    <?= Html::submitButton('<i class="bi bi-search mr-2"></i>ค้นหา', ['class' => 'btn btn-search w-100']) ?>
                 </div>
             </div>
             <?php ActiveForm::end(); ?>
@@ -274,8 +274,8 @@ $this->params['breadcrumbs'][] = $this->title;
         </div>
 
         <div class="d-flex justify-content-between align-items-center mb-4">
-            <h5 class="mb-0"><i class="bi bi-list-ul me-2"></i>รายการใบเสร็จ</h5>
-            <?= Html::a('<i class="bi bi-printer-fill me-2"></i>พิมพ์ทั้งหมด', [
+            <h5 class="mb-0"><i class="bi bi-list-ul mr-2"></i>รายการใบเสร็จ</h5>
+            <?= Html::a('<i class="bi bi-printer-fill mr-2"></i>พิมพ์ทั้งหมด', [
                 'purchases/print-all-bills',
                 'filter_date' => $filterDate,
                 'book_no' => $bookNo,
@@ -289,11 +289,11 @@ $this->params['breadcrumbs'][] = $this->title;
                 <table class="table table-hover mb-0">
                     <thead>
                         <tr>
-                            <th><i class="bi bi-calendar-date me-2"></i>วันที่</th>
-                            <th><i class="bi bi-journal-bookmark me-2"></i>เล่ม/เลขที่</th>
-                            <th><i class="bi bi-person-fill me-2"></i>ชื่อสมาชิก</th>
-                            <th class="text-end"><i class="bi bi-currency-dollar me-2"></i>จำนวนเงิน</th>
-                            <th class="text-center no-print"><i class="bi bi-gear me-2"></i>จัดการ</th>
+                            <th><i class="bi bi-calendar-date mr-2"></i>วันที่</th>
+                            <th><i class="bi bi-journal-bookmark mr-2"></i>เล่ม/เลขที่</th>
+                            <th><i class="bi bi-person-fill mr-2"></i>ชื่อสมาชิก</th>
+                            <th class="text-end"><i class="bi bi-currency-dollar mr-2"></i>จำนวนเงิน</th>
+                            <th class="text-center no-print"><i class="bi bi-gear mr-2"></i>จัดการ</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -309,7 +309,7 @@ $this->params['breadcrumbs'][] = $this->title;
                             <tr>
                                 <td>
                                     <div class="d-flex align-items-center">
-                                        <i class="bi bi-calendar3 text-primary me-2"></i>
+                                        <i class="bi bi-calendar3 text-primary mr-2"></i>
                                         <span><?= Yii::$app->helpers->dateThai($receipt->receipt_date) ?></span>
                                     </div>
                                 </td>
@@ -330,11 +330,18 @@ $this->params['breadcrumbs'][] = $this->title;
                                     </span>
                                 </td>
                                 <td class="text-center no-print">
-                                    <?= Html::a('<i class="bi bi-printer me-1"></i>พิมพ์', ['purchases/print-bill', 'id' => $receipt->id], [
-                                        'class' => 'btn btn-print btn-sm',
-                                        'target' => '_blank',
-                                        'title' => 'พิมพ์ใบเสร็จ'
-                                    ]) ?>
+                                    <div class="btn-group">
+                                        <?= Html::a('<i class="bi bi-printer mr-1"></i>พิมพ์', ['purchases/print-bill', 'id' => $receipt->id], [
+                                            'class' => 'btn btn-print btn-sm',
+                                            'target' => '_blank',
+                                            'title' => 'พิมพ์ใบเสร็จ'
+                                        ]) ?>
+                                        <button type="button" class="btn btn-warning btn-sm btn-manage-items" 
+                                                data-id="<?= $receipt->id ?>" 
+                                                data-no="<?= $receipt->receipt_no ?>">
+                                            <i class="bi bi-pencil-square"></i> จัดการรายการ
+                                        </button>
+                                    </div>
                                 </td>
                             </tr>
                         <?php endforeach; ?>
@@ -344,11 +351,12 @@ $this->params['breadcrumbs'][] = $this->title;
         </div>
     <?php else: ?>
         <div class="alert alert-warning-custom alert-custom text-center">
-            <i class="bi bi-exclamation-triangle-fill me-2" style="font-size: 1.5rem;"></i>
+            <i class="bi bi-exclamation-triangle-fill mr-2" style="font-size: 1.5rem;"></i>
             <h5 class="mb-2">ไม่พบใบเสร็จ</h5>
             <p class="mb-0">ไม่พบใบเสร็จตามเงื่อนไขที่เลือก กรุณาปรับเงื่อนไขการค้นหาใหม่</p>
         </div>
     <?php endif; ?>
+</div>
 
 </div>
 
@@ -378,12 +386,28 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
+    // จัดการการคลิกปุ่ม "จัดการรายการ"
+    document.querySelectorAll('.btn-manage-items').forEach(button => {
+        button.addEventListener('click', function() {
+            const receiptId = this.getAttribute('data-id');
+            const url = '<?= Url::to(['purchases/manage-receipt-items']) ?>?id=' + receiptId;
+            
+            // เปิดหน้าต่าง popup
+            const width = 1000;
+            const height = 700;
+            const left = (screen.width - width) / 2;
+            const top = (screen.height - height) / 2;
+            
+            window.open(url, 'ManageItems', `width=${width},height=${height},top=${top},left=${left},resizable=yes,scrollbars=yes,status=yes`);
+        });
+    });
+
     // เพิ่ม loading effect เมื่อคลิกปุ่มพิมพ์
     const printButtons = document.querySelectorAll('.btn-print, .btn-print-all');
     printButtons.forEach(button => {
         button.addEventListener('click', function() {
             const originalText = this.innerHTML;
-            this.innerHTML = '<i class="bi bi-hourglass-split me-1"></i>กำลังเตรียม...';
+            this.innerHTML = '<i class="bi bi-hourglass-split mr-1"></i>กำลังเตรียม...';
             this.disabled = true;
             
             setTimeout(() => {

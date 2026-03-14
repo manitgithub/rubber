@@ -7,6 +7,7 @@ use yii\data\ActiveDataProvider;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
+use app\models\Receipt;
 use Yii;
 
 /**
@@ -453,14 +454,17 @@ class PurchasesController extends Controller
 
         $transaction = Yii::$app->db->beginTransaction();
         try {
-            Yii::$app->db->createCommand()
-                ->update('purchases', [
-                    'price_per_kg' => $newPrice,
-                    'total_amount' => new \yii\db\Expression('dry_weight * :price', [':price' => $newPrice])
-                ], [
-                    'date' => $date,
-                    'flagdel' => 0
-                ])->execute();
+            $purchases = Purchases::find()
+                ->where(['date' => $date, 'flagdel' => 0])
+                ->all();
+
+            foreach ($purchases as $purchase) {
+                $purchase->price_per_kg = $newPrice;
+                $purchase->total_amount = $purchase->dry_weight * $newPrice;
+                if (!$purchase->save(false)) {
+                    throw new \Exception('ไม่สามารถบันทึกข้อมูลได้');
+                }
+            }
 
             $transaction->commit();
             return ['success' => true, 'message' => 'ปรับราคาทั้งหมดเรียบร้อยแล้ว'];
@@ -510,6 +514,126 @@ class PurchasesController extends Controller
         return ['exists' => false];
     }
 
+
+    public function actionGetReceiptItems($id)
+    {
+        Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+        $receipt = Receipt::findOne($id);
+        if (!$receipt) {
+            return ['success' => false, 'message' => 'ไม่พบใบเสร็จ'];
+        }
+
+        $items = [];
+        foreach ($receipt->purchases as $p) {
+            $items[] = [
+                'id' => $p->id,
+                'date' => Yii::$app->helpers->dateThai($p->date),
+                'receipt_number' => $p->receipt_number,
+                'weight' => $p->weight,
+                'dry_weight' => $p->dry_weight,
+                'total_amount' => $p->total_amount,
+            ];
+        }
+
+        // ดึงใบเสร็จอื่นๆ ของสมาชิกคนนี้ เพื่อเป็นตัวเลือกในการย้าย
+        $otherReceipts = Receipt::find()
+            ->where(['member_id' => $receipt->member_id])
+            ->andWhere(['!=', 'id', $id])
+            ->orderBy(['receipt_date' => SORT_DESC, 'running_no' => SORT_DESC])
+            ->all();
+
+        $receiptOptions = [];
+        foreach ($otherReceipts as $r) {
+            $receiptOptions[] = [
+                'id' => $r->id,
+                'receipt_no' => $r->receipt_no,
+                'date' => Yii::$app->helpers->dateThai($r->receipt_date),
+            ];
+        }
+
+        return [
+            'success' => true,
+            'items' => $items,
+            'receiptOptions' => $receiptOptions,
+            'member_name' => $receipt->member->fullname ?? 'Unknown'
+        ];
+    }
+
+    public function actionMovePurchase()
+    {
+        Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+        $purchaseId = Yii::$app->request->post('purchase_id');
+        $targetReceiptId = Yii::$app->request->post('target_receipt_id');
+
+        if (!$purchaseId || !$targetReceiptId) {
+            return ['success' => false, 'message' => 'ข้อมูลไม่ครบถ้วน'];
+        }
+
+        $purchase = Purchases::findOne($purchaseId);
+        $targetReceipt = Receipt::findOne($targetReceiptId);
+
+        if (!$purchase || !$targetReceipt) {
+            return ['success' => false, 'message' => 'ไม่พบข้อมูลรายการหรือใบเสร็จปลายทาง'];
+        }
+
+        $sourceReceiptId = $purchase->receipt_id;
+        $sourceReceipt = Receipt::findOne($sourceReceiptId);
+
+        $transaction = Yii::$app->db->beginTransaction();
+        try {
+            // ย้ายรายการ และปรับ Member ID ให้ตรงกับใบเสร็จปลายทาง
+            $purchase->receipt_id = $targetReceiptId;
+            $purchase->member_id = $targetReceipt->member_id;
+            if (!$purchase->save(false)) {
+                throw new \Exception('ไม่สามารถย้ายรายการได้');
+            }
+
+            // คำนวณยอดรวมใหม่ของใบเสร็จต้นทาง
+            if ($sourceReceipt) {
+                $sourceTotal = Purchases::find()
+                    ->where(['receipt_id' => $sourceReceiptId])
+                    ->andWhere(['!=', 'flagdel', 1])
+                    ->sum('total_amount') ?? 0;
+                $sourceReceipt->total_amount = $sourceTotal;
+                $sourceReceipt->save(false);
+            }
+
+            // คำนวณยอดรวมใหม่ของใบเสร็จปลายทาง
+            $targetTotal = Purchases::find()
+                ->where(['receipt_id' => $targetReceiptId])
+                ->andWhere(['!=', 'flagdel', 1])
+                ->sum('total_amount') ?? 0;
+            $targetReceipt->total_amount = $targetTotal;
+            $targetReceipt->save(false);
+
+            $transaction->commit();
+            return ['success' => true, 'message' => 'ย้ายรายการเรียบร้อยแล้ว'];
+        } catch (\Exception $e) {
+            $transaction->rollBack();
+            return ['success' => false, 'message' => $e->getMessage()];
+        }
+    }
+
+    public function actionManageReceiptItems($id)
+    {
+        $this->layout = 'blank';
+        $receipt = Receipt::findOne($id);
+        if (!$receipt) {
+            throw new \yii\web\NotFoundHttpException('ไม่พบใบเสร็จ');
+        }
+
+        // ดึงใบเสร็จอื่นๆ ในวันเดียวกัน (รวมของคนอื่นด้วย)
+        $otherReceipts = Receipt::find()
+            ->where(['receipt_date' => $receipt->receipt_date])
+            ->andWhere(['!=', 'id', $id])
+            ->orderBy(['running_no' => SORT_DESC])
+            ->all();
+
+        return $this->render('manage-items', [
+            'receipt' => $receipt,
+            'otherReceipts' => $otherReceipts,
+        ]);
+    }
 
 }
 

@@ -347,4 +347,31 @@ class ReportController extends Controller
         ]);
     }
 
+    public function actionPurchaseLog()
+    {
+        $request = Yii::$app->request;
+        $sdate = $request->get('sdate', date('Y-m-d'));
+        $edate = $request->get('edate', date('Y-m-d'));
+
+        $query = \app\models\Purchases::find()
+            ->joinWith('members')
+            ->where(['between', 'purchases.date', $sdate, $edate])
+            ->andWhere(['purchases.flagdel' => 0]);
+
+        // Sorting is handled by DataTables on the client side for this implementation
+        // but we provide a sensible default order here.
+        $query->orderBy([
+            'purchases.date' => SORT_DESC,
+            'members.memberid' => SORT_ASC
+        ]);
+
+        $purchases = $query->all();
+
+        return $this->render('purchase-log', [
+            'purchases' => $purchases,
+            'sdate' => $sdate,
+            'edate' => $edate,
+        ]);
+    }
+
 }

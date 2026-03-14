@@ -128,6 +128,7 @@ $isHomeActive = $currentController === 'site' && $currentAction === 'index';
   <a href="<?= Url::to(['purchases/create']) ?>" class="<?= $isPurchasesActive ? 'active' : '' ?>"><i class="fas fa-shopping-cart"></i> รับซื้อน้ำยาง</a>
   <a href="<?= Url::to(['members/index']) ?>" class="<?= $isMembersActive ? 'active' : '' ?>"><i class="fas fa-users"></i> สมาชิก</a>
   <a href="<?= Url::to(['prices/create']) ?>" class="<?= $isPricesActive ? 'active' : '' ?>"><i class="fas fa-tags"></i> ราคาน้ำยาง</a>
+  <a href="<?= Url::to(['report/purchase-log']) ?>" class="<?= $currentAction === 'purchase-log' ? 'active' : '' ?>"><i class="fas fa-book-open"></i> สมุดรับซื้อ</a>
   <a href="<?= Url::to(['report/index']) ?>" class="<?= $isReportsActive ? 'active' : '' ?>"><i class="fas fa-chart-line"></i> รายงาน</a>
   <a href="<?= Url::to(['purchases/payment']) ?>" class="<?= $isPaymentActive ? 'active' : '' ?>"><i class="fas fa-list"></i> รันเลขใบเสร็จทั้งหมด</a>
   <a href="<?= Url::to(['purchases/bill']) ?>" class="<?= $isBillActive ? 'active' : '' ?>"><i class="fas fa-money-bill-wave"></i> ใบเสร็จ</a>
