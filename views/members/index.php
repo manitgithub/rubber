@@ -334,7 +334,7 @@ $(document).ready(function() {
             }
         ],
         order: [[0, 'asc']],
-        pageLength: 25,
+        pageLength: -1,
         lengthMenu: [[10, 25, 50, 100, -1], [10, 25, 50, 100, "ทั้งหมด"]],
         columnDefs: [
             {

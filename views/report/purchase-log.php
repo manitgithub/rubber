@@ -134,6 +134,8 @@ foreach ($purchases as $p) {
                             <th>วันที่</th>
                             <th>รหัสสมาชิก</th>
                             <th>ชื่อ-นามสกุล</th>
+                            <th>เบอร์โทร</th>
+                            <th>ที่อยู่</th>
                             <th class="text-end">น้ำหนัก</th>
                             <th class="text-end">%DRC</th>
                             <th class="text-end">น้ำหนักแห้ง</th>
@@ -157,7 +159,7 @@ foreach ($purchases as $p) {
                                     echo '<tr class="table-info fw-bold subtotal-row">';
                                     echo '<td data-order="' . Html::encode($currentDate) . '">' . Yii::$app->formatter->asDate($currentDate, 'dd/MM/yyyy') . '</td>';
                                     echo '<td data-order="ZZZ"></td>';
-                                    echo '<td class="text-end">รวมวันที่ ' . Yii::$app->formatter->asDate($currentDate, 'dd/MM/yyyy') . ' (' . $dayCount . ' รายการ)</td>';
+                                    echo '<td colspan="3" class="text-end">รวมวันที่ ' . Yii::$app->formatter->asDate($currentDate, 'dd/MM/yyyy') . ' (' . $dayCount . ' รายการ)</td>';
                                     echo '<td class="text-end">' . number_format($dayTotalWeight, 2) . '</td>';
                                     echo '<td></td>';
                                     echo '<td class="text-end">' . number_format($dayTotalDryWeight, 2) . '</td>';
@@ -175,10 +177,9 @@ foreach ($purchases as $p) {
                                 // Output HEADER for the NEW date
                                 echo '<tr class="table-dark group-header-row">';
                                 echo '<td data-order="' . Html::encode($p->date) . '">' . Yii::$app->formatter->asDate($p->date, 'dd/MM/yyyy') . '</td>';
-                                echo '<td data-order="000" colspan="2"><strong>รายการรับซื้อ ประจำวันที่ ' . Yii::$app->formatter->asDate($p->date, 'dd/MM/yyyy') . '</strong></td>';
-                                // DataTables needs 8 cells even with colspan in previous cell if we want to avoid warnings easily, 
-                                // but we skip those with empty tds or hidden? Better to be explicit for DT.
-                                echo '<td style="display:none"></td>'; 
+                                echo '<td data-order="000" colspan="4"><strong>รายการรับซื้อ ประจำวันที่ ' . Yii::$app->formatter->asDate($p->date, 'dd/MM/yyyy') . '</strong></td>';
+                                // DataTables needs 10 cells even with colspan in previous cell if we want to avoid warnings easily
+                                echo '<td style="display:none"></td><td style="display:none"></td>'; 
                                 echo '<td></td><td></td><td></td><td></td><td></td>';
                                 echo '</tr>';
                             }
@@ -188,11 +189,21 @@ foreach ($purchases as $p) {
                             $dayTotalDryWeight += $p->dry_weight;
                             $dayTotalAmount += $p->total_amount;
                             $dayCount++;
+
+                            $address = $p->members ? trim(implode(' ', array_filter([
+                                $p->members->homenum,
+                                $p->members->moo ? 'ม.' . $p->members->moo : '',
+                                $p->members->tumbon,
+                                $p->members->amper,
+                                $p->members->chawat
+                            ]))) : '-';
                         ?>
                             <tr class="data-row">
                                 <td data-order="<?= Html::encode($p->date) ?>"><?= Yii::$app->formatter->asDate($p->date, 'dd/MM/yyyy') ?></td>
                                 <td><strong><?= Html::encode($p->members->memberid ?? '-') ?></strong></td>
                                 <td><?= Html::encode(($p->members->pername ?? '') . ' ' . ($p->members->name ?? '') . ' ' . ($p->members->surname ?? '')) ?></td>
+                                <td><?= Html::encode($p->members->phone ?? '-') ?></td>
+                                <td><small><?= Html::encode($address) ?></small></td>
                                 <td class="text-end"><?= number_format($p->weight, 2) ?></td>
                                 <td class="text-end"><?= number_format($p->percentage, 2) ?></td>
                                 <td class="text-end"><?= number_format($p->dry_weight, 2) ?></td>
@@ -207,7 +218,7 @@ foreach ($purchases as $p) {
                             echo '<tr class="table-info fw-bold subtotal-row">';
                             echo '<td data-order="' . Html::encode($currentDate) . '">' . Yii::$app->formatter->asDate($currentDate, 'dd/MM/yyyy') . '</td>';
                             echo '<td data-order="ZZZ"></td>';
-                            echo '<td class="text-end">รวมวันที่ ' . Yii::$app->formatter->asDate($currentDate, 'dd/MM/yyyy') . ' (' . $dayCount . ' รายการ)</td>';
+                            echo '<td colspan="3" class="text-end">รวมวันที่ ' . Yii::$app->formatter->asDate($currentDate, 'dd/MM/yyyy') . ' (' . $dayCount . ' รายการ)</td>';
                             echo '<td class="text-end">' . number_format($dayTotalWeight, 2) . '</td>';
                             echo '<td></td>';
                             echo '<td class="text-end">' . number_format($dayTotalDryWeight, 2) . '</td>';
